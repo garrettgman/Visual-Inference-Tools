@@ -26,8 +26,8 @@ bootstrapGetDiffFun = function(){
 }
 
 boostrapRoundDf = function(x.df){
-  digit = bootstrapGetDataDigit()
-  initArgsBootstrapRoundData(x.df,digit)
+  digit = bootstrapGetDataDigit() # sigh: digit = bootstrapGetCurrentGrob()$digit
+  initArgsBootstrapRoundData(x.df,digit) #?
 }
 
 bootstrapGetRedrawGroup = function(tab, i){
@@ -49,19 +49,21 @@ bootstrapClearTable = function(){
 bootstrapFinalise = function(){
   Sys.sleep(2)
   gb = bootstrapGetCurrentGrob()
-  gb = editGrob(gb,gPath("bstrapBoxDot"),show.pts=FALSE,show.box=FALSE,show.w=FALSE)
+  gb = editGrob(gb,gPath("bstrapBoxDot"),show.pts=FALSE,show.box=FALSE,show.w=FALSE) # removes points, box, and w - but a blue line showed up. Does it make the ghost box? Is the ghost box always there?
   grid.newpage()
   grid.draw(gb)
 }
 # remove ghost boxes, bstrpvp and bootstrap distribution
 bootstrapRefresh = function(){
   gb = bootstrapGetCurrentGrob()
-  gb$tab = list()
-  gb = editGrob(gb,gPath("ghostBox"),tab=list())
+  gb$tab = list() # makes table an empty list
+  gb = editGrob(gb,gPath("ghostBox"),tab=list()) # ghostbox's tab slot to empty list?
+  # hides box points and whiskers
   gb = editGrob(gb,gPath("bstrapBoxDot"), show.pts=FALSE,show.box=FALSE,show.w=FALSE)
+  # hides "bdist" - top distribution?
   gb = editGrob(gb,"bdist",show=FALSE)
-  grid.newpage()
-  grid.draw(gb)
+  grid.newpage() # erases everything/opens a new device
+  grid.draw(gb) # redraws the page without the bootstrap information
 }
 
 bootstrapSimulation = function(x, n){
@@ -79,40 +81,41 @@ bootstrapSimulation = function(x, n){
   list(est=est, tab=tab)
 }
 
+# draw a new bootstrap
 bootstrapUpdateBox = function(index,id){
-  gb      = bootstrapGetCurrentGrob()
-  data.df = gb$data
-  x.bt    = as.data.frame(data.df[index,])
-  names(x.bt)=names(data.df)
-  x.bt.str= boostrapRoundDf(x.bt)
+  gb      = bootstrapGetCurrentGrob() # grab the screen
+  data.df = gb$data # extract the data
+  x.bt    = as.data.frame(data.df[index,]) # grab the sample of the data to be plotted
+  names(x.bt)=names(data.df) # grab the names used for the data
+  x.bt.str= boostrapRoundDf(x.bt) # seems to round each value to 3 signficant digits
   
-  label   = as.vector(t(as.matrix(x.bt.str)))
+  label   = as.vector(t(as.matrix(x.bt.str))) # captures data vaues as a character vector
 
   #update tab
   if(length(gb$tab)==0)
     gb$tab = list(index)
   else{ 
-    gb$tab[[length(gb$tab)+1]]=index
+    gb$tab[[length(gb$tab)+1]]=index # appends index to end of table
   }
 
-  gb = editGrob(gb,gPath("ghostBox"),tab=gb$tab)
-  gb = editGrob(gb,gPath("bootstraptable","mainTxt"),label=paste("Resampling #",id,sep=""))
-  gb = editGrob(gb,gPath("bootstraptable","dataTxt"),label=label)
-  gb = editGrob(gb, "bstrapBoxDot", x=x.bt[,1])
+  gb = editGrob(gb,gPath("ghostBox"),tab=gb$tab) # make the tab of the ghost box equal the tab of gb
+  gb = editGrob(gb,gPath("bootstraptable","mainTxt"),label=paste("Resampling #",id,sep="")) # change title of sample table
+  gb = editGrob(gb,gPath("bootstraptable","dataTxt"),label=label) # fill the data values into the sample table
+  gb = editGrob(gb, "bstrapBoxDot", x=x.bt[,1]) # replace bootstrap x dots with new locations
   
   mgb = NULL
-  if(identical(bootstrapGetDiffFun(), mean)){
-    gb = editGrob(gb, "bstrapBoxDot", show.pts=TRUE, show.w=FALSE)
-    center =  mean(x.bt)
+  if(identical(bootstrapGetDiffFun(), mean)){ # if mean is selected
+    gb = editGrob(gb, "bstrapBoxDot", show.pts=TRUE, show.w=FALSE) # show the points, but not the w
+    center =  mean(x.bt) # calculate mean
     mgb = meanBarGrob(xat=unit(center,"native"),yat=unit(0.5,"npc"),len=unit(0.3,"npc"),
-                      name="meanBar",gp=gpar(lwd=4),vp=vpPath("bootstrap","bstrapvp"))
+                      name="meanBar",gp=gpar(lwd=4),vp=vpPath("bootstrap","bstrapvp")) # creates the mean bar
   }
-  else{
-    gb = editGrob(gb, "bstrapBoxDot", show.pts=TRUE,show.box=TRUE,show.w=TRUE)
+  else{ # if median is selected
+    gb = editGrob(gb, "bstrapBoxDot", show.pts=TRUE,show.box=TRUE,show.w=TRUE) # what does w mean?
   }
 
-  grid.newpage()
-  grid.draw(gList(gb,mgb))
+  grid.newpage() # clear and then draw...
+  grid.draw(gList(gb,mgb)) # gb and mgb
 }
 
 bootstrapShowPointer = function(pointer,index,i){

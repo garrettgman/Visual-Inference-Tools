@@ -6,6 +6,8 @@
 ##############################################################################
 
 onesampBootGUI = function(){
+	
+  # first we make a constructor for an environment with specific slots	
   initEnv = function(){
     e             = new.env()
     e$pause       = FALSE
@@ -23,17 +25,23 @@ onesampBootGUI = function(){
     e
   }
   
-  setEnvData = function(x.df){
+  # A function that places the specified dataframe in bpEnv's data slot 
+  setEnvData = function(x.df){  	
+  	#bpEnv is an environment we create with initEnv
     bpEnv$x.df   = x.df
   }
   
+  # adds a bootstrapped sample to the environment  
   simuEnv = function(){
+  	# creates a bootstrapped sample of the same length as x
     sim           = bootstrapSimulation(bpEnv$x.df[,1], bpEnv$n)
     bpEnv$curr.n  = 1
+    # saves ambiguously labelled info related to the bootstrap
     bpEnv$est     = sim$est
     bpEnv$redraw  = sim$tab
   }
   
+  # advances environment's curr.n by 1 until it gets to 1000. Then it starts over at 1.
   updateEnvCurrN = function(){
     if(bpEnv$curr.n < bpEnv$n)
       bpEnv$curr.n = bpEnv$curr.n + 1
@@ -42,35 +50,47 @@ onesampBootGUI = function(){
     }
   }  
   
+  # makes a display with both the original data and a bootstrapped sample?
   initDev = function(){
+  	# if bpEnv has data, close all open devices
     if(!is.null(bpEnv$x.df)){
       graphics.off()
+      
+    # opens window  
       # won't fit the 13" screen
       # should use (11,7)
       x11(width=10, height=8)
-      vname = names(bpEnv$x.df)[1]
+      vname = names(bpEnv$x.df)[1] # variable names
+      
+      # turns the arguments into a bootstrap grob and then draws it
       grid.bootstrap(bpEnv$x.df, vname=vname,
                    diffFun=get(svalue(diffFun.radio)),
                    main=bpEnv$filename,
                    name="bootstrapMovie")
       
-      disableButtons()
-      svalue(status) = "Loading..."
-      simuEnv()
-      svalue(status) = "Finished"
-      grid.newpage()
+      disableButtons() # prevents user manipulations until done
+      svalue(status) = "Loading..." # updates value of status
+      simuEnv() # adds a new bootstrapped sample to the environment
+      svalue(status) = "Finished" # updates value of status
+      grid.newpage() # clears the graphics screen
+      
+      # plots the new bootsrtapped data
       grid.bootstrap(bpEnv$x.df, x.sim=bpEnv$est,vname=vname,
                    diffFun=get(svalue(diffFun.radio)),
                    main=bpEnv$filename,
                    name="bootstrapMovie")
+                   
       bpEnv$isShow = TRUE
-      enableButtons()
-      enabled(point.but)=FALSE
+      enableButtons() # user can resume input
+      
+      enabled(point.but)=FALSE # point.but no longer greyed out
     } else {
       dialog("No data", "Warning")
     }
     return()
   }
+  
+  # opens a file choose window and reads the data into the environment
   handlerReadData = function(h, ...){
     disableButtons()
     path = gfile("Select a csv file...",
@@ -98,14 +118,18 @@ onesampBootGUI = function(){
     }
   }
   
+  # Opens the initial device
   handlerShowData = function(h, ...){
     initDev()
     return()
   }
+  
+   
   showWarning = function(){
-    dialog("Animation still runing...", "Warnning")
+    dialog("Animation still runing...", "Warning")
   }
     
+  # greys out all of the buttons and makes them unresponsive
   disableButtons = function(){
     enabled(read.data.but) = FALSE
     enabled(show.data.but) = FALSE
@@ -115,6 +139,7 @@ onesampBootGUI = function(){
     enabled(point.but)     = FALSE
   }
   
+  # makes buttons responsive again
   enableButtons = function(){
     enabled(read.data.but) = TRUE
     enabled(show.data.but) = TRUE
@@ -123,10 +148,13 @@ onesampBootGUI = function(){
     enabled(diffFun.radio) = TRUE
   }
   
+  # creates a pause... how?
   pause = function(){
-    while(bpEnv$pause){
+    while(bpEnv$pause){ # if pause is true, it cycles until... stopped from the outside?
     }  
   }  
+  
+  # if data is loaded, it opens initial plot. If not, it disables buttons
   handlerDiffFun = function(h, ...){
     if(!is.null(bpEnv$x.df)){
       handlerShowData()
@@ -143,17 +171,24 @@ onesampBootGUI = function(){
     enabled(point.but) = FALSE
   }
   
+  
+  # create the bootstraps when a user clicks among the top four buttons
   handlerRedraw = function(h, ...){
+  	
+  	# disables everything but pause while it runs
     disableButtons()
     enabled(pause.but)  = TRUE
     enabled(show.ci.but)= FALSE
     
+    # if this is the first time, create the initial device
     if(!bpEnv$isShow)
       initDev()
     
+    # change redraw panel to true
     if(!bpEnv$redrawPanel)
       bpEnv$redrawPanel = TRUE
       
+    # if a bootstrap has been previously drawn erase it. But what about the ghostbox?
     if(bpEnv$bootstrapPanel){
       bpEnv$bootstrapPanel = FALSE
       bpEnv$curr.n = 1
@@ -161,30 +196,38 @@ onesampBootGUI = function(){
     }
  
     svalue(status) = "Running..."
-    n.redraw       = svalue(redraw.radio)
-    sel            = svalue(redraw.radio, index=TRUE)   
+    n.redraw       = svalue(redraw.radio) # see how many redraws the user is asking for
+    sel            = svalue(redraw.radio, index=TRUE) # which button was selected (index)
     
-    if(sel != 1)
+    if(sel != 1) # i.e, if not the 1 (all) case
       n.redraw     = as.numeric(n.redraw)
 
+	# the different behaviors for the different buttons
     if(sel==1){
       svalue(status) = paste("Running...1/1")
-      bootstrapRefresh()
-      index = bootstrapGetRedrawGroup(bpEnv$redraw, bpEnv$curr.n)
+      bootstrapRefresh() # clears page, redraws it without a bootstrap
+      
+      # moving text between left hand boxes
+      index = bootstrapGetRedrawGroup(bpEnv$redraw, bpEnv$curr.n) # index tracks which pre-generated group we will plot
       obj   = bootstrapInitMovingTxt(index)
       for(i in 1:length(index)){
         bootstrapMoveTableFromTablevp(obj,index,i)
         pause()
       }
-      bootstrapUpdateBox(index,bpEnv$curr.n)
-      updateEnvCurrN()
-      pause()
-      Sys.sleep(1)
-    } else if(sel==2 || sel==3){
-      for(i in 1:n.redraw){
+      
+      # WHERE BLUE AND RED GET DRAWN. WILL HAVE TO CHANGE THE GROBS THEMSELVES.
+      bootstrapUpdateBox(index,bpEnv$curr.n) # draw the specified group
+      updateEnvCurrN() # advance curr.n by 1
+      pause() # pauses R so nothing happens
+      Sys.sleep(1) # puts R to sleep until a GUI event happens. Checks whether a GUI event happens every 1 milliseconds?
+      
+      # for 1 or 5 redraws without messing with the text boxes
+    } else if(sel==2 || sel==3){ 
+    	
+      for(i in 1:n.redraw){ # for however many times selected
         svalue(status) = paste("Running...", i, "/", n.redraw, sep="")
-        index = bootstrapGetRedrawGroup(bpEnv$redraw, bpEnv$curr.n)      
-        bootstrapUpdateBox(index,bpEnv$curr.n)
+        index = bootstrapGetRedrawGroup(bpEnv$redraw, bpEnv$curr.n) # grab the group to draw     
+        bootstrapUpdateBox(index,bpEnv$curr.n) # plot the new bootstrap data
         updateEnvCurrN()
         pause()
         Sys.sleep(1)
@@ -196,17 +239,22 @@ onesampBootGUI = function(){
         bootstrapUpdateBox(index,bpEnv$curr.n)
         updateEnvCurrN()
         pause()
-        Sys.sleep(0.5)
+        Sys.sleep(0.5) # pauses less between iterations; a little faster
       }
     }    
     svalue(status) = "Finished"
     pause()
-    bootstrapFinalise()
+    
+    # HERE'S WHERE THE BOXPLOT IS REMOVED
+    bootstrapFinalise() # removes boxplot, leaves ghost box
     enableButtons()
     enabled(point.but)  = TRUE
     enabled(pause.but) = FALSE
   }
   
+  
+  
+  # creates the bootstrapped differences when the user clicks among the bottom four buttons  
   handlerBootstrapDiff = function(h, ...){
     disableButtons()
     enabled(pause.but)   = FALSE
@@ -296,6 +344,7 @@ onesampBootGUI = function(){
       enabled(point.but)=TRUE
   }
   
+  # Creates the confidence interval animation
   handlerShowCI = function(h, ...){
     # bootstrapMoveBarFromDatavp()
     x = bootstrapGetCurrentData()
@@ -355,6 +404,7 @@ onesampBootGUI = function(){
     enabled(run2.but)  = TRUE  
   }
 
+  # create an environment, name it bpEnv
   bpEnv = initEnv()
   window = gwindow("bootstrapping", width=100, height=200)
   diffFun.ops   = c("median", "mean")
