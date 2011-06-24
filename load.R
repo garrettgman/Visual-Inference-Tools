@@ -1,5 +1,6 @@
 rm(list = ls())
- 
+X11.options(type = "cairo")
+
 # change the directory here
 # setwd(...)
  
@@ -60,3 +61,5 @@ source("grid/random3/random3Args.R")
 # randomGUI()
 # randomGUI2()
 # randomGUI3()
+
+source("GUI/samplingGUI.R")
