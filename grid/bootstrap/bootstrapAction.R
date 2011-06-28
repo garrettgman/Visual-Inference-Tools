@@ -45,11 +45,12 @@ bootstrapClearTable = function(){
     grid.edit("bootstraptable::dataTxt",label="")
   }
 }
-# remove ghost boxes from bstravp
+# remove bootstrap box, leaves just ghost box behind
 bootstrapFinalise = function(){
   Sys.sleep(2)
   gb = bootstrapGetCurrentGrob()
   gb = editGrob(gb,gPath("bstrapBoxDot"),show.pts=FALSE,show.box=FALSE,show.w=FALSE) # removes points, box, and w - but a blue line showed up. Does it make the ghost box? Is the ghost box always there?
+  # show.w displays the whiskers, but only if show.box is also TRUE
   grid.newpage()
   grid.draw(gb)
 }
@@ -81,7 +82,7 @@ bootstrapSimulation = function(x, n){
   list(est=est, tab=tab)
 }
 
-# draw a new bootstrap
+# draw a new bootstrap. Ghostbox is already included under it
 bootstrapUpdateBox = function(index,id){
   gb      = bootstrapGetCurrentGrob() # grab the screen
   data.df = gb$data # extract the data
@@ -91,7 +92,7 @@ bootstrapUpdateBox = function(index,id){
   
   label   = as.vector(t(as.matrix(x.bt.str))) # captures data vaues as a character vector
 
-  #update tab
+  #add the current sample (index) to the list of all samples (tab)
   if(length(gb$tab)==0)
     gb$tab = list(index)
   else{ 

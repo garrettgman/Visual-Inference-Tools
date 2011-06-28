@@ -38,7 +38,7 @@ onesampBootGUI = function(){
     bpEnv$curr.n  = 1
     # saves ambiguously labelled info related to the bootstrap
     bpEnv$est     = sim$est
-    bpEnv$redraw  = sim$tab
+    bpEnv$redraw  = sim$tab # redraw contains the row numbers for 1000 resamplings of the data
   }
   
   # advances environment's curr.n by 1 until it gets to 1000. Then it starts over at 1.
@@ -184,11 +184,10 @@ onesampBootGUI = function(){
     if(!bpEnv$isShow)
       initDev()
     
-    # change redraw panel to true
+    # controlling which panel we draw in?
     if(!bpEnv$redrawPanel)
       bpEnv$redrawPanel = TRUE
       
-    # if a bootstrap has been previously drawn erase it. But what about the ghostbox?
     if(bpEnv$bootstrapPanel){
       bpEnv$bootstrapPanel = FALSE
       bpEnv$curr.n = 1
@@ -216,7 +215,7 @@ onesampBootGUI = function(){
       }
       
       # WHERE BLUE AND RED GET DRAWN. WILL HAVE TO CHANGE THE GROBS THEMSELVES.
-      bootstrapUpdateBox(index,bpEnv$curr.n) # draw the specified group
+      bootstrapUpdateBox(index,bpEnv$curr.n) # draws the boxplot and points for specified resample group
       updateEnvCurrN() # advance curr.n by 1
       pause() # pauses R so nothing happens
       Sys.sleep(1) # puts R to sleep until a GUI event happens. Checks whether a GUI event happens every 1 milliseconds?
@@ -246,7 +245,7 @@ onesampBootGUI = function(){
     pause()
     
     # HERE'S WHERE THE BOXPLOT IS REMOVED
-    bootstrapFinalise() # removes boxplot, leaves ghost box
+    # bootstrapFinalise() # removes boxplot, leaves ghost box
     enableButtons()
     enabled(point.but)  = TRUE
     enabled(pause.but) = FALSE
@@ -404,9 +403,10 @@ onesampBootGUI = function(){
     enabled(run2.but)  = TRUE  
   }
 
-  # create an environment, name it bpEnv
-  bpEnv = initEnv()
-  window = gwindow("bootstrapping", width=100, height=200)
+  
+  # RUNNING THE GUI STARTS HERE - we just draw everything and define the functions t obe run when each button is pressed. We create a master environment, and each handler function manipulates it in some way.
+  bpEnv = initEnv() # create an environment, name it bpEnv
+  window = gwindow("bootstrapping", width=100, height=200) # window for controls
   diffFun.ops   = c("median", "mean")
   redraw.times  = c("1 (all)",1, 5, 20)
   bootstrap.times  = c("1 (all)", 1, 5, 20, bpEnv$n)

@@ -6,13 +6,15 @@
 ##          : numerical data
 ##############################################################################
 
-
+# draws a bootstrapGrob to the device
 grid.bootstrap = function(...){
   grid.draw(bootstrapGrob(...))
 }
 
+# defining a bootstrap Grob
 bootstrapGrob = function(data, diffFun=median, vname=NULL, x.sim=NULL, main="MyData", digit=3,
                        name=NULL, gp=gpar(), vp=NULL, tab=list()){
+  # converting data to a data frame
   if(is.numeric(data))
     data = data.frame(x=data)
   else if(is.data.frame(data)){
@@ -21,14 +23,34 @@ bootstrapGrob = function(data, diffFun=median, vname=NULL, x.sim=NULL, main="MyD
  
   names(data)=vname
 
-  igt = gTree(data=data, diffFun=diffFun,digit=digit,
-              children=makeBootstrapGrob(data,diffFun,x.sim, main, digit,tab),
-              childrenvp=makeBootstrapViewports(data, diffFun,x.sim),
-              name=name, gp=gp, vp=vp, tab=tab,
-              cl="bootstrap")
+  # The grob is a gTree with these slots:
+  igt = gTree(data=data, # data, which holds the data
+  	diffFun=diffFun, # diffFun which tracks mean or median
+  	digit=digit, # digit which tracks the number of significant digits?
+  	# it has a child grob
+    children=makeBootstrapGrob(data,diffFun,x.sim, main, digit,tab),
+    childrenvp=makeBootstrapViewports(data, diffFun,x.sim),
+    name=name, # identifier for the gTree
+    gp=gp, # user defined graphical parameters
+    vp=vp, # the veiwport the gTree is to be drawn in
+    tab=tab,
+    cl="bootstrap") # it receives its own class
+    
   igt
 }
 
+# makes a list of grobs to populate the bootstrapGrob gTree. This list includes the following types of grobs:
+# tablegrob - a tree of textGrobs that combine to form a box like the type that hold the data on the lefthand side of the GUI
+# boxdotgrob - a tree that draws just the data points and the boxplot
+# ghostgrob - a tree that draws a group of ghostboxes (red and blue versions of boxplot)
+# stackptsgrob - a group of points neatly stacked and arranged
+# it includes the following instances of these types:
+# tabgb - the leftmost table of data
+# btabgb - the next table of sampled data displayed in text form
+# datgb - the boxplot and points of the original data. Drawn at the top of the page
+# ghostgb - the accumulated ghost plots on the second axis down in the GUI
+# rangb - the visible points and boxplot on the second axis down in the GUI
+# distgb -
 makeBootstrapGrob = function(data, diffFun, x.sim, main, digit, tab){
   
   tabgb = datgb = ghostgb = rangb = distgb = NULL
@@ -36,23 +58,28 @@ makeBootstrapGrob = function(data, diffFun, x.sim, main, digit, tab){
   args  = list(data,tab,diffFun, gb="boxdotGrob", 
                gbfmt=initArgsBootstrapGhostBox(data[,1],diffFun), name="ghostBox")
   
+  # default args assume a median diffFun, but we can update them for a mean diffFun
   if(identical(diffFun, mean)){
     args$gb = "meanBarGrob"
     args$gbfmt = initArgsBootstrapGhostBar(data[,1],diffFun)
   }
   
   ## setting table grob at tablevp (col1)
+  # defined in grid/public/grid.table.R
   tabgb = do.call("tableGrob", initArgsBootstrapTable(data, main, digit))
   ## setting table grob at btablevp (col3)
   btabgb = do.call("tableGrob", initArgsBootstrapBootstrapTable(data, main, digit))
   
   ## setting boxdotsDiff grob at datavp (row1)
+  # defined in grid/public/grid.boxdot.R
   datgb = do.call("boxdotGrob", initArgsBootstrapData(data[,1], diffFun))
   
-   ## setting ghost boxeds at bstrapvp (row3)
+  ## setting ghost boxeds at bstrapvp (row3)
+  # defined in grid/public/grid.ghost.R
   ghostgb = do.call("ghostGrob", args)
   
   ## setting boxdotsDiff grob at bstrapvp (row3)
+  # but this appears to be a boxdotGrob. Disregard above?
   rangb = do.call("boxdotGrob", initArgsBootstrapRandom(data[,1], diffFun))
   
   ## setting stackpts grob at distvp (row5)

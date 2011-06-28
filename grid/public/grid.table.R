@@ -9,36 +9,42 @@ grid.table = function(...){
   grid.draw(tableGrob(...))
 }
 
-tableGrob = function(data, varname, main, rc.layout=dim(data),
-                     cex.data=1, cex.varname=1.5, cex.main=2,
-                     col.data="black", col.varname="black", col.main="black",
-                     height.varname=1.5, height.main=1.5,
-                     name=NULL, gp=gpar(), vp=NULL, showTxt=TRUE){
-  ## define table grob
-  ##
-  ## Args:
-  ## rc.layout: row column layout
-  ##
-  ## Returns:
-  ##  grob
+# constructs and defines tableGrobs. TableGrobs are gTrees that construct the vertically oriented data tables on the left side of the GUI. TableGrobs have the following slots
+tableGrob = function(data, # the data to be displayed
+	varname, # the name of the variable being displayed
+	main, # the name of the file being displayed	
+	rc.layout=dim(data), # a vector with number of rows and then number of columns
+    cex.data=1, 
+    cex.varname=1.5, 
+    cex.main=2,
+    col.data="black", 
+    col.varname="black", 
+    col.main="black",
+    height.varname=1.5, 
+    height.main=1.5,
+    name=NULL, # name to identify grob
+    gp=gpar(), # user inputed graphical parameters
+    vp=NULL, # the viewport to draw the grob in
+    showTxt=TRUE){ 
+
   
   data = as.matrix(data)
   igt = gTree(data=data, varname=varname, main=main, rc.layout=rc.layout, 
               cex.data=cex.data, cex.varname=cex.varname, cex.main=cex.main,
               col.data=col.data, col.varname=col.varname, col.main=col.main,
               height.main=height.main, height.varname=height.varname,
-              childrenvp=makeTableViewports(height.main,  height.varname),
+              childrenvp=makeTableViewports(height.main,  height.varname), # the children viewports are arranged in three rows, with mainvp above variablevp above the datavp
               children=makeTableGrob(data, varname, main, rc.layout,
                                      cex.data, cex.varname, cex.main,
-                                     col.data, col.varname, col.main, showTxt),
-              gp=gp, name=name, vp=vp, cl="table")
+                                     col.data, col.varname, col.main, showTxt), # the children of the tableGrob are three textGrobs that draw the relevant pieces of text where we want them in our tables
+              gp=gp, name=name, vp=vp, cl="table") # assigned its own class: table
   igt
 }
 
 makeTableGrob = function(data, varname, main, rc.layout,
                          cex.data, cex.varname, cex.main,
                          col.data, col.varname, col.main, showTxt){                         
-  datagb = varnamegb = maingb = NULL
+  datagb = varnamegb = maingb = NULL # clear names for grobs
   if(class(col.data)=="data.frame")
     col.data = as.matrix(col.data)
   if(class(col.data)=="matrix")
@@ -48,7 +54,7 @@ makeTableGrob = function(data, varname, main, rc.layout,
   else
     idx = showTxt
 
-  label.coord = function(nr, nc){
+  label.coord = function(nr, nc){ # creates pretty breaks for divvying up viewport when drawing text 
     ## unit: npc
     x = seq(0, 1, length.out=nc*2+1)[c(FALSE, TRUE)]
     y = seq(1, 0, length.out=nr*2+1)[c(FALSE, TRUE)]
@@ -63,9 +69,11 @@ makeTableGrob = function(data, varname, main, rc.layout,
     y = coord$y[as.vector(t(row(data)))]
     
     if(length(label[idx])>0){
-      datagb = textGrob(label[idx], x=unit(x, "npc")[idx], y=unit(y, "npc")[idx],
+      # datagb is a textGrob
+      datagb = textGrob(label[idx], # text to draw
+      				  x=unit(x, "npc")[idx], y=unit(y, "npc")[idx],
                       name="dataTxt", gp=gpar(cex=cex.data, col=col.data),
-                      vp=vpPath("tablelay", "datavp"))
+                      vp=vpPath("tablelay", "datavp")) # the childvp to draw datagp in
     }
     else{
       datagb = textGrob(NULL, x=unit(x, "npc"), y=unit(y, "npc"),
@@ -91,6 +99,8 @@ makeTableGrob = function(data, varname, main, rc.layout,
   gList(maingb, varnamegb, datagb)
 }
 
+# Creates vps for tableGrobs children that lays children out one on top of the other
+# takes the height of the main title and the height of the variable name as inputs
 makeTableViewports = function(height.main,  height.varname){
   mylay = grid.layout(3, 1, heights=unit(c(height.main,  height.varname, 1),
                                          c("lines", "lines", "null")))

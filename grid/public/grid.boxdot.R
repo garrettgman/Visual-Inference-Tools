@@ -6,7 +6,7 @@
 ## Note     : not support vertical boxdot yet
 ##############################################################################
 
-grid.boxdot = function(...){
+grid.boxdot = function(...){ # method for drawing the boxdotGrob
   grid.draw(boxdotGrob(...))
 }
 
@@ -30,11 +30,14 @@ boxdotGrob = function(x, at, stack.height, pad.box,
   ##  size.pts      : size of points, a unit object
   ##  show.pts      : show points or not
   ##  show.box      : show box or not
+  #   show.w        : 
   ##  gp.pts        : gpar for points
   ##  gp.box        : gpar for box
   ##
   ## Returns:
   ##  grob            
+  
+  # the boxdotGrob is a gTree whose children are only set when you update it. Its entirely defined by its class, "boxdot", and the class methods
   igt = gTree(x=x, at=at, stack.height=stack.height, pad.box=pad.box,
               width.box=width.box, col.box=col.box, wrange=wrange, horiz=horiz,
               size.pts=size.pts, show.pts=show.pts, show.box=show.box, show.w=show.w,
@@ -44,13 +47,13 @@ boxdotGrob = function(x, at, stack.height, pad.box,
 }
 
 drawDetails.boxdot = function(x, recording){
-  x = setBoxdotGrob(x)
+  x = setBoxdotGrob(x) # add the necessary children to the boxdotGrob
   for (i in childNames(x)){
-    grid.draw(getGrob(x, i))
+    grid.draw(getGrob(x, i)) # draw the children
   }
 }
 
-setBoxdotGrob = function(x){
+setBoxdotGrob = function(x){ # method for replacing or altering a boxdotGrob
   data          = x$x
   at            = x$at
   stack.height  = x$stack.height
@@ -67,16 +70,20 @@ setBoxdotGrob = function(x){
   show.w        = x$show.w
 
   n = length(data)
-  show.pts = rep(show.pts, length.out=n)
-  pgb = NULL
-  boxgb = NULL
+  show.pts = rep(show.pts, length.out=n) # show all of the points, or none of them
+  pgb = NULL # clear name for points in a stackptsGrob
+  boxgb = NULL # clear name for boxplot in a bxpGrob
   
   if(horiz){
-    if(!all(!show.pts)){
+    if(!all(!show.pts)){ # if any point is shown
+    
+      # ...build a stackptsGrob with the points shown
       pgb = stackptsGrob(data[show.pts], size.pts, at, wrange, stack.height,
                          horiz, name="pts", gp=gp.pts)
     }    
-    if(show.box){
+    if(show.box){ # if the box is shown
+    
+      # ...build a bxpGrob
       x5 = fivenum(data)
       pad.box   = convertHeight(pad.box, "inches")
       at.box    = convertY(at+pad.box, "npc")
@@ -85,13 +92,14 @@ setBoxdotGrob = function(x){
                           name="bxp", gp=gp.box)
     }
   } else {
-    stop("verticle plot is not implemented yet")
+    stop("vertical plot is not yet implemented")
   }
   
-  x = setChildren(x, gList(pgb, boxgb))
+  x = setChildren(x, gList(pgb, boxgb)) # make the points and boxplot children of the boxdotGrob
   x
 }
 
+# removes the children of x. Where does spec come in?
 editDetails.boxdot = function(x, spec){
   x = boxdotGrob(x$x, x$at, x$stack.height, x$pad.box, x$width.box, x$col.box,
                  x$wrange, x$horiz, x$size.pts, x$show.pts, x$show.box, x$show.w,
@@ -99,6 +107,7 @@ editDetails.boxdot = function(x, spec){
   x
 }
 
+# method for catching errors in the boxdot arguments
 validDetails.boxdot = function(x){
   if(!is.unit(x$at))
     stop("at must be unit")
