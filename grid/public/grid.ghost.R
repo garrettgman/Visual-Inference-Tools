@@ -33,7 +33,6 @@ setghostGrob = function(x){
   index    = 1
   for(i in tab){ # once for each previous bootstrap
     x.bt        = data[i,] # grab the rows of data in the current sample
-    
     if(ncol(data)>1){
       # two sample case
       if(identical(x$diffFun, median)){
@@ -54,7 +53,7 @@ setghostGrob = function(x){
       }
     }
     gbfmt$name  = paste("ghost #",index,sep="")
-    ghost[[index]] = do.call(x$gb,gbfmt) # each ghost is a x$gb grob, by default that's a boxdotsDiffGrob
+    ghost[[index]] = do.call(x$gb,gbfmt) # each ghost is a x$gb grob, by default that's a boxdotGrob
     index = index + 1
   }
   x = setChildren(x, do.call("gList",ghost))

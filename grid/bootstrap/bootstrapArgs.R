@@ -164,20 +164,23 @@ checkGroupBootstrap = function(x.df, diffFun){
   x.df
 }
 
+# calculates tickmarks for bootstrap
 xatBootstrap = function(data, diffFun, x.sim=NULL){
   x    = data[,1]
-  m    = diffFun(x)
+  m    = diffFun(x) # this works? might want a match.fun:
+  # f <- match.fun(diffFun)
+  # m <- f(x)
 
   xat1 = pretty(range(x), n=9)
-  xat2 = round(xat1-median(xat1)+pretty(m)[1])
+  xat2 = round(xat1-median(xat1)+pretty(m)[1]) 
 
-  if(!is.null(x.sim)){
+  if(!is.null(x.sim)){# is x.sim the sampled data? Its range should never exceed the real data
     rg  = range(xat2)
     rg1 = range(x.sim)
-    if(rg1[1]<rg[1] || rg1[2]>rg[2]){
+    if(rg1[1]<rg[1] || rg1[2]>rg[2]){ # if range of sim exceeds range calculated above
       xat2 = round(xat1-median(xat1)+pretty(mean(x.sim))[1])
     }
   }
-  # temporary setting xat1=xat2
+  # temporary setting xat1=xat2  #????
   list(xat1=xat1, xat2=xat1)
 }

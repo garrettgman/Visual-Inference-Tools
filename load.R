@@ -2,7 +2,7 @@ rm(list = ls())
 X11.options(type = "cairo")
 
 # change the directory here
-# setwd(...)
+setwd("/Users/garrettgrolemund/Documents/git/vit")
  
 ######################################
 # grid objects and useful functions

@@ -63,9 +63,10 @@ onesampBootGUI = function(){
       vname = names(bpEnv$x.df)[1] # variable names
       
       # turns the arguments into a bootstrap grob and then draws it
-      grid.bootstrap(bpEnv$x.df, vname=vname,
+      # why repeat this twice? just because the diffFun is stored in the grob we draw?
+       grid.bootstrap(bpEnv$x.df, vname=vname,
                    diffFun=get(svalue(diffFun.radio)),
-                   main=bpEnv$filename,
+                  main=bpEnv$filename,
                    name="bootstrapMovie")
       
       disableButtons() # prevents user manipulations until done
@@ -74,7 +75,7 @@ onesampBootGUI = function(){
       svalue(status) = "Finished" # updates value of status
       grid.newpage() # clears the graphics screen
       
-      # plots the new bootsrtapped data
+      # plots the new bootstrapped data
       grid.bootstrap(bpEnv$x.df, x.sim=bpEnv$est,vname=vname,
                    diffFun=get(svalue(diffFun.radio)),
                    main=bpEnv$filename,

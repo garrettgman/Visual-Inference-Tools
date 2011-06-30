@@ -10,11 +10,11 @@ grid.meanBar = function(...){
   grid.draw(meanBarGrob(...))
 }
 
-meanBarGrob = function(xat,yat,len,pad=0.2,horiz=FALSE,show=TRUE,name=NULL,gp=gpar(lwd=3),vp=NULL){
-  ####################################################
-  ####################################################
-  igt = gTree(xat=xat,yat=yat,len=len,pad=pad,horiz=horiz,show=show,name=name,gp=gp,vp=vp,cl="meanBar")
-  igt
+meanBarGrob = function(xat,yat,len,pad=0.2,horiz=FALSE,show=TRUE,name=NULL,
+	gp=gpar(lwd=3),vp=NULL){
+  		igt = gTree(xat=xat,yat=yat,len=len,pad=pad,horiz=horiz,show=show,
+  			name=name,gp=gp,vp=vp,cl="meanBar")
+  		igt
 }
 
 drawDetails.meanBar = function(x, recording){
@@ -23,6 +23,7 @@ drawDetails.meanBar = function(x, recording){
     for (i in childNames(x)) grid.draw(getGrob(x, i))
   }
 }
+
 setMeanBarGrob = function(x){
   if(x$horiz){
     y0 = y1 = x$yat
@@ -64,6 +65,7 @@ setMeanBarGrob = function(x){
   x = setChildren(x, do.call("gList",bars))
   x
 }
+
 editDetails.meanBar = function(x, spec){
   x = meanBarGrob(xat=x$xat,yat=x$yat,len=x$len,pad=x$pad,horiz=x$horiz,show=x$show,name=x$name,gp=x$gp,vp=x$vp)
   x
