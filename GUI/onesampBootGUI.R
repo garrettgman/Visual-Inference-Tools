@@ -299,7 +299,7 @@ onesampBootGUI = function(){
       pause()
       Sys.sleep(0.05)
       #bootstrapRefresh()
-      bootstrapFinalise()
+      #bootstrapFinalise()
       updateEnvCurrN()
     } else if(sel==2 | sel==3){
       n.random = as.numeric(n.random)
@@ -314,7 +314,7 @@ onesampBootGUI = function(){
         updateEnvCurrN()
       }
       pause()
-      bootstrapFinalise()
+      #bootstrapFinalise()
     } else if(sel==4){
       n.random = as.numeric(n.random)
       for(i in 1:n.random){
@@ -327,7 +327,7 @@ onesampBootGUI = function(){
           break
       }
       pause()
-      bootstrapFinalise()
+      #bootstrapFinalise()
     } else if(sel==5){   
       bootstrapRefresh()
       bootstrapUpdateDistShow(FALSE)
