@@ -48,9 +48,13 @@ boxdotGrob = function(x, at, stack.height, pad.box,
 
 drawDetails.boxdot = function(x, recording){
   x = setBoxdotGrob(x) # add the necessary children to the boxdotGrob
-  for (i in childNames(x)){
-    grid.draw(getGrob(x, i)) # draw the children
+  if(x$show.pts == TRUE){
+  	grid.draw(getGrob(x, "pts"))
+  	pause()
+    Sys.sleep(0.05)
   }
+  if(x$show.box == TRUE)
+  	grid.draw(getGrob(x, "bxp"))
 }
 
 setBoxdotGrob = function(x){ # method for replacing or altering a boxdotGrob
