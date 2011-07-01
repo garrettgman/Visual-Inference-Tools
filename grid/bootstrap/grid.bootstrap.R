@@ -55,7 +55,7 @@ makeBootstrapGrob = function(data, diffFun, x.sim, main, digit, tab){
   
   tabgb = datgb = ghostgb = rangb = distgb = NULL
   
-  args  = list(data,tab,diffFun, gb="boxdotGrob", 
+  args  = list(data,tab,diffFun, gb="ghostboxdotGrob", 
                gbfmt=initArgsBootstrapGhostBox(data[,1],diffFun), name="ghostBox")
   
   # default args assume a median diffFun, but we can update them for a mean diffFun

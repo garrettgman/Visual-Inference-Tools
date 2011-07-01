@@ -26,7 +26,8 @@ setghostGrob = function(x){
   diffFun  = x$diffFun # mean or median
   
   numBox   = length(tab) # size of sample
-  ghost    = vector("list",numBox) 
+  ghostOutlines    = vector("list",numBox) 
+  ghostCenters    = vector("list",numBox) 
   gbfmt    = x$gbfmt # format?
   
   if(!is.null(x$vp)) gbfmt$vp = x$vp # if a vp has been assigned, save it to the gbfmt vp
@@ -52,11 +53,17 @@ setghostGrob = function(x){
         gbfmt$xat    = unit(mean(x.bt),"native")
       }
     }
-    gbfmt$name  = paste("ghost #",index,sep="")
-    ghost[[index]] = do.call(x$gb,gbfmt) # each ghost is a x$gb grob, by default that's a boxdotGrob
+    gbfmt$name  = paste("ghost outline #",index,sep="")
+    gbfmt$show.center = FALSE
+    gbfmt$show.box = TRUE
+    ghostOutlines[[index]] = do.call(x$gb,gbfmt) # each ghost is a x$gb grob, by default that's a boxdotGrob
+    gbfmt$name  = paste("ghost center #",index,sep="")
+    gbfmt$show.center = TRUE
+    gbfmt$show.box = FALSE
+    ghostCenters[[index]] = do.call(x$gb,gbfmt)
     index = index + 1
   }
-  x = setChildren(x, do.call("gList",ghost))
+  x = setChildren(x, do.call("gList",c(ghostOutlines, ghostCenters)))
   x
 }
 
