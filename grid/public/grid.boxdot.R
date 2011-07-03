@@ -50,8 +50,7 @@ drawDetails.boxdot = function(x, recording){
   x = setBoxdotGrob(x) # add the necessary children to the boxdotGrob
   if(x$show.pts == TRUE){
   	grid.draw(getGrob(x, "pts"))
-  	pause()
-    Sys.sleep(0.05)
+    Sys.sleep(0.5)
   }
   if(x$show.box == TRUE)
   	grid.draw(getGrob(x, "bxp"))
