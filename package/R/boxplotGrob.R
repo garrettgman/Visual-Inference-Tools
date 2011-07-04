@@ -53,71 +53,58 @@ setBoxplotGrob <- function(bpgt){
 	box <- rectGrob(x = unit(x[2], "native"), y = at, width = unit(x[4] - x[2], "native"), 
 					height = height, just = "left", gp = gpar(col = box.color), name = "box")
 					
-	pad = convertHeight(unit(as.numeric(height)/2, attr(height, "unit")), "inches")			
+	pad <- convertHeight(unit(as.numeric(height)/2, attr(height, "unit")), "inches")			
 	median.line <- segmentsGrob(x0 = unit(x[3], "native"), y0 = at - pad, 
 								x1 = unit(x[3], "native"), y1 = at + pad, 
-								gp = par(col = median.color), name = "median.line")
+								gp = gpar(col = median.color), name = "median.line")
   	
-  	bpgt = setChildren(bpgt, gList(whisker.low, whisker.high, box, median.line))
-  	x
+  	bpgt <- setChildren(bpgt, gList(whisker.low, whisker.high, box, median.line))
+  	bpgt
 }
 
 
-drawDetails.boxplot = function(x, recording){
-  x = setBoxplotGrob(x)
-  for (i in childNames(x)) grid.draw(getGrob(x, i))
+drawDetails.boxplot <- function(x, recording){
+	x <- setBoxplotGrob(x)
+ 	for (i in childNames(x)) grid.draw(getGrob(x, i))
 }
 
-## notes by Vivian
-## change the default settings
-## output: gTree() (boxplot grob)
-editDetails.bxp = function(x, spec){ 
-  x = bxpGrob(x$x5, x$at, x$width, x$cols, x$horiz, x$show.w,x$name, x$gp, x$vp)
-  x
+editDetails.boxplot <- function(x, spec){ 
+	x <- boxplotGrob(x$data, x$at, x$height, x$box.color, x$median.color, x$show.w, x$name, 
+					x$gp, x$vp)
+	x
 }
 
-validDetails.bxp = function(x){
-  if(class(x$x5) %in% c("integer", "numeric")){
-    if(length(x$x5)!=5)
-      stop("length of x5 must be 5")
-  } else if(class(x$x5)=="matrix"){
-    if(ncol(x$x5)!=5)
-      stop("number of colume of x5 must be 5")
-  } else {
-    stop("x5 must be integer, numeric or matrix")  
-  }
+validDetails.boxplot <- function(x){
+	if (!inherits(x$data, c("integer", "numeric")))
+		stop("data must be integer, numeric or matrix")  
   
-  if(!(any(class(x$at) %in% "unit") & any(class(x$width) %in% "unit")))
-    stop("at and width must be unit object")  
+	if (!(any(class(x$at) %in% "unit") & any(class(x$height) %in% "unit")))
+		stop("at and height must be unit object")  
 
-  if("unit.arithmetic" %in% class(x$at))
-    stop("at is unit.arithmetic")
+	if ("unit.arithmetic" %in% class(x$at))
+	 	stop("at is unit.arithmetic")
 
-  if("unit.arithmetic" %in% class(x$width))
-    stop("width is unit.arithmetic")
-    
-  if(length(x$cols)!=3)
-    stop("length of cols must be 3")
-  
-  if(!is.logical(x$horiz))
-    stop("horiz must be logical")
-  x
+	if ("unit.arithmetic" %in% class(x$height))
+		stop("height is unit.arithmetic")
+
+	x
 }
 
-grid.bxp.example = function(){
-  vp = viewport(width=unit(0.8, "npc"), height=unit(0.8, "npc"),
-                xscale=c(-10, 10), yscale=c(-10, 10))
-  pushViewport(vp)
-  grid.rect()
-  grid.xaxis()
-  grid.yaxis()
-  ## Notes by Vivian
-  ## Tukey's five number summary (minimum, lower-hinge, median, upper-hinge, maximum) 
-  x = fivenum(rnorm(100, 0, 3))
-  col = c(rgb(1, 0, 0, alpha=0.3), rgb(1, 0, 0, alpha=0.3),
-          rgb(1, 0, 0, alpha=0.3))
-  at = unit(0.5, "npc")
-  grid.bxp(x, at=at, width=unit(5, "native"), col,
-           horiz=TRUE, name="bxpExample", gp=gpar(lwd=3))
+grid.boxplot.example <- function(data = rnorm(100, 0, 3), at = unit(0.5, "npc"), 
+	height = unit(5, "native"), box.color = "black", median.color = "black", show.w = TRUE, 
+	name="bxpExample", gp = gpar(lwd=3)){
+		require(grid)
+		vp <- viewport(width = unit(0.8, "npc"), height = unit(0.8, "npc"), 
+			xscale = c(-10, 10), yscale = c(-10, 10))
+		pushViewport(vp)
+	
+		grid.rect()
+		grid.xaxis()
+		grid.yaxis()
+
+		grid.boxplot(data = data, at = at, height = height, box.color = box.color, 
+			median.color = median.color, show.w = show.w, name = name, gp = gp)
 }
-#grid.bxp.example()
+
+# grid.boxplot.example()
+# grid.boxplot.example( box.color = "red", median.color = "blue", show.w = FALSE, gp = gpar(lwd = 3, alpha = 0.5))
