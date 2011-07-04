@@ -34,7 +34,7 @@ bxpGrob = function(x5, at, width, cols=rep("black", 3), horiz=TRUE, show.w=TRUE,
 }
 
 setBxpGrob = function(x){
-    x5    = x$x5
+  x5    = x$x5
   at    = x$at
   width = x$width
   cols  = x$cols
