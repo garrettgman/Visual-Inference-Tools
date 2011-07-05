@@ -108,3 +108,5 @@ grid.boxplot.example <- function(data = rnorm(100, 0, 3), at = unit(0.5, "npc"),
 
 # grid.boxplot.example()
 # grid.boxplot.example( box.color = "red", median.color = "blue", show.w = FALSE, gp = gpar(lwd = 3, alpha = 0.5))
+
+# bp <- boxplotGrob(data = rnorm(100, 0, 3), at = unit(0.5, "npc"), height = unit(5, "native"), box.color = "black", median.color = "black", show.w = TRUE, name="bxpExample", gp = gpar(lwd=3))
