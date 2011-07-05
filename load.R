@@ -15,6 +15,9 @@ source("grid/utility.R")
 # one sample mean/median
 source("grid/onesampBootGrid.R")
 source("GUI/onesampBootGUI.R")
+source("grid/public/grid.ghost.R")
+source("grid/public/grid.ghostboxdot.R")
+source("grid/public/grid.ghostbxp.R")
 #onesampBootGUI()
 
 # two samples difference of mean/median
