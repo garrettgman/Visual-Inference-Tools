@@ -1,7 +1,7 @@
 # functions and methods for constructing boxplot grobs
 
 #' Draw a boxplot grob
-grid.boxplot = function(...){
+grid.boxplot <- function(...){
   grid.draw(boxplotGrob(...))
 }
 
@@ -19,8 +19,9 @@ grid.boxplot = function(...){
 #' @param name A name for the grob to be constructed
 #' @param gp graphical parameters for the boxplot, constructed with gpar()
 #' @param vp A default viewport to be used when drawing the grob
-boxplotGrob <- function(data, at, height, box.color = "black", median.color = "black", 
-	show.w = TRUE, name = NULL, gp = NULL, vp = NULL){
+boxplotGrob <- function(data, at = unit(0.5, "npc"), height = unit(0.5, "npc"), 
+	box.color = "black", median.color = "black", show.w = TRUE, name = NULL, gp = NULL, 
+	vp = NULL){
 	
 		bpgt <- gTree(data = data, at = at, height = height, box.color = box.color, 
 			median.color = median.color, show.w = show.w, name = name, gp = gp, vp = vp, 
@@ -109,4 +110,4 @@ grid.boxplot.example <- function(data = rnorm(100, 0, 3), at = unit(0.5, "npc"),
 # grid.boxplot.example()
 # grid.boxplot.example( box.color = "red", median.color = "blue", show.w = FALSE, gp = gpar(lwd = 3, alpha = 0.5))
 
-# bp <- boxplotGrob(data = rnorm(100, 0, 3), at = unit(0.5, "npc"), height = unit(5, "native"), box.color = "black", median.color = "black", show.w = TRUE, name="bxpExample", gp = gpar(lwd=3))
+# bp <- boxplotGrob(data = rnorm(100, 0, 3), at = unit(0.5, "npc"), height = unit(0.5, "native"), box.color = "black", median.color = "black", show.w = TRUE, name="bxpExample", gp = gpar(lwd=3))
