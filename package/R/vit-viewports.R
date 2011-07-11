@@ -61,12 +61,12 @@ textBoxVP <- function(name = list("text"), layout.pos.row = NULL, layout.pos.col
 	dataName <- do.call("paste", c(name, "data"))
 	sampName <- do.call("paste", c(name, "sample"))
 	
-	layout <- grid.layout(ncol = 2, widths = unit(1, c("null", "null")))
+	layout <- grid.layout(ncol = 3, widths = unit(c(1, 0.5, 1), c("null", "line", "null")))
 	
 	textBox <- viewport(layout = layout, layout.pos.row = layout.pos.row, 
 		layout.pos.col = layout.pos.col, name = do.call("paste", name))
 	data <- textColumnVP(layout.pos.col = 1, name = c(name, "data"))
-	sample <- textColumnVP(layout.pos.col = 2, name = c(name, "sample"))
+	sample <- textColumnVP(layout.pos.col = 3, name = c(name, "sample"))
 	
 	vpTree(textBox, vpList(data, sample))
 }
@@ -86,7 +86,7 @@ framedDataVP <- function(data = data, name = NULL, layout.pos.row = NULL,
 		layout.pos.col = layout.pos.col)
 	plot <- plotViewport(c(2,1,1,1), name = plotName)
 	
-	if (dim(data)[2] == 1)
+	if (dim(as.data.frame(data))[2] == 1)
 		dataVP <- dataViewport(xData = data[,1], yscale = c(0,1), name = dataName)
 	else	
 		dataVP <- dataViewport(xData = data[,1], yData = data[,2], name = dataName)
@@ -121,6 +121,15 @@ graphsBoxVP <- function(data, name = list("graphs"), layout.pos.row = NULL,
 	vpTree(graphsBox, vpList(dataVp, sample, statistic))
 }
 
+#' Helper function to quickly construct vpPaths to the three plotting spaces on the VIT 
+#' canvas: the data plot, the sample plot, and the statistics plot.
+#'
+#' @param plot.name A character string that gives the name of the plot whose vpPath you wish to retrieve. "data" retrieves the data plot, "sample" the sample plot, and "stat" the statistic plot.
+graphsPath <- function(plot.name){
+	vpPath("canvas.frame", "graphs", paste("graphs", plot.name, "frame", sep = "."), 
+		paste("graphs", plot.name, "plot", sep = "."), paste("graphs", plot.name, "data", 
+		sep = "."))
+}
 
 
 
