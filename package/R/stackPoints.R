@@ -8,7 +8,7 @@
 #' @param nbins The number of bins to stack points into. nbins will be ignored if binwidth is specified
 #'
 #' @return a vector of y values. When x is plotted against stackPoints(x)
-stackPoints <- function(x, pheight, xmin = min(x), xmax = max(x), ymin = 0, ymax = 1, 
+stackPoints <- function(x, pheight = unit(1, "char"), xmin = min(x), xmax = max(x), ymin = 0, ymax = 1, 
 	binwidth = NULL, nbins = 30){
 		span <- xmax - xmin
 	
