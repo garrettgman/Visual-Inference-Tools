@@ -1,0 +1,24 @@
+Package: vit
+Imports: 
+Maintainer: Garrett Grolemund <grolemund@rice.edu>
+License: GPL
+Title: Visual Inference Tools
+LazyData: true
+Type: Package
+Author: Garrett Grolemund <grolemund@rice.edu>, Danny Chang, 
+	Vivian Li
+Description: Traditional methods of teaching statistical 
+	inference rely on concepts that are unfamiliar to students, 
+	such as probability distributions. This may overwhelm a 
+	student's cognitive load and hinder understanding. These 
+	tools simplify the intuition behind inference to a visual 
+	level. They can be used to develop a student's intuitions 
+	about inference before teaching mathematical and 
+	probabilistic concepts.
+Enhances: 
+Version: 0.1.0
+Depends: R (>= 2.13)
+Suggests: 
+Collate: 'boxPlotGrob.R' 'ghost-methods.R' 'makeCanvas.R' 
+	'makePlot.R' 'plot1dGrob.R' 'stackPoints.R' 
+	'vit-viewports.R'
