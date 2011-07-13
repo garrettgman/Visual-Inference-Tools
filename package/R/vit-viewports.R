@@ -86,10 +86,7 @@ framedDataVP <- function(data = data, name = NULL, layout.pos.row = NULL,
 		layout.pos.col = layout.pos.col)
 	plot <- plotViewport(c(2,1,1,1), name = plotName)
 	
-	if (dim(as.data.frame(data))[2] == 1)
-		dataVP <- dataViewport(xData = data[,1], yscale = c(0,1), name = dataName)
-	else	
-		dataVP <- dataViewport(xData = data[,1], yData = data[,2], name = dataName)
+	dataVP <- dataViewport(xData = data, yscale = c(0,1), name = dataName)
 	
 	vpStack(frame, plot, dataVP)
 }
@@ -129,6 +126,17 @@ graphsPath <- function(plot.name){
 	vpPath("canvas.frame", "graphs", paste("graphs", plot.name, "frame", sep = "."), 
 		paste("graphs", plot.name, "plot", sep = "."), paste("graphs", plot.name, "data", 
 		sep = "."))
+}
+
+#' Helper function to quickly construct vpPaths to the three levels of the two text boxes on 
+#' the VIT canvas: the data box and the sample box.
+#'
+#' @param data.or.sample A character string that gives the name of the box whose vpPath you wish to retrieve. "data" retrieves the data box, "sample" the sample box. 
+#' @param top.mid.or.bottom A character string that gives the name of the level of the box whose vpPath you wish to retrieve: "top", "mid", or "bottom". The top level displays the title of the box, the mid the filepath, and the bottom the data values.
+textPath <- function(data.or.sample, top.mid.or.bottom){
+	vpPath("canvas.frame", "text", paste("text", data.or.sample, sep = "."), 
+		paste("text", data.or.sample, top.mid.or.bottom, "frame", sep = "."), 
+		paste("text", data.or.sample, top.mid.or.bottom, "plot", sep = "."))
 }
 
 
