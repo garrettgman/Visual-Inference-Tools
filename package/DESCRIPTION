@@ -1,5 +1,5 @@
 Package: vit
-Imports: 
+Imports: grid
 Maintainer: Garrett Grolemund <grolemund@rice.edu>
 License: GPL
 Title: Visual Inference Tools
@@ -19,6 +19,4 @@ Enhances:
 Version: 0.1.0
 Depends: R (>= 2.13)
 Suggests: 
-Collate: 'boxPlotGrob.R' 'ghost-methods.R' 'makeCanvas.R' 
-	'makePlot.R' 'plot1dGrob.R' 'stackPoints.R' 
-	'vit-viewports.R'
+Collate: 'boxPlotGrob.R' 'ghost-methods.R' 'makeCanvas.R' 'makePlot.R' 'plot1dGrob.R' 'stackPoints.R' 'vit-viewports.R'
