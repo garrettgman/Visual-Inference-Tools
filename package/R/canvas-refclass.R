@@ -1,10 +1,18 @@
 # R5 implementation for canvas object
 
 # 1. make R5 canvas class
-# To consider: should I externalize some of these methods? For example, include the plotPoints method, but have plotData, plotSample, and plotStat external functions that access the plotPoints method?
-canvas <- setRefClass("canvas", fields = c("image", "viewports", "data", "samples", "which.sample", "n", "stat.dist"), methods = list(
+#' The canvasClass reference class provides a class for making objects that manage the 
+#' visual display of the VIT tool. I used a reference class here because we can keep all of 
+#' the relevant information in one place (the canvas object) and use methods to manipulate 
+#' it. This is different than the normal R approach, which is "functional." In the 
+#' functional approach we must put all our information into each function and then collect 
+#' it again on the other side of the function. That would be burdensome here because there 
+#' is so much information to keep track of. The reference class approach is an attempt at 
+#' object oriented programming.
+canvas <- setRefClass("canvasClass", fields = c("image", "viewports", "data", "samples", "which.sample", "n", "stat.dist", "var.name"), methods = list(
 	initialize = function(data = NA, ...){
 		require(grid)
+		var.name <<- deparse(substitute(data))
 		data <<- data
 		n <<- length(data)
 		samples <<- split(sample(1:n, n * 1000, replace = TRUE), rep(1:1000, each = n))
@@ -42,7 +50,7 @@ canvas <- setRefClass("canvas", fields = c("image", "viewports", "data", "sample
 			seekViewport(vp)
 		
 			pheight <- convertY(unit(1, "char"), "native", valueOnly = TRUE) * 0.8
-			binwidth <- pheight * diff(range(x)) * 0.37
+			binwidth <- pheight * diff(range(x)) * 0.37/2
   			nbins <- ceiling(diff(range(x) / binwidth))
 			breaks <- min(x) + c(0:(nbins)) * binwidth
 			group <- cut(x, breaks, include.lowest = TRUE)
@@ -59,7 +67,7 @@ canvas <- setRefClass("canvas", fields = c("image", "viewports", "data", "sample
 			df$y <- (df$y - 1) * ydist
 		}
 		
-		image <<- addGrob(image, pointsGrob(x = df$x, y = df$y, vp = vp, name = name))
+		image <<- addGrob(image, pointsGrob(x = df$x, y = df$y, vp = vp, name = name, ...))
 		drawCanvas()
 	},
 	plotBoxplot = function(x, vp, name, ...){
@@ -67,18 +75,14 @@ canvas <- setRefClass("canvas", fields = c("image", "viewports", "data", "sample
 		image <<- addGrob(image, boxplotGrob(x, vp = vp, name = name, ...))
 		drawCanvas()
 	},
+	writeList = function(x, vp, name, ...){
+		'Writes text list of x in the specified viewport'
+		image <<- addGrob(image, textlistGrob(x, vp = vp, name = name, ...))		
+		drawCanvas()
+	},
 	writeText = function(x, vp, name, ...){
-		'Writes text in x in the specified viewport'
-		seekViewport(vp)
-		limit <- convertHeight(unit(0.9, "npc"), "points", valueOnly = TRUE) / 12
-		x <- as.character(x)
-		print(limit)
-		if (length(x) > floor(limit)) x <- c(x[1:limit - 1], "...")
-		text <- as.list(x)
-		text$sep <- "\n"
-		text <- do.call("paste", text)
-		image <<-addGrob(image, textGrob(text, gp = gpar(fontsize = 12, lineheight = 1, cex = 1), vp = vp, name = name, ...)) # might need its own GROB
-		image <<-addGrob(image, rectGrob(vp = vp))
+		'Writes text of x in the specified viewport'
+		image <<- addGrob(image, textGrob(x, vp = vp, name = name, ...)) 		
 		drawCanvas()
 	}
 ))
