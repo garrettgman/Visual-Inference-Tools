@@ -1,4 +1,12 @@
 # helper functions for making viewport trees
+makeViewports <- function(data){
+	layout <- grid.layout(ncol = 2, widths = unit(c(.6, 1), "null"))
+	frameVP <- plotViewport(c(1,1,1,1), layout = layout, name = "canvas.frame")
+	text <- textBoxVP(layout.pos.col = 1)
+	graphs <- graphsBoxVP(data = data, layout.pos.col = 2) 
+	vpTree(frameVP, vpList(text, graphs))
+}
+
 
 framedPlotVP <- function(name = NULL, layout.pos.row = NULL, layout.pos.col = NULL){
 	if (!is.list(name)) stop("name must be a list of character strings")
@@ -11,7 +19,7 @@ framedPlotVP <- function(name = NULL, layout.pos.row = NULL, layout.pos.col = NU
 	# making viewports
 	frame <- viewport(name = frameName, layout.pos.row = layout.pos.row, 
 		layout.pos.col = layout.pos.col)
-	plot <- plotViewport(c(1,1,1,1), name = plotName)
+	plot <- plotViewport(c(0,.5, 0,.5), name = plotName)
 	
 	# making stack
 	vpStack(frame, plot)
@@ -22,7 +30,7 @@ textColumnVP <- function(name = NULL, layout.pos.row = NULL, layout.pos.col = NU
 	if (is.null(name$sep)) name$sep <- "."
 	
 	# making viewports
-	layout <- grid.layout(nrow = 3, heights = unit(c(1.5,  1.5, 1), 
+	layout <- grid.layout(nrow = 3, heights = unit(c(1, 1, 1), 
 		c("lines", "lines", "null")))
 		
 	root <- viewport(layout = layout, layout.pos.row = layout.pos.row, 

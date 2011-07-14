@@ -19,4 +19,4 @@ Enhances:
 Version: 0.1.0
 Depends: R (>= 2.13)
 Suggests: 
-Collate: 'boxPlotGrob.R' 'ghost-methods.R' 'makeCanvas.R' 'makePlot.R' 'plot1dGrob.R' 'stackPoints.R' 'vit-viewports.R'
+Collate: 'boxplotData.R' 'boxplotGrob.R' 'canvas-refclass.R' 'drawBackground.R' 'plotData.R' 'textlistGrob.R' 'vit-viewports.R' 'writeData.R'

@@ -25,11 +25,13 @@ drawBackground <- function(data, vpTree){
 	
 	dataTextBox <- roundrectGrob(gp=gpar(fill = "#0000FF0D"), name = "dataTextBox", 
 		vp = vpPath("canvas.frame", "text", "text.data"))
+	dataTitle <- textGrob("Data", vp = textPath("data", "top"), name = "data.title")
 	sampleTextBox <- roundrectGrob(gp=gpar(fill = "#0000FF0D"), name = "sampleTextBox",
 		vp = vpPath("canvas.frame", "text", "text.sample"))
+	sampleTitle <- textGrob("Sample", vp = textPath("sample", "top"), name = "sample.title")
 	
 	gTree(name = "canvas", childrenvp = vpTree, children = gList(dataAxis, sampleAxis, 
-		statAxis, dataTextBox, sampleTextBox))
+		statAxis, dataTextBox, dataTitle, sampleTextBox, sampleTitle))
 }
 	
 
