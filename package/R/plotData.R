@@ -13,5 +13,5 @@ plotSample <- function(canvasObj, ...){
 #' Plots the current distribution of the sample statistic as neatly stacked points in the 
 #' bottom plot of the VIT canvas.
 plotStat <- function(canvasObj, ...){
-		canvasObj$plotPoints(canvasObj$getStatDist(), graphsPath("stat"), "stat.points", ...)
+		canvasObj$plotPoints(canvasObj$getStatDist(), graphsPath("stat"), "stat.points", pch = 2,...)
 }
