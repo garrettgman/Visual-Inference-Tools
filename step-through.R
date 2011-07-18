@@ -1,10 +1,12 @@
 # building a vit canvas
-library(ggplot2)
+require(ggplot2)
 
-vit <- makeCanvas(mpg$hwy)
+vit()
+c1 <- canvas$new(mpg$hwy)
+c1$drawCanvas()
+writeData(c1)
+writeSample(c1)
+plotData(c1)
+plotSample(c1)
+plotStat(c1)
 
-drawCanvas(vit) #displays the initial version of the canvas
-drawBackground(vit)
-plotData(vit)
-boxplotData(vit)
-listData(vit)
