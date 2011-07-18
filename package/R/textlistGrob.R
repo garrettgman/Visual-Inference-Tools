@@ -34,7 +34,7 @@ drawDetails.textlist <- function(x, recording){
 	text <- as.list(data)
 	text$sep <- "\n"
 	text <- do.call("paste", text)
-	grid.text(text, gp = gpar(fontsize = 12, lineheight = 0.9, cex = 1), name = x$name)
+	grid.text(text, gp = gpar(fontsize = 12, lineheight = 1, cex = 1), name = x$name)
 }
 
 editDetails.textlist <- function(x, spec){ 
