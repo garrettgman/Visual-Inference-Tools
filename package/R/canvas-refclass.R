@@ -83,7 +83,7 @@ canvas <- setRefClass("canvasClass", fields = c("image", "viewports", "data", "s
 	writeText = function(x, vp, name, ...){
 		'Writes text of x in the specified viewport'
 		image <<- addGrob(image, textGrob(x, vp = vp, name = name, ...)) 		
-		drawCanvas()
+		# drawCanvas()
 	}
 ))
 
