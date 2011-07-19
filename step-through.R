@@ -1,3 +1,7 @@
+setwd("/Users/garrettgrolemund/Documents/git/vit")
+library(devtools)
+load_all("package")
+
 # building a vit canvas
 require(ggplot2)
 

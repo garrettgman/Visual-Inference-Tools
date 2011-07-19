@@ -1,5 +1,5 @@
 vit <- function() {
-	e <- new.env()
+	e <- new.vit.env()
 	e$win <- gwindow("Visual Inference Tools", visible = TRUE, width = 870, 
     		height = 600)
     
@@ -12,7 +12,7 @@ vit <- function() {
     # control panel has a read data tab inspired from iNZight
     # and a VIT tab
     controls.iNZight <- ggroup(horizontal = FALSE, container = g.controls, 
-    	expand = TRUE, label = "Read Data")
+    	expand = TRUE, label = "Load Data")
     controls.vit <- ggroup(horizontal = FALSE, container = g.controls, 
     	expand = TRUE, label = "Analyze Data")
     	
@@ -53,17 +53,21 @@ vit <- function() {
 	
 	
 	# adding iNZight controls
-	# data vs. variable view
+	# top three buttons
 	iNZ.view <- ggroup()
-	addSpring(iNZ.view)
+	e$importData <- gbutton("Import Data",
+		handler = function(h,...) e$fileReader())
 	e$dataView <- gbutton("View Data Set", 
 		handler = function(h,...) e$viewData(h,...))
 	e$listView <- gbutton("View Variables", 
 		handler = function(h,...) e$viewList(h,...))
+	font(e$importData) <- list(weight = "bold", family = "normal", 
+		color = "navy")
 	font(e$dataView) <- list(weight = "bold", family = "normal", 
 		color = "navy")
 	font(e$listView) <- list(weight = "bold", family = "normal", 
 		color = "navy")
+	add(iNZ.view, e$importData)
 	add(iNZ.view, e$dataView)
 	add(iNZ.view, e$listView)
 	add(controls.iNZight, iNZ.view)
@@ -87,20 +91,20 @@ vit <- function() {
 	tbl[5,1, anchor = c(0,0)] = glabel(" Variable 2 :")
 	tbl[7,1, anchor = c(0,0)] = glabel(" subset by  :")
 
-	yVar <- glabel("Drop name here")
-	font(yVar) <- list(weight = "bold", family = "normal")
-	tag(e$obj,"yVarData") <- NULL
-	tbl[5,3, anchor = c(0,0)] <- yVar
+	e$yVar <- glabel("Drop name here")
+	font(e$yVar) <- list(weight = "bold", family = "normal")
+	tag(e$obj,"e$yVarData") <- NULL
+	tbl[5,3, anchor = c(0,0)] <- e$yVar
 
-	xVar <- glabel("Drop name here")
-	font(xVar) <- list(weight = "bold", family = "normal")
-	tag(e$obj,"xVarData") <- NULL
-	tbl[3,3, anchor = c(0,0)] <- xVar
+	e$xVar <- glabel("Drop name here")
+	font(e$xVar) <- list(weight = "bold", family = "normal")
+	tag(e$obj,"e$xVarData") <- NULL
+	tbl[3,3, anchor = c(0,0)] <- e$xVar
 
-	groupingVar <- glabel("Drop name here")
-	font(groupingVar) <- list(weight = "bold", family = "normal")
-	tag(e$obj,"groupingVarData") <- NULL
-	tbl[7,3, anchor = c(0,0)] <- groupingVar
+	e$groupingVar <- glabel("Drop name here")
+	font(e$groupingVar) <- list(weight = "bold", family = "normal")
+	tag(e$obj,"e$groupingVarData") <- NULL
+	tbl[7,3, anchor = c(0,0)] <- e$groupingVar
 
 	tbl[3,7, anchor = c(0,0)] <- gbutton("clear", 
 		handler = function(h,...) clear1())
@@ -121,10 +125,10 @@ vit <- function() {
 	tbl2 <- glayout(expand = FALSE)
 	tbl2[2,1] <- glabel(" subset by  :")
 
-	groupingVar2 <- glabel("Drop name here")
-	font(groupingVar2) <- list(weight = "bold", family = "normal")
-	tag(e$obj,"groupingVarData2") <- NULL
-	tbl2[2,3] = groupingVar2
+	e$groupingVar2 <- glabel("Drop name here")
+	font(e$groupingVar2) <- list(weight = "bold", family = "normal")
+	tag(e$obj,"e$groupingVarData2") <- NULL
+	tbl2[2,3] = e$groupingVar2
 	tbl2[2,7, anchor = c(0,0)] <- gbutton("clear", 
 		handler=function(h,...) clear4())
 
@@ -135,4 +139,5 @@ vit <- function() {
 	add(controls.iNZight, e$secondSliderGp, expand = FALSE)
 
 }
+	
     
