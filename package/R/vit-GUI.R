@@ -84,60 +84,67 @@ vit <- function() {
 	add(e$dataGp, e$dataSt, expand = TRUE)
 	e$dataList1 <- NULL
 	e$dataList2 <- NULL
-	
-	# Setting up the labels and drag and drop locations	
+
+
+	# Variable 1 and 2 display
+	# column 1
 	tbl <- glayout(expand = FALSE)
 	tbl[3,1, anchor = c(0,0)] = glabel(" Variable 1 :")
 	tbl[5,1, anchor = c(0,0)] = glabel(" Variable 2 :")
-	tbl[7,1, anchor = c(0,0)] = glabel(" subset by  :")
-
-	e$yVar <- glabel("Drop name here")
-	font(e$yVar) <- list(weight = "bold", family = "normal")
-	tag(e$obj,"e$yVarData") <- NULL
-	tbl[5,3, anchor = c(0,0)] <- e$yVar
-
+	
+	# column 2
 	e$xVar <- glabel("Drop name here")
 	font(e$xVar) <- list(weight = "bold", family = "normal")
 	tag(e$obj,"e$xVarData") <- NULL
 	tbl[3,3, anchor = c(0,0)] <- e$xVar
+	
+	e$yVar <- glabel("Drop name here")
+	font(e$yVar) <- list(weight = "bold", family = "normal")
+	tag(e$obj,"e$yVarData") <- NULL
+	tbl[5,3, anchor = c(0,0)] <- e$yVar
+	
+	# column 3
+	tbl[3,7, anchor = c(0,0)] <- gbutton("clear", handler = function(h,...) {
+		e$xData <- NULL
+		svalue(e$xVar) <- "Drop name here"
+		updateCanvas()
+	})
+	tbl[5,7, anchor = c(0,0)] <- gbutton("clear", handler = function(h,...) {
+		e$yData <- NULL
+		svalue(e$yVar) <- "Drop name here"
+		updateCanvas()
+	})
 
-	e$groupingVar <- glabel("Drop name here")
-	font(e$groupingVar) <- list(weight = "bold", family = "normal")
-	tag(e$obj,"e$groupingVarData") <- NULL
-	tbl[7,3, anchor = c(0,0)] <- e$groupingVar
-
-	tbl[3,7, anchor = c(0,0)] <- gbutton("clear", 
-		handler = function(h,...) clear1())
-	tbl[5,7, anchor = c(0,0)] <- gbutton("clear", 
-		handler = function(h,...) clear2())
-	tbl[7,7, anchor = c(0,0)] <- gbutton("clear", 
-		handler = function(h,...) clear3())
+	tbl[3,8] <- ""
 
 	add(controls.iNZight, tbl, expand = FALSE)
+	addSpace(controls.iNZight, 10, horizontal = TRUE)
 	visible(tbl) <- TRUE
 
-	# Group for first slider
-	e$firstSliderGp <- ggroup(horizontal = FALSE)
-	add(controls.iNZight, e$firstSliderGp)
+	# adding drop zones
+	adddroptarget(e$xVar, targetType = "object", handler = function(h, ...) {
+		svalue(e$xVar) <- id(h$dropdata)
+		e$xData <- svalue(h$dropdata)
+		updateCanvas()
+	})
+	
+	adddroptarget(e$yVar, targetType = "object", handler = function(h, ...) {
+		svalue(e$yVar) <- id(h$dropdata)
+		e$yData <- svalue(h$dropdata)
+		updateCanvas()
+	})
 
-	# Group for label and drag and drop box for the second subsetting
-	# variable
-	tbl2 <- glayout(expand = FALSE)
-	tbl2[2,1] <- glabel(" subset by  :")
+}
+######################################################################
+######################################################################
+######################################################################
+######################################################################
+######################################################################
+######################################################################
+######################################################################	
 
-	e$groupingVar2 <- glabel("Drop name here")
-	font(e$groupingVar2) <- list(weight = "bold", family = "normal")
-	tag(e$obj,"e$groupingVarData2") <- NULL
-	tbl2[2,3] = e$groupingVar2
-	tbl2[2,7, anchor = c(0,0)] <- gbutton("clear", 
-		handler=function(h,...) clear4())
-
-	add(controls.iNZight, tbl2, expand = FALSE)
-	visible(tbl2) <- TRUE
-
-	e$secondSliderGp <- ggroup(horizontal = FALSE, expand = FALSE)
-	add(controls.iNZight, e$secondSliderGp, expand = FALSE)
-
+updateCanvas <- function() {
+	print("Coming Soon!")
 }
 	
     

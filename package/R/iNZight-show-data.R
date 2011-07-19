@@ -265,18 +265,15 @@ new.vit.env <- function() {
 	
 	e$clearAllSlots = function(){
 		if(!(svalue(e$xVar) == "Drop name here" && 
-			svalue(e$yVar) == "Drop name here"  && 
-			svalue(e$groupingVar) == "Drop name here" && 
-			svalue(e$groupingVar2) == "Drop name here"))
+			svalue(e$yVar) == "Drop name here"))
 				add(nb, ggraphics(expand = TRUE),label = "plot")
 
 		svalue(e$xVar) <- "Drop name here"
-		e$e$xVarData <- NULL
+		e$e$xData <- NULL
 		tag(e$obj,"e$xVarData") <- NULL
 		svalue(e$yVar) <- "Drop name here"
-		e$e$yVarData <- NULL
-		tag(e$obj,"e$yVarData") <- NULL
-		svalue(e$groupingVar) <- "Drop name here"
+		e$e$yData <- NULL
+
 		e$e$groupingVarData <- NULL
 		tag(e$obj,"e$groupingVarData") <- NULL
 		tag(e$obj,  "sliderData") <- NULL
@@ -292,7 +289,6 @@ new.vit.env <- function() {
 		}
 		e$fourthVariable <- NULL
 		e$fourthVarName <- ""
-		svalue(e$groupingVar2) <- "Drop name here"
 		e$e$groupingVarData2 <- NULL
 		tag(e$obj,"e$groupingVarData2") <- NULL
 		tag(e$obj,  "sliderData2") <- NULL
