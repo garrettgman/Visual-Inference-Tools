@@ -1,3 +1,6 @@
+# Much of the vit() function and the new.vit.env() function in new-vit-env.R are borrowed from the iNZight package. We'd like to one day add the vit tools into the iNZight tools, so I've aimed to keep the interfaces as similar as possible. However, the iNZight code is not very modular and most of the functions include many routines irrelevant to vit. Hence, most of the iNZight code that appears in these vit files is modified from its original form - Garrett
+
+
 vit <- function() {
 	e <- new.vit.env()
 	e$win <- gwindow("Visual Inference Tools", visible = TRUE, width = 870, 
