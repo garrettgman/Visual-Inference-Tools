@@ -195,5 +195,26 @@ new.vit.env <- function() {
 	    e$inDataView = TRUE
 	}
 	
+	e$buildCanvas <- function() {
+		if (is.null(e$xData)) {
+			grid.newpage()
+			grid.text("Please select Variable 1")
+			return()
+		}
+		
+		if (is.categorical(e$xData) & !is.categorical(e$yData) & !is.null(e$yData))
+			e$reverseVariables()
+	}	
+	
+	e$reverseVariables <- function() {
+		temp <- e$xData
+		e$xData <- e$yData
+		e$yData <- temp
+		
+		temp <- svalue(e$xVar)
+		svalue(e$xVar) <- svalue(e$yVar)
+		svalue(e$yVar) <- temp
+	}	
+	
 	e
 }

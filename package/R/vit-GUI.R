@@ -128,13 +128,13 @@ vit <- function() {
 	adddroptarget(e$xVar, targetType = "object", handler = function(h, ...) {
 		svalue(e$xVar) <- id(h$dropdata)
 		e$xData <- svalue(h$dropdata)
-		updateCanvas()
+		e$buildCanvas()
 	})
 	
 	adddroptarget(e$yVar, targetType = "object", handler = function(h, ...) {
 		svalue(e$yVar) <- id(h$dropdata)
 		e$yData <- svalue(h$dropdata)
-		updateCanvas()
+		e$buildCanvas()
 	})
 
 }

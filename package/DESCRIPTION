@@ -19,4 +19,4 @@ Enhances:
 Version: 0.1.0
 Depends: R (>= 2.13)
 Suggests: 
-Collate: 'boxplotData.R' 'boxplotGrob.R' 'canvas-refclass.R' 'drawBackground.R' 'new-vit-env.R' 'plotData.R' 'textlistGrob.R' 'vit-GUI.R' 'vit-viewports.R' 'writeData.R'
+Collate: 'boxplotData.R' 'boxplotGrob.R' 'buildCanvas.R' 'canvas-refclass.R' 'drawBackground.R' 'new-vit-env.R' 'plotData.R' 'textlistGrob.R' 'vit-GUI.R' 'vit-viewports.R' 'writeData.R'
