@@ -18,32 +18,33 @@
 #' side of the function. That would be burdensome here because there is so much 
 #' information to keep track of. The reference class approach is an attempt at 
 #' object oriented programming.
-canvas <- setRefClass("canvasClass", fields = c("image", "viewports", "data", 
-	"samples", "which.sample", "n", "stat.dist", "var.name"), 
-	methods = list(initialize = function(data = NA, ...){
+canvas <- setRefClass("canvasClass", fields = c("image", "viewports", "x", "y", 
+	"samples", "which.sample", "n", "stat.dist", "var.name", "calcStatistic"), 
+	methods = list(initialize = function(x = NA, y = NA...){
 		require(grid)
-		var.name <<- deparse(substitute(data))
-		data <<- data
-		n <<- length(data)
+		var.name <<- deparse(substitute(x))
+		x <<- x
+		y <<- y
+		n <<- length(x)
 		samples <<- split(sample(1:n, n * 1000, replace = TRUE), 
 			rep(1:1000, each = n))
-		viewports <<- makeViewports(data)
-		image <<- drawBackground(data, viewports)
+		#viewports <<- makeViewports(x)
+		#image <<- drawBackground(x, viewports)
 		which.sample <<- 1
 		stat.dist <<- vector(length = 1000)
-		for(i in 1:1000)
-			stat.dist[i] <<- mean(data[samples[[i]]])
+		#for(i in 1:1000)
+		#	stat.dist[i] <<- mean(x[samples[[i]]])
 		invisible(.self)
 	},
 	getSample = function(){
 		'Returns current sample of data.'
-		data[samples[[which.sample]]]
+		x[samples[[which.sample]]]
 	},
 	newSample = function(){
 		'Takes new sample of data and returns it invisibly.'
 		if (which.sample >= 1000) which.sample <<- 0
 		which.sample <<- which.sample + 1
-		invisible(data[samples[[which.sample]]])
+		invisible(x[samples[[which.sample]]])
 	},
 	getStatDist = function(){
 		'Returns current distribution of sampling statistic.'

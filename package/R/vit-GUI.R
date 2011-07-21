@@ -22,8 +22,23 @@ vit <- function() {
     	
     # adding vit controls
     addSpace(controls.vit, 10, horizontal = FALSE)
-    diffFun.radio <- gradio(c("median", "mean"),  horizontal=TRUE) 
-	add(controls.vit, diffFun.radio)
+    tbl <- glayout(container = controls.vit)
+	tbl[1,1] <- glabel("Statistic:    ",container = tbl)
+	tbl[1,2] <- (e$stat <- gcombobox(c(), editable=TRUE, container = tbl, 
+		handler = function(h, ...) {
+			if(!is.null(e$xData) & !is.null(e$yData)) {
+				e$confirmDialog(
+"VIT cannot apply confidence interval methods to 
+more than one variable at a time. The statistic
+of interest will be changed to the mean.", 
+					handler = function(h, ...) { 
+						svalue(e$stat) <- "mean"
+						dispose(h$obj)
+				})
+			} 
+		}))
+	e$stat[] <- c("mean", "median", "confidence interval")
+	svalue(e$stat) <- "mean"
 	
 	addSpace(controls.vit, 10, horizontal = FALSE)
 	vit.bootbox <- gframe("bootstrapping",  container = controls.vit)
@@ -110,12 +125,12 @@ vit <- function() {
 	tbl[3,7, anchor = c(0,0)] <- gbutton("clear", handler = function(h,...) {
 		e$xData <- NULL
 		svalue(e$xVar) <- "Drop name here"
-		updateCanvas()
+		e$buildCanvas()
 	})
 	tbl[5,7, anchor = c(0,0)] <- gbutton("clear", handler = function(h,...) {
 		e$yData <- NULL
 		svalue(e$yVar) <- "Drop name here"
-		updateCanvas()
+		e$buildCanvas()
 	})
 
 	tbl[3,8] <- ""
@@ -127,13 +142,15 @@ vit <- function() {
 	# adding drop zones
 	adddroptarget(e$xVar, targetType = "object", handler = function(h, ...) {
 		svalue(e$xVar) <- id(h$dropdata)
-		e$xData <- svalue(h$dropdata)
+		if (e$inDataView) e$xData <- svalue(h$dropdata)
+		else e$xData <- tag(e$obj, "dataSet")[,id(h$dropdata)]
 		e$buildCanvas()
 	})
 	
 	adddroptarget(e$yVar, targetType = "object", handler = function(h, ...) {
 		svalue(e$yVar) <- id(h$dropdata)
-		e$yData <- svalue(h$dropdata)
+		if (e$inDataView) e$yData <- svalue(h$dropdata)
+		else e$yData <- tag(e$obj, "dataSet")[,id(h$dropdata)]
 		e$buildCanvas()
 	})
 

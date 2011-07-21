@@ -7,7 +7,21 @@ new.vit.env <- function() {
 		e$specifyFileForImport()
 	}
 	
-		e$specifyFileForImport <- function(...) {
+	e$viewList <- function(h, ...){
+		if(is.null(tag(e$obj, "dataSet"))) {
+			gmessage("Please load a new data set (with named columns)", 
+				parent = e$win)
+		} else if(names(tag(e$obj, "dataSet"))[1] == "empty") {
+				gmessage("Please load a new data set", parent = e$win)
+		} else {
+			enabled(h$obj) <- FALSE
+			e$updateList()
+			enabled(e$dataView) <- TRUE
+			e$inDataView <- FALSE
+      }
+    }
+	
+	e$specifyFileForImport <- function(...) {
 		e1 <- new.env()
 		importFileWin <- gwindow("File Browser", cont = TRUE, parent = e$win)
 		fileMainGp <- ggroup(cont = importFileWin, horizontal = FALSE)
@@ -195,15 +209,111 @@ new.vit.env <- function() {
 	    e$inDataView = TRUE
 	}
 	
+	e$updateList <- function() {
+		names(tag(e$obj,"dataSet")) <- make.names(names(tag(e$obj,"dataSet")), 
+			unique = TRUE)
+		tag(e$obj,"rowDataSet") <- data.frame(ROW_NAME = tag(e$obj,
+			"rowDataSet")[,1], tag(e$obj, "dataSet"))
+		names(tag(e$obj,"rowDataSet")) <- make.names(names(tag(e$obj,
+			"rowDataSet")), unique = TRUE)
+		
+		if(!is.null(e$dataList))
+			delete(e$dataGp, e$dataList, expand = TRUE)
+		if(!is.null(e$dataList1))
+			delete(e$dataGp, e$dataList1, expand = TRUE)
+		if(!is.null(e$dataList2))
+			delete(e$dataGp, e$dataList2, expand = TRUE)
+		if(!is.null(e$dataSt))
+			delete(e$dataGp, e$dataSt, expand = TRUE)
+
+		N = 19
+		# if(e$sliderCreated && e$sliderCreated2) N = 14
+		
+		if((length(names(tag(e$obj,"dataSet"))) > N) && 
+			(length(names(tag(e$obj,"dataSet"))) < 80)){
+				x <- length(names(tag(e$obj,
+					"dataSet"))[(N+1):(length(names(tag(e$obj,"dataSet"))))])
+				d1 <- (names(tag(e$obj,"dataSet"))[1:N])
+				d2 <- c(names(tag(e$obj,
+					"dataSet"))[(N+1):(length(names(tag(e$obj,"dataSet"))))])
+				e$dataList1 <- gtable(d1,expand = TRUE)
+				names(e$dataList1) <- "VARIABLES"
+				e$dataList2 <- gtable(d2,expand = TRUE)
+				names(e$dataList2) <- "...CONTINUED"
+				adddropsource(e$dataList1)
+				adddropsource(e$dataList2)
+				add(e$dataGp, e$dataList1, expand = TRUE)
+				add(e$dataGp, e$dataList2, expand = TRUE)
+		} else {
+			d <- names(tag(e$obj,"dataSet"))
+			e$dataList <- gtable(d,expand = TRUE)
+			names(e$dataList) <- "VARIABLES"
+			adddropsource(e$dataList)
+			add(e$dataGp, e$dataList, expand = TRUE)
+		}
+
+		e$inDataView <- FALSE
+	}
+	
 	e$buildCanvas <- function() {
+		grid.newpage()
 		if (is.null(e$xData)) {
-			grid.newpage()
 			grid.text("Please select Variable 1")
 			return()
 		}
 		
-		if (is.categorical(e$xData) & !is.categorical(e$yData) & !is.null(e$yData))
-			e$reverseVariables()
+		if (is.categorical(e$xData) & !is.categorical(e$yData) &
+			 !is.null(e$yData)) {
+				e$reverseVariables()
+		}
+			
+		method <- svalue(e$stat)
+		e$c1 <- canvas$new(x = e$xData, y = e$yData)
+		
+		if (is.categorical(e$xData)) {
+#			e$c1$plotData <- plotProportionBars
+#			e$c1$viewports <- makeViewports(e$xData, proportion = TRUE)
+			grid.text("x is categorical")
+		} else {
+#			e$c1$plotData <- plotPoints
+#			e$c1$viewports <- makeViewports(e$xData)
+			grid.text("x is numeric")
+		}
+	
+		if (is.null(e$yData)) {
+			e$c1$calcStatistic <- list(mean = calcMean, median = calcMedian, 
+				"confidence interval" = calcCI)[[method]]
+#			e$c1$plotStatDist <- list(mean = plotTriangleDist, 
+#				median = plotTriangleDist, 
+#				"Confidence Interval" = plotCIStack)[[method]]	
+			grid.text("                                          ...y is NULL")	
+		} else if (is.categorical(e$yData)) {
+			if (method == "confidence interval"){
+				e$confirmDialog(
+"VIT cannot apply confidence interval methods to 
+more than one variable at a time. The statistic
+of interest will be changed to the mean.", 
+					handler = function(h, ...) { 
+						svalue(e$stat) <- "mean"
+						dispose(h$obj)
+				}) 
+			}
+			e$c1$calcStatistic <- list(mean = calcDiffMean, 
+				median = calcDiffMedian)[[method]]
+#			e$c1$plotStatistic <- plotArrow
+#			e$c1$viewports <- splitViewports(c1$viewports, 
+#				levels = nlevel(e$yData))
+#			e$c1$plotStatDist <- plotTriangleDist			
+			grid.text("                                          ...y is categorical")
+		} else {
+#			e$c1$viewports <- yAxisViewports(c1$viewports, e$yData)
+			e$c1$calcStatistic <- notYetImplemented
+#			e$c1$plotStatistic <- notYetImplemented
+#			e$c1$plotData <- notYetImplemented			
+			grid.text("                                          ...y is numeric")
+		}
+#			e$c1$drawCanvas()
+	
 	}	
 	
 	e$reverseVariables <- function() {
@@ -215,6 +325,26 @@ new.vit.env <- function() {
 		svalue(e$xVar) <- svalue(e$yVar)
 		svalue(e$yVar) <- temp
 	}	
+	
+	# code borrowed straight from gwidgets vignette
+	e$confirmDialog <- function(message, handler=NULL)  {
+		window <- gwindow("Confirm")
+		group <- ggroup(container = window)
+		gimage("info", dirname="stock", size="dialog", container=group)
+
+		## A group for the message and buttons
+		inner.group <- ggroup(horizontal=FALSE, container = group)
+		glabel(message, container=inner.group, expand=TRUE)
+
+		## A group to organize the buttons
+		button.group <- ggroup(container = inner.group)
+		## Push buttons to right
+		addSpring(button.group)
+		gbutton("ok", handler=handler, container=button.group)
+		gbutton("cancel", container=button.group, handler = handler)
+  		
+  		return()
+	}
 	
 	e
 }

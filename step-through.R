@@ -1,11 +1,15 @@
 setwd("/Users/garrettgrolemund/Documents/git/vit")
 library(devtools)
 load_all("package")
+vit()
+
+bp <- read.csv("data/BloodPressure.csv")
+canvas$new(x = bp$type, y = NULL) -> c2
+
 
 # building a vit canvas
 require(ggplot2)
 
-vit()
 c1 <- canvas$new(mpg$hwy)
 c1$drawCanvas()
 writeData(c1)
