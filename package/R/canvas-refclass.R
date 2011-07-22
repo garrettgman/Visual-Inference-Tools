@@ -18,24 +18,46 @@
 #' side of the function. That would be burdensome here because there is so much 
 #' information to keep track of. The reference class approach is an attempt at 
 #' object oriented programming.
-canvas <- setRefClass("canvasClass", fields = c("image", "viewports", "x", "y", 
-	"samples", "which.sample", "n", "stat.dist", "var.name", "calcStatistic"), 
+canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.sample", "stat", "stat.dist", "viewports", "image"), 
 	methods = list(initialize = function(x = NA, y = NA...){
 		require(grid)
-		var.name <<- deparse(substitute(x))
 		x <<- x
 		y <<- y
-		n <<- length(x)
+		n <- length(x)
 		samples <<- split(sample(1:n, n * 1000, replace = TRUE), 
 			rep(1:1000, each = n))
-		#viewports <<- makeViewports(x)
-		#image <<- drawBackground(x, viewports)
 		which.sample <<- 1
 		stat.dist <<- vector(length = 1000)
-		#for(i in 1:1000)
-		#	stat.dist[i] <<- mean(x[samples[[i]]])
 		invisible(.self)
 	},
+	
+	# Primary Methods (details vary based on x, y, and stat)
+	plotData = function() {
+		'Plots a vector or dataframe of data points.'
+		PLOT_DATA()
+	},
+	calcStat = function() {
+		'Calculates the sample statistic for a group of data.'
+		CALC_STAT()
+	},	
+	calcStatDist = function() {
+		'Calculates the distribution of the sample statistic for the 1000 pre-generated samples'
+		CALC_STAT_DIST()
+	},
+	plotStat = function() {
+		'Plots the sample statistic with the sample.'
+		PLOT_STAT()
+	},
+	plotStatDist = function() {
+		'Plots the distribution of the sample statistic.'
+		PLOT_STAT_DIST()
+	},
+	displayResult = function() {
+		'Displays the final result of the VIT simulation.'
+		DISPLAY_RESULT()
+	},
+
+	# Methods for dealing with sample distribution
 	getSample = function(){
 		'Returns current sample of data.'
 		x[samples[[which.sample]]]
@@ -46,10 +68,14 @@ canvas <- setRefClass("canvasClass", fields = c("image", "viewports", "x", "y",
 		which.sample <<- which.sample + 1
 		invisible(x[samples[[which.sample]]])
 	},
+	
+	# Methods for dealing with distribution of sample statistic
 	getStatDist = function(){
-		'Returns current distribution of sampling statistic.'
+		'Returns current distribution of the sampling statistic.'
 		stat.dist[1:which.sample]
 	},
+	
+	# Methods for plotting 
 	drawCanvas = function(){
 		'Draws current image in device.'
 		grid.newpage()

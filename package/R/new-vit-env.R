@@ -262,6 +262,8 @@ new.vit.env <- function() {
 			return()
 		}
 		
+		confidenceCheck(e$xData, e$yData, svalue(e$stat))
+		
 		if (is.categorical(e$xData) & !is.categorical(e$yData) &
 			 !is.null(e$yData)) {
 				e$reverseVariables()
@@ -288,15 +290,6 @@ new.vit.env <- function() {
 #				"Confidence Interval" = plotCIStack)[[method]]	
 			grid.text("                                          ...y is NULL")	
 		} else if (is.categorical(e$yData)) {
-			if (method == "confidence interval"){
-				e$confirmDialog(
-"VIT cannot apply confidence interval methods to 
-more than one variable at a time. The statistic
-of interest will be changed to the mean.", 
-					handler = function(h, ...) { 
-						svalue(e$stat) <- "mean"
-						dispose(h$obj)
-				}) 
 			}
 			e$c1$calcStatistic <- list(mean = calcDiffMean, 
 				median = calcDiffMedian)[[method]]
@@ -326,25 +319,7 @@ of interest will be changed to the mean.",
 		svalue(e$yVar) <- temp
 	}	
 	
-	# code borrowed straight from gwidgets vignette
-	e$confirmDialog <- function(message, handler=NULL)  {
-		window <- gwindow("Confirm")
-		group <- ggroup(container = window)
-		gimage("info", dirname="stock", size="dialog", container=group)
 
-		## A group for the message and buttons
-		inner.group <- ggroup(horizontal=FALSE, container = group)
-		glabel(message, container=inner.group, expand=TRUE)
-
-		## A group to organize the buttons
-		button.group <- ggroup(container = inner.group)
-		## Push buttons to right
-		addSpring(button.group)
-		gbutton("ok", handler=handler, container=button.group)
-		gbutton("cancel", container=button.group, handler = handler)
-  		
-  		return()
-	}
 	
 	e
 }
