@@ -290,7 +290,6 @@ new.vit.env <- function() {
 #				"Confidence Interval" = plotCIStack)[[method]]	
 			grid.text("                                          ...y is NULL")	
 		} else if (is.categorical(e$yData)) {
-			}
 			e$c1$calcStatistic <- list(mean = calcDiffMean, 
 				median = calcDiffMedian)[[method]]
 #			e$c1$plotStatistic <- plotArrow

@@ -10,7 +10,7 @@ canvas$new(x = bp$type, y = NULL) -> c2
 # building a vit canvas
 require(ggplot2)
 
-c1 <- canvas$new(mpg$hwy)
+c1 <- canvas$new(x = mpg$hwy)
 c1$drawCanvas()
 writeData(c1)
 writeSample(c1)

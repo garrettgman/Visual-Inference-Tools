@@ -19,7 +19,7 @@
 #' information to keep track of. The reference class approach is an attempt at 
 #' object oriented programming.
 canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.sample", "stat", "stat.dist", "viewports", "image"), 
-	methods = list(initialize = function(x = NA, y = NA...){
+	methods = list(initialize = function(x = NULL, y = NULL, ...){
 		require(grid)
 		x <<- x
 		y <<- y
