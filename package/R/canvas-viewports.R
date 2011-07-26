@@ -84,10 +84,12 @@ textBoxVP <- function(name = list("text"), layout.pos.col = NULL,
 	textBox <- viewport(layout = layout, layout.pos.col = layout.pos.col, 
 		layout.pos.row = layout.pos.row, name = do.call("paste", name))
 	if (null.y) {
-		data <- vpStack(viewport(name = do.call("paste", c(name, "data"))),
-			textColumnVP(layout.pos.col = 1, name = c(name, "data", "x")))
-		sample <- vpStack(viewport(name = do.call("paste", c(name, "sample"))),
-			textColumnVP(layout.pos.col = 3, name = c(name, "sample", "x")))
+		data <- vpStack(viewport(layout.pos.col = 1, 
+			name = do.call("paste", c(name, "data"))),
+			textColumnVP(name = c(name, "data", "x")))
+		sample <- vpStack(viewport(layout.pos.col = 3, 
+			name = do.call("paste", c(name, "sample"))), 
+			textColumnVP(name = c(name, "sample", "x")))
 	} else {
 		data <- textTwoColumnVP(layout.pos.col = 1, name = c(name, "data"))
 		sample <- textTwoColumnVP(layout.pos.col = 3, name = c(name, "sample"))

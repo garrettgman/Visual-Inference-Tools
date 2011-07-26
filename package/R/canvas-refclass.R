@@ -32,29 +32,29 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 	},
 	
 	# Primary Methods (details vary based on x, y, and stat)
-	plotData = function() {
+	plotData = function(vp, name) {
 		'Plots a vector or dataframe of data points.'
-		PLOT_DATA()
+		PLOT_DATA(.self, vp, name)
 	},
 	calcStat = function() {
 		'Calculates the sample statistic for a group of data.'
-		CALC_STAT()
+		CALC_STAT(.self)
 	},	
 	calcStatDist = function() {
 		'Calculates the distribution of the sample statistic for the 1000 pre-generated samples'
-		CALC_STAT_DIST()
+		CALC_STAT_DIST(.self)
 	},
-	plotStat = function() {
+	plotStat = function(vp) {
 		'Plots the sample statistic with the sample.'
-		PLOT_STAT()
+		PLOT_STAT(.self, vp)
 	},
 	plotStatDist = function() {
 		'Plots the distribution of the sample statistic.'
-		PLOT_STAT_DIST()
+		PLOT_STAT_DIST(.self)
 	},
 	displayResult = function() {
 		'Displays the final result of the VIT simulation.'
-		DISPLAY_RESULT()
+		DISPLAY_RESULT(.self)
 	},
 
 	# Methods for dealing with sample distribution
@@ -76,7 +76,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 	},
 	
 	# Methods for plotting 
-	drawCanvas = function(){
+	drawImage = function(){
 		'Draws current image in device.'
 		grid.newpage()
 		grid.draw(image)

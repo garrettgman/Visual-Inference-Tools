@@ -255,56 +255,39 @@ new.vit.env <- function() {
 		e$inDataView <- FALSE
 	}
 	
+	
+# buildCanvas creates a canvas object from the R5 reference class canvas. This 
+# canvas object is saved in the GUI environment and handles all of the graphical 
+# displays in the vit tool. It may help to keep GUI methods (functions that 
+# begin with e$ ) separate in your mind from the canvas methods (functions that 
+# begin with e$c1$	). They behave a little differently. In general GUI methods 
+# affect the gui environment and canvas methods affect the canvas object. 
+# Handler functions that work with both are saved to the top level whenever 
+# possible.
 	e$buildCanvas <- function() {
 		grid.newpage()
 		if (is.null(e$xData)) {
 			grid.text("Please select Variable 1")
 			return()
 		}
-		
+
 		confidenceCheck(e$xData, e$yData, svalue(e$stat))
-		
+
 		if (is.categorical(e$xData) & !is.categorical(e$yData) &
 			 !is.null(e$yData)) {
 				e$reverseVariables()
-		}
-			
-		method <- svalue(e$stat)
+		}	
+		
 		e$c1 <- canvas$new(x = e$xData, y = e$yData)
 		
-		if (is.categorical(e$xData)) {
-#			e$c1$plotData <- plotProportionBars
-#			e$c1$viewports <- makeViewports(e$xData, proportion = TRUE)
-			grid.text("x is categorical")
-		} else {
-#			e$c1$plotData <- plotPoints
-#			e$c1$viewports <- makeViewports(e$xData)
-			grid.text("x is numeric")
-		}
-	
-		if (is.null(e$yData)) {
-			e$c1$calcStatistic <- list(mean = calcMean, median = calcMedian, 
-				"confidence interval" = calcCI)[[method]]
-#			e$c1$plotStatDist <- list(mean = plotTriangleDist, 
-#				median = plotTriangleDist, 
-#				"Confidence Interval" = plotCIStack)[[method]]	
-			grid.text("                                          ...y is NULL")	
-		} else if (is.categorical(e$yData)) {
-			e$c1$calcStatistic <- list(mean = calcDiffMean, 
-				median = calcDiffMedian)[[method]]
-#			e$c1$plotStatistic <- plotArrow
-#			e$c1$viewports <- splitViewports(c1$viewports, 
-#				levels = nlevel(e$yData))
-#			e$c1$plotStatDist <- plotTriangleDist			
-			grid.text("                                          ...y is categorical")
-		} else {
-#			e$c1$viewports <- yAxisViewports(c1$viewports, e$yData)
-			e$c1$calcStatistic <- notYetImplemented
-#			e$c1$plotStatistic <- notYetImplemented
-#			e$c1$plotData <- notYetImplemented			
-			grid.text("                                          ...y is numeric")
-		}
-#			e$c1$drawCanvas()
+		# loads the data dependent details that allow the canvas to perform 
+		# its basic actions. NOTE: should actions be stored in e?
+		loadDetails(e$xData, e$yData, svalue(e$stat))
+		loadViewports(e$c1, e$xData, e$yData)
+		loadImage(e$c1)
+		pushViewport(e$c1$viewports)
+		e$c1$plotData(graphsPath("data"), "dataPlot")
+		e$c1$drawImage()
 	
 	}	
 	
