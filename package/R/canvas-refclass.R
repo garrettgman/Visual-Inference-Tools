@@ -32,9 +32,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 	},
 	
 	# Primary Methods (details vary based on x, y, and stat)
-	plotData = function(vp, name) {
+	plotData = function(x, vp, name) {
 		'Plots a vector or dataframe of data points.'
-		PLOT_DATA(.self, vp, name)
+		PLOT_DATA(.self, x, vp, name)
 	},
 	calcStat = function() {
 		'Calculates the sample statistic for a group of data.'

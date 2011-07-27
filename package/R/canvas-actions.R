@@ -21,29 +21,34 @@ DISPLAY_RESULT <- function(canvas)
 
 # Fills in the correct details for PLOT_DATA, CALC_STAT, CALC_STAT_DIST, PLOT_STAT, PLOT_STAT_DIST, DISPLAY_RESULT based on x, y, and method. Method should be the selected value of the vit GUI e$stat combobox.	
 loadDetails <- function(x, y, method) {
-		confidenceCheck(x, y, method)
+	confidenceCheck(x, y, method)
+	if (is.null(y)) {
 		if (is.categorical(x)) {
 			PLOT_DATA <<- plotProportionBars
 		} else {
 			PLOT_DATA <<- plotPoints
 		}
-	
-		if (is.null(y)) {
 			CALC_STAT <<- list(mean = calcMean, median = calcMedian, 
 				"confidence interval" = calcCI)[[method]]
 			PLOT_STAT_DIST <<- list(mean = plotTriangleDist, 
 				median = plotTriangleDist, 
 				"confidence interval" = plotCIStack)[[method]]		
-		} else if (is.categorical(y)) {
-			CALC_STAT <<- list(mean = calcDiffMean, 
-				median = calcDiffMedian)[[method]]
-			PLOT_STAT <<- plotArrow
-			PLOT_STAT_DIST <<- plotTriangleDist			
+	} else if (is.categorical(y)) {
+		CALC_STAT <<- list(mean = calcDiffMean, 
+			median = calcDiffMedian)[[method]]
+		PLOT_STAT <<- plotArrow
+		PLOT_STAT_DIST <<- plotTriangleDist	
+			
+		if (is.categorical(x)) {
+			PLOT_DATA <<- plotProportionGroups
 		} else {
-			CALC_STAT <<- notYetImplemented
-			PLOT_STAT <<- notYetImplemented
-			PLOT_DATA <<- notYetImplemented			
-		}
+			PLOT_DATA <<- plotPointGroups
+		}		
+	} else {
+		CALC_STAT <<- notYetImplemented
+		PLOT_STAT <<- notYetImplemented
+		PLOT_DATA <<- notYetImplemented			
+	}
 }
 
 is.categorical <- function(x) {

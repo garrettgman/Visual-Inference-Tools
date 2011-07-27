@@ -4,12 +4,9 @@
 #'
 #' @param canvas a canvasClass object made with the generator object canvas
 # NOTE: should plotPoints be replaced with a points GROB that calculates stacking in drawDetails? So stacking changes as the plot is resized? ANSWER: Because we would have to repeat all of these calculations for every step of the animations, which would really slow things down.
-plotPoints <- function(canvas, vp, name) {
-	browser()
-	if (length(canvas$x) > 100) plotHist(canvas, vp)
+plotPoints <- function(canvas, x, vp, name) {
+	if (length(x) > 100) plotHist(canvas, x, vp, name)
 	else {
-		x <- canvas$x
-		
 		# drawing points
 		if (length(x) <= 1) df <- data.frame(x = x, y = 0)
 		else {
@@ -45,7 +42,17 @@ plotPoints <- function(canvas, vp, name) {
 
 
 
+plotPointGroups <- function(canvas, x, vp, name) {
+	n <- 1
+	for (i in unique(canvas$y)) {
+		plotPoints(canvas, x[canvas$y == i], 
+			vp = appendPath(vp, n),
+			name = paste(name, n, sep = "."))
+		n <- n + 1
+	}
+}
 
+plotProportionGroups <-
 plotProportionBars <-
 plotTriangleDist <-
 plotCIStack <-
