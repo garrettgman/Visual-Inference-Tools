@@ -17,6 +17,7 @@ loadViewports <- function(canvas, x, y = NULL) {
 		stop("method does not exist yet.")
 	}
 	
+	print(c(x.scale, y.scale, is.null(y), n.y))
 	canvas$viewports <- makeViewports(x.scale, y.scale, is.null(y), n.y)
 }
 	
@@ -212,7 +213,7 @@ framedDataVP <- function(x.scale = x.scale, y.scale = y.scale, n.y = 1,
 	dataVPs <- list()
 	for (i in 1:n.y) {
 		dataVPs[[i]] <- dataViewport(xscale = x.scale, yscale = y.scale, 
-			name = paste(dataName, i, sep = "."))
+			layout.pos.row = n.y - i + 1, name = paste(dataName, i, sep = "."))
 	}	
 	vpStack(frame, vpTree(plot, do.call("vpList", dataVPs)))
 }
@@ -251,4 +252,17 @@ textPath <- function(data.or.sample = "sample", x.or.y = "x",
 			sep = "."), 
 		paste("text", data.or.sample, x.or.y, top.mid.or.bottom, "plot", 
 			sep = "."))
+}
+
+#' appends a vpPath to include the number n on the bottommost viewport. If the 
+#' bottom most viewport ends in a number, it replaces that number with n.
+
+appendPath <- function(vp, n) {
+	text <- as.character(vp$name)
+	m <- nchar(text)
+	if (substr(text, m - 1, m - 1) == ".") substr(text, m, m) <- as.character(n)
+	else text <- paste(text, n, sep = ".")
+	
+	structure(list(path = vp$path, name = text, n = vp$n), 
+		class = c("vpPath", "path"))
 }
