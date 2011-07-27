@@ -20,12 +20,12 @@ grid.boxplot <- function(...){
 #' @param gp graphical parameters for the boxplot, constructed with gpar()
 #' @param vp A default viewport to be used when drawing the grob
 boxplotGrob <- function(data, at = unit(0.5, "npc"), height = unit(0.5, "npc"), 
-	box.color = "black", median.color = "black", show.w = TRUE, name = NULL, gp = NULL, 
-	vp = NULL){
+	box.color = "red", median.color = "blue", show.w = TRUE, name = NULL, 
+	gp = NULL, vp = NULL){
 	
-		bpgt <- gTree(data = data, at = at, height = height, box.color = box.color, 
-			median.color = median.color, show.w = show.w, name = name, gp = gp, vp = vp, 
-			cl="boxplot")
+		bpgt <- gTree(data = data, at = at, height = height, 
+			box.color = box.color, median.color = median.color, show.w = show.w, 
+			name = name, gp = gp, vp = vp, cl="boxplot")
         bpgt
 }
 
@@ -45,21 +45,27 @@ setBoxplotGrob <- function(bpgt){
 	if (show.w) {
 		whisker.low <- segmentsGrob(x0 = unit(x[1], "native"), y0 = at, 
 									x1 = unit(x[2], "native"), y1 = at, 
-									gp = gpar(col = box.color), name = "whisker.low")	
+									gp = gpar(col = box.color), 
+									name = "whisker.low")	
 		whisker.high <- segmentsGrob(x0 = unit(x[4], "native"), y0 = at, 
 									x1 = unit(x[5], "native"), y1 = at, 
-									gp = gpar(col = box.color), name = "whisker.high")
+									gp = gpar(col = box.color), 
+									name = "whisker.high")
 	}
 	
-	box <- rectGrob(x = unit(x[2], "native"), y = at, width = unit(x[4] - x[2], "native"), 
-					height = height, just = "left", gp = gpar(col = box.color), name = "box")
+	box <- rectGrob(x = unit(x[2], "native"), y = at, 
+		width = unit(x[4] - x[2], "native"), height = height, 
+		just = "left", gp = gpar(col = box.color), name = "box")
 					
-	pad <- convertHeight(unit(as.numeric(height)/2, attr(height, "unit")), "inches")			
+	pad <- convertHeight(unit(as.numeric(height)/2, attr(height, "unit")), 
+		"inches")			
 	median.line <- segmentsGrob(x0 = unit(x[3], "native"), y0 = at - pad, 
 								x1 = unit(x[3], "native"), y1 = at + pad, 
-								gp = gpar(col = median.color), name = "median.line")
+								gp = gpar(col = median.color), 
+								name = "median.line")
   	
-  	bpgt <- setChildren(bpgt, gList(whisker.low, whisker.high, box, median.line))
+  	bpgt <- setChildren(bpgt, 
+  		gList(whisker.low, whisker.high, box, median.line))
   	bpgt
 }
 
@@ -70,8 +76,8 @@ drawDetails.boxplot <- function(x, recording){
 }
 
 editDetails.boxplot <- function(x, spec){ 
-	x <- boxplotGrob(x$data, x$at, x$height, x$box.color, x$median.color, x$show.w, x$name, 
-					x$gp, x$vp)
+	x <- boxplotGrob(x$data, x$at, x$height, x$box.color, x$median.color, 
+		x$show.w, x$name, x$gp, x$vp)
 	x
 }
 
@@ -92,8 +98,8 @@ validDetails.boxplot <- function(x){
 }
 
 grid.boxplot.example <- function(data = rnorm(100, 0, 3), at = unit(0.5, "npc"), 
-	height = unit(5, "native"), box.color = "black", median.color = "black", show.w = TRUE, 
-	name="bxpExample", gp = gpar(lwd=3)){
+	height = unit(5, "native"), box.color = "black", median.color = "black", 
+	show.w = TRUE, name="bxpExample", gp = gpar(lwd=3)){
 		require(grid)
 		vp <- viewport(width = unit(0.8, "npc"), height = unit(0.8, "npc"), 
 			xscale = c(-10, 10), yscale = c(-10, 10))
@@ -103,8 +109,9 @@ grid.boxplot.example <- function(data = rnorm(100, 0, 3), at = unit(0.5, "npc"),
 		grid.xaxis()
 		grid.yaxis()
 
-		grid.boxplot(data = data, at = at, height = height, box.color = box.color, 
-			median.color = median.color, show.w = show.w, name = name, gp = gp)
+		grid.boxplot(data = data, at = at, height = height, 
+			box.color = box.color, median.color = median.color, show.w = show.w, 
+			name = name, gp = gp)
 }
 
 # grid.boxplot.example()
