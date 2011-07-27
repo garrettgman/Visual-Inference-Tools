@@ -34,7 +34,7 @@ plotPoints <- function(canvas, x, vp, name) {
 		canvas$image <- addGrob(canvas$image, pointsGrob(x = df$x, y = df$y, 
 			vp = vp, name = paste(name, "points", sep = "."), 
 			gp = gpar(col = "grey50")))
-		canvas$image <- addGrob(canvas$image, boxplotGrob(data = canvas$x, 
+		canvas$image <- addGrob(canvas$image, boxplotGrob(data = x, 
 			name = paste(name, "boxplot", sep = "."), vp = vp))
 
 	}
