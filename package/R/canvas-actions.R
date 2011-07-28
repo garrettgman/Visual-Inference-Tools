@@ -21,7 +21,6 @@ DISPLAY_RESULT <- function(canvas)
 
 # Fills in the correct details for PLOT_DATA, CALC_STAT, CALC_STAT_DIST, PLOT_STAT, PLOT_STAT_DIST, DISPLAY_RESULT based on x, y, and method. Method should be the selected value of the vit GUI e$stat combobox.	
 loadDetails <- function(x, y, method) {
-	confidenceCheck(x, y, method)
 	if (is.null(y)) {
 		if (is.categorical(x)) {
 			PLOT_DATA <<- plotProportionBars

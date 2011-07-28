@@ -271,7 +271,7 @@ new.vit.env <- function() {
 			return()
 		}
 
-		confidenceCheck(e$xData, e$yData, svalue(e$stat))
+		confidenceCheck(e, e$xData, e$yData, svalue(e$stat))
 
 		if (is.categorical(e$xData) & !is.categorical(e$yData) &
 			 !is.null(e$yData)) {
@@ -293,7 +293,7 @@ new.vit.env <- function() {
 	
 	# like buildCanvas, but retains viewports. For use with e$stat
 	e$resetCanvas <- function() {
-		confidenceCheck(e$xData, e$yData, svalue(e$stat))
+		confidenceCheck(e, e$xData, e$yData, svalue(e$stat))
 		loadDetails(e$xData, e$yData, svalue(e$stat))
 		loadImage(e$c1)
 		pushViewport(e$c1$viewports)

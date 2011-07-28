@@ -3,7 +3,7 @@
 #' @param x the vit gui's e$xData
 #' @param y the vit gui's e$yData
 #' @param method the selected value of the gui's e$stat combobox
-confidenceCheck <- function(x, y, method){
+confidenceCheck <- function(e, x, y, method){
 	if (!is.null(x) & !is.null(y) & method == "confidence interval") {
 		confirmDialog(
 "VIT cannot apply confidence interval methods to 
