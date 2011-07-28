@@ -40,9 +40,12 @@ plotPoints <- function(canvas, x, vp, name) {
 	}
 }
 
-plotHist <- function(canvas, x, vp, name)
-    canvas$image <- addGrob(canvas$image, histGrob(x, breaks = seq(min(x), max(x), length.out = 11),
-                                                   name = paste(name, "hist", sep = "."), vp = vp))
+plotHist <- function(canvas, x, vp, name){
+    boxes <- length(hist(x, plot = FALSE)$mids)
+    canvas$image <- addGrob(canvas$image, histGrob(x, breaks = seq(min(x), max(x), length.out = boxes),
+                                                   freq = 0.8, name = paste(name, "hist", sep = "."),
+                                                   vp = vp))
+}
 
 plotPointGroups <- function(canvas, x, vp, name) {
 	n <- 1
