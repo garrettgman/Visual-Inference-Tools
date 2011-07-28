@@ -11,7 +11,7 @@ grid.hist <- function(...)
 #'
 #' @param data a numeric vector of data.
 #' @param breaks if numeric, either an integer specifying the (approximate) number of histogram cells, or a vector specifying the breakpoints between histogram cells. A character string specifies the algorithm used to compute the number of cells (either "Sturges", "Scott" or "Freedman-Diaconis"). Additionally, a function can be supplied to calculate this.
-#' @param freq a logical value that indicates whether the histogram should represent frequencies or densities. If 'TRUE', breaks must be equidistant. If this is not the case, 'freq' reverts to FALSE with a warning.
+#' @param freq if logical, it indicates whether the histogram should represent frequencies or densities. If 'TRUE', breaks must be equidistant. If this is not the case, 'freq' reverts to FALSE with a warning. If a numeric value, the height of the tallest bar is specified. All other bars are scaled respectively.
 #' @param include.lowest a logical value that specifies whether a data value equal to the lowest (or if right = 'TRUE', the highest) break point should be included in the lowest histogram cell.
 #' @param right a logical value that indicates whether histogram cells are right closed ('TRUE') or left closed ('FALSE').
 #' @param fill a colour to be used to fill the histogram bars. This overrides a fill specified in 'gp'.
@@ -33,14 +33,18 @@ histGrob <- function(data, breaks = 10, freq = FALSE, include.lowest = TRUE,
                      gp = NULL, vp = NULL){
     histvals <- hist(x = data, breaks = breaks, include.lowest = include.lowest,
                      right = right, plot = FALSE)
-    if (freq & histvals$equidist) heights <- histvals$counts else
     heights <- histvals$density
+    if (is.numeric(freq)){
+        maxHeight <- max(heights)
+        scaleHeight <- freq/maxHeight
+        heights <- heights*scaleHeight
+    } else if (freq & histvals$equidist) heights <- histvals$counts
     if (freq & !histvals$equidist){
         freq = FALSE
         warning("if freq = TRUE, breaks must be equidistant. Plotting densities instead.")
     }
     grob(data = data, breaks = breaks, freq = freq, include.lowest = include.lowest,
-         right = right, fill = fill, histvals = histvals, heights = heights,
+         right = right, scale = scale, fill = fill, histvals = histvals, heights = heights,
          name = name, gp = gp, vp = vp, cl = "hist")
 }
 
@@ -60,8 +64,10 @@ drawDetails.hist <- function(x, recording){
 validDetails.hist <- function(x){
     if (!inherits(x$data, c("integer", "numeric")))
         stop("data must be integer or numeric")
-    if (!is.logical(x$freq))
-        stop("freq must be logical")
+    if (!(is.logical(x$freq) | is.numeric(x$freq)))
+        stop("freq must be logical or numeric")
+    if (length(x$freq) != 1)
+        stop("freq must have length 1")
     if (!is.logical(x$include.lowest))
         stop("include.lowest must be logical")
     if (!is.logical(x$right))
@@ -76,7 +82,7 @@ editDetails.hist <- function(x, specs){
     x
 }
 
-grid.hist.example <- function(data = rnorm(100, 0, 3), breaks = 3*(-4:4), freq = FALSE,
+grid.hist.example <- function(data = rnorm(100, 0, 3), breaks = 3*(-4:4), freq = 1,
                               include.lowest = TRUE, right = TRUE, fill = "white",
                               name = "histExample", gp = gpar(lwd = 3)){
     require(grid)
