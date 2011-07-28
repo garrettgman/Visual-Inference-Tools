@@ -179,16 +179,16 @@ graphsBoxVP <- function(x.scale, y.scale, n.y = 1, name = list("graphs"),
 	if (!is.list(name)) stop("name must be a list of character strings")
 	if (is.null(name$sep)) name$sep <- "."
 
-	layout <- grid.layout(nrow = n.y * 2 + 1)
+	layout <- grid.layout(nrow = 3)
 	
 	graphsBox <- viewport(layout = layout, layout.pos.row = layout.pos.row, 
 		layout.pos.col = layout.pos.col, name = do.call("paste", name))
-	dataVp <- framedDataVP(x.scale, y.scale, n.y, layout.pos.row = seq(1, n.y), 
+	dataVp <- framedDataVP(x.scale, y.scale, n.y, layout.pos.row = 1, 
 		name = c(name, "data"))
-	sample <- framedDataVP(x.scale, y.scale, n.y, 
-		layout.pos.row = 2 * seq(1, n.y), name = c(name, "sample"))
-	statistic <- framedDataVP(x.scale, y.scale, 
-		layout.pos.row = 2 * n.y + 1, name = c(name, "stat"))
+	sample <- framedDataVP(x.scale, y.scale, n.y, layout.pos.row = 2, 
+		name = c(name, "sample"))
+	statistic <- framedDataVP(x.scale, y.scale, layout.pos.row = 3, 
+		name = c(name, "stat"))
 	
 	vpTree(graphsBox, vpList(dataVp, sample, statistic))
 }
