@@ -13,7 +13,7 @@ loadViewports <- function(canvas, x, y = NULL) {
 	} else {
 		n.y <- 1
 		y.scale <- range(y)
-		notyetimplemented()
+		notYetImplemented()
 		stop("method does not exist yet.")
 	}
 	
