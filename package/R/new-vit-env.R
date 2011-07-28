@@ -291,6 +291,16 @@ new.vit.env <- function() {
 	
 	}	
 	
+	# like buildCanvas, but retains viewports. For use with e$stat
+	e$resetCanvas <- function() {
+		confidenceCheck(e$xData, e$yData, svalue(e$stat))
+		loadDetails(e$xData, e$yData, svalue(e$stat))
+		loadImage(e$c1)
+		pushViewport(e$c1$viewports)
+		e$c1$plotData(e$xData, graphsPath("data"), "dataPlot")
+		e$c1$drawImage()
+	}
+	
 	e$reverseVariables <- function() {
 		temp <- e$xData
 		e$xData <- e$yData

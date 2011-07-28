@@ -26,26 +26,25 @@ vit <- function() {
 	tbl[1,1] <- glabel("Statistic:    ",container = tbl)
 	tbl[1,2] <- (e$stat <- gcombobox(c(), editable=TRUE, container = tbl, 
 		handler = function(h, ...) {
-			if(!is.null(e$xData) & !is.null(e$yData)) {
-				e$confirmDialog(
-"VIT cannot apply confidence interval methods to 
-more than one variable at a time. The statistic
-of interest will be changed to the mean.", 
-					handler = function(h, ...) { 
-						svalue(e$stat) <- "mean"
-						dispose(h$obj)
-				})
-			} 
+			if (!is.null(e$xData)) e$resetCanvas()
 		}))
 	e$stat[] <- c("mean", "median", "confidence interval")
 	svalue(e$stat) <- "mean"
 	
 	addSpace(controls.vit, 10, horizontal = FALSE)
 	vit.bootbox <- gframe("bootstrapping",  container = controls.vit)
-	redraw.radio <- gradio(c("1 (all)",1, 5, 20),  horizontal=FALSE)
-	add(vit.bootbox, redraw.radio)
+	e$redraw.radio <- gradio(c("1 (all)",1, 5, 20),  horizontal=FALSE)
+	add(vit.bootbox, e$redraw.radio)
 	
-	run1.but  <- gbutton(text = "Run", container = controls.vit)
+	run1.but  <- gbutton(text = "Run", container = controls.vit, 
+		handler = function(h, ...) {
+			n <- c("1 (all)" = 1, "1" = 1, "5" = 5, 
+				"20" = 20)[svalue(e$redraw.radio)]
+			for (i in 1:n) {
+				e$c1$plotSample()
+				e$c1$drawImage()
+			}
+		})
 	point.but <- gbutton(text = "Track", container = controls.vit)
 	pause.but <- gbutton(text = "Pause", container = controls.vit)
 	addSpace(controls.vit, 40, horizontal=FALSE)
@@ -63,7 +62,7 @@ of interest will be changed to the mean.",
   
 	status <- glabel("", container = controls.vit)    
     
-	enabled(run1.but)      = FALSE
+	#enabled(run1.but)      = FALSE
 	enabled(pause.but)     = FALSE
 	enabled(run2.but)      = FALSE  
 	enabled(show.ci.but)   = FALSE

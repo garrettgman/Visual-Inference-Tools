@@ -26,7 +26,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 		n <- length(x)
 		samples <<- split(sample(1:n, n * 1000, replace = TRUE), 
 			rep(1:1000, each = n))
-		which.sample <<- 1
+		which.sample <<- 0
 		stat.dist <<- vector(length = 1000)
 		invisible(.self)
 	},
@@ -58,69 +58,45 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 	},
 
 	# Methods for dealing with sample distribution
-	getSample = function(){
+	getSample = function() {
 		'Returns current sample of data.'
 		x[samples[[which.sample]]]
 	},
-	newSample = function(){
+	newSample = function() {
 		'Takes new sample of data and returns it invisibly.'
 		if (which.sample >= 1000) which.sample <<- 0
 		which.sample <<- which.sample + 1
 		invisible(x[samples[[which.sample]]])
 	},
+	plotSample = function() {
+		'Retreives and plots the next sample.'
+		plotData(x = newSample(), vp = graphsPath("sample"), 
+			name = "samplePlot")
+	},
 	
 	# Methods for dealing with distribution of sample statistic
-	getStatDist = function(){
+	getStatDist = function() {
 		'Returns current distribution of the sampling statistic.'
 		stat.dist[1:which.sample]
 	},
 	
 	# Methods for plotting 
-	drawImage = function(){
+	drawImage = function() {
 		'Draws current image in device.'
 		grid.newpage()
 		grid.draw(image)
 	},
-	plotPoints = function(x, vp, name, ...){
-		'Plots x in specified viewport.'
-		if (length(x) <= 1) df <- data.frame(x = x, y = 0)
-		else {
-			seekViewport(vp)
-		
-			pheight <- convertY(unit(1, "char"), "native", 
-				valueOnly = TRUE) * 0.8
-			binwidth <- pheight * diff(range(x)) * 0.37/2
-  			nbins <- ceiling(diff(range(x) / binwidth))
-			breaks <- min(x) + c(0:(nbins)) * binwidth
-			group <- cut(x, breaks, include.lowest = TRUE)
-			max.stack <- max(table(group))
-			ydist <- min(1/max.stack, as.numeric(pheight))
-			df <- data.frame(x = x, group = group)
-			df$y <- NA	
-			for (i in levels(group)) {
-				igroup <- which(df$group == i)
-				j <- nrow(df[igroup, ])
-				if (j > 0) df[igroup, ]$y <- seq_len(j)
-			}
-	
-			df$y <- (df$y - 1) * ydist
-		}
-		
-		image <<- addGrob(image, pointsGrob(x = df$x, y = df$y, vp = vp, 
-			name = name, ...))
-		drawCanvas()
-	},
-	plotBoxplot = function(x, vp, name, ...){
+	plotBoxplot = function(x, vp, name, ...) {
 		'Plots boxplot of x in specified viewport'
 		image <<- addGrob(image, boxplotGrob(x, vp = vp, name = name, ...))
 		drawCanvas()
 	},
-	writeList = function(x, vp, name, ...){
+	writeList = function(x, vp, name, ...) {
 		'Writes text list of x in the specified viewport'
 		image <<- addGrob(image, textlistGrob(x, vp = vp, name = name, ...))		
 		drawCanvas()
 	},
-	writeText = function(x, vp, name, ...){
+	writeText = function(x, vp, name, ...) {
 		'Writes text of x in the specified viewport'
 		image <<- addGrob(image, textGrob(x, vp = vp, name = name, ...)) 		
 		# drawCanvas()

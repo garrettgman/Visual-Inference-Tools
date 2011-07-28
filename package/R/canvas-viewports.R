@@ -202,20 +202,26 @@ framedDataVP <- function(x.scale = x.scale, y.scale = y.scale, n.y = 1,
 	frameName <- do.call("paste", c(name, "frame"))
 	plotName <- do.call("paste", c(name, "plot"))
 	dataName <- do.call("paste", c(name, "data"))
+	statName <- do.call("paste", c(name, "stat"))
+	
+	frame.layout <- grid.layout(nrow = 2, heights = unit(1, c("null", "line")))
 	
 	if (n.y == 1) layout <- grid.layout()
 	else layout <- grid.layout(nrow = n.y)
 	
 	frame <- viewport(name = frameName, layout.pos.row = layout.pos.row, 
-		layout.pos.col = layout.pos.col)
-	plot <- plotViewport(c(2,1,1,1), name = plotName, layout = layout)
-	
+		layout.pos.col = layout.pos.col, layout = frame.layout)
+	plot <- plotViewport(c(2,1,1,1), name = plotName, layout = layout, 
+		layout.pos.row = 1)
 	dataVPs <- list()
 	for (i in 1:n.y) {
 		dataVPs[[i]] <- dataViewport(xscale = x.scale, yscale = y.scale, 
 			layout.pos.row = n.y - i + 1, name = paste(dataName, i, sep = "."))
 	}	
-	vpStack(frame, vpTree(plot, do.call("vpList", dataVPs)))
+	stat <- dataViewport(xscale = x.scale, yscale = y.scale, layout.pos.row = 2, 
+		name = statName)
+		
+	vpTree(frame, vpList(stat, vpTree(plot, do.call("vpList", dataVPs))))
 }
 
 
@@ -228,13 +234,19 @@ graphsPath <- function(plot.name = "sample", number = "1") {
 	if(!(plot.name %in% c("data", "sample", "stat")))
 		stop("plot.name must be \'data', \'sample', or \'stat'.")
 	if (is.numeric(number)) number <- as.character(number)
-	if ( !(number %in% c("1", "2", "3", "4", "5")))
-		stop("number must be \'1', \'2', \'3', \'4', or \'5'.")
-		
-	vpPath("canvas.frame", "graphs", 
-		paste("graphs", plot.name, "frame", sep = "."), 
-		paste("graphs", plot.name, "plot", sep = "."), 
-		paste("graphs", plot.name, "data", number, sep = "."))
+	if ( !(number %in% c("1", "2", "3", "4", "5", "stat")))
+		stop("number must be \'1', \'2', \'3', \'4', \'5', or 'stat'.")
+	
+	if (number == "stat") {
+		vpPath("canvas.frame", "graphs", 
+			paste("graphs", plot.name, "frame", sep = "."), 
+			paste("graphs", plot.name, "stat", sep = "."))
+	} else {	
+		vpPath("canvas.frame", "graphs", 
+			paste("graphs", plot.name, "frame", sep = "."), 
+			paste("graphs", plot.name, "plot", sep = "."), 
+			paste("graphs", plot.name, "data", number, sep = "."))
+	}
 }
 
 #' Helper function to quickly construct vpPaths to the three levels of the two 
@@ -266,3 +278,21 @@ appendPath <- function(vp, n) {
 	structure(list(path = vp$path, name = text, n = vp$n), 
 		class = c("vpPath", "path"))
 }
+
+#' helper function for programming use
+showVPs <- function() {
+	vps <- as.character(current.vpTree())
+	vps <- gsub("viewport\\[", "", vps)
+	vps <- gsub("\\]", "", vps)
+	vps <- gsub("\\(", "", vps)
+	vps <- gsub("\\)", "", vps)
+	vps <- gsub(" ", "", vps)
+	vps <- gsub("->", ",", vps)
+	
+	vlist <- strsplit(vps, ",")
+	
+	for (name in vlist[[1]][-1]) {
+		seekViewport(name)		
+		grid.rect(gp = gpar(col = "black", alpha = 0.5))
+	}
+} 

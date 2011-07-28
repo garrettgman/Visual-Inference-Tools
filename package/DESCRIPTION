@@ -6,7 +6,7 @@ Title: Visual Inference Tools
 LazyData: true
 Type: Package
 Author: Garrett Grolemund <grolemund@rice.edu>, Danny Chang, 
-	Vivian Li
+	Vivian Li, Ben Stevenson
 Description: Traditional methods of teaching statistical 
 	inference rely on concepts that are unfamiliar to students, 
 	such as probability distributions. This may overwhelm a 
