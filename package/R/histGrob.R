@@ -9,15 +9,24 @@ grid.hist <- function(...)
 #' histGrob constructs a histogram of a vector of data.
 #' histGrobs inherit the class "hist".
 #'
-#' @param data a numeric vector of data
+#' @param data a numeric vector of data.
 #' @param breaks if numeric, either an integer specifying the (approximate) number of histogram cells, or a vector specifying the breakpoints between histogram cells. A character string specifies the algorithm used to compute the number of cells (either "Sturges", "Scott" or "Freedman-Diaconis"). Additionally, a function can be supplied to calculate this.
 #' @param freq a logical value that indicates whether the histogram should represent frequencies or densities. If 'TRUE', breaks must be equidistant. If this is not the case, 'freq' reverts to FALSE with a warning.
 #' @param include.lowest a logical value that specifies whether a data value equal to the lowest (or if right = 'TRUE', the highest) break point should be included in the lowest histogram cell.
 #' @param right a logical value that indicates whether histogram cells are right closed ('TRUE') or left closed ('FALSE').
 #' @param fill a colour to be used to fill the histogram bars. This overrides a fill specified in 'gp'.
-#' @param name a name for the grob to be constructed
-#' @param gp graphical parameters for the histogram, constructed with gpar()
-#' @param vp a default viewport to be used when drawing the grob
+#' @param name a name for the grob to be constructed.
+#' @param gp graphical parameters for the histogram, constructed with gpar().
+#' @param vp a default viewport to be used when drawing the grob.
+
+#' Value:
+#' An object of class 'hist' with a list of components. This includes all inputted arguments, although it should be noted that 'freq' defaults to FALSE if break points are not equidistant, and therefore does not necessarily take the value of the supplied argument. In addition, a list 'histvals' is returned, which includes all values that are returned from the generic function 'hist()'. Most importantly:
+#' breaks: a vector of break points that split the data into bins. This is useful for specifying the range of the x-axis (see grid.hist.example() below).
+#' counts: the frequencies of data points falling into each bin.
+#' density: densities for each bin.
+#' mids: the cell midpoints.
+#' equidist: a logical value indicating whether or not break points are equidistant.
+
 
 histGrob <- function(data, breaks = 10, freq = FALSE, include.lowest = TRUE,
                      right = TRUE, fill = "grey", name = NULL,
