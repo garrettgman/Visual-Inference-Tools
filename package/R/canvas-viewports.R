@@ -17,7 +17,6 @@ loadViewports <- function(canvas, x, y = NULL) {
 		stop("method does not exist yet.")
 	}
 	
-	print(c(x.scale, y.scale, is.null(y), n.y))
 	canvas$viewports <- makeViewports(x.scale, y.scale, is.null(y), n.y)
 }
 	
