@@ -3,6 +3,9 @@
 PLOT_DATA <- function(canvas) 
 	warning("PLOT_DATA details must be set by loadDetails()")
 	
+PLOT_SAMPLE <- function(canvas) 
+	warning("PLOT_SAMPLE details must be set by loadDetails()")
+	
 CALC_STAT <- function(canvas) 
 	warning("CALC_STAT details must be set by loadDetails()")
 	
@@ -24,8 +27,10 @@ loadDetails <- function(x, y, method) {
 	if (is.null(y)) {
 		if (is.categorical(x)) {
 			PLOT_DATA <<- plotProportionBars
+			PLOT_SAMPLE <<- plotSampleProportionBars
 		} else {
 			PLOT_DATA <<- plotPointsAndBoxplot
+			PLOT_SAMPLE <<- plotSamplePointsAndBoxplot
 		}
 			CALC_STAT <<- list(mean = calcMean, median = calcMedian, 
 				"confidence interval" = calcCI)[[method]]
@@ -40,13 +45,16 @@ loadDetails <- function(x, y, method) {
 			
 		if (is.categorical(x)) {
 			PLOT_DATA <<- plotProportionGroups
+			PLOT_SAMPLE <<- plotSampleProportionGroups
 		} else {
 			PLOT_DATA <<- plotPointGroups
+			PLOT_SAMPLE <<- plotSamplePointGroups
 		}		
 	} else {
 		CALC_STAT <<- notYetImplemented
 		PLOT_STAT <<- notYetImplemented
-		PLOT_DATA <<- notYetImplemented			
+		PLOT_DATA <<- notYetImplemented	
+		PLOT_SAMPLE <<- notYetImplemented		
 	}
 }
 

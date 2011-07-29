@@ -1,16 +1,10 @@
-# Ghost methods for making grobs transparent
-
-#' Convert a grob into a transparent ghost of itself
-#' @name ghost
-#'
-#' @S3method ghost boxplot
-ghost <- function(grob, ...) {
-	if (!inherits(grob, c("grob", "gTree"))) stop("grob must be a graphical object or gTree")
-	UseMethod("ghost", grob)
+#' Turns a boxplot grob into a ghost version of itself
+makeGhost <- function(canvas, boxplot.grob) {
+	boxplot.grob$box.color <- "red"
+	boxplot.grob$median.color <- "blue"
+	boxplot.grob$show.w <- FALSE
+	boxplot.grob$name <- paste("ghost", canvas$which.ghost, sep = ".")
+	canvas$which.ghost <- canvas$which.ghost + 1
+	boxplot.grob$gp <- gpar(alpha = 0.5)
+	boxplot.grob
 }
-
-ghost.boxplot <- function(grob, ...) {
-	editGrob(grob, box.color = "red", median.color = "blue", show.w = FALSE, 
-		gp = gpar(alpha = 0.7))
-}
-	

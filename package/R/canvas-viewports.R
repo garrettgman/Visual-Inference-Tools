@@ -267,7 +267,6 @@ textPath <- function(data.or.sample = "sample", x.or.y = "x",
 
 #' appends a vpPath to include the number n on the bottommost viewport. If the 
 #' bottom most viewport ends in a number, it replaces that number with n.
-
 appendPath <- function(vp, n) {
 	text <- as.character(vp$name)
 	m <- nchar(text)
@@ -277,6 +276,18 @@ appendPath <- function(vp, n) {
 	structure(list(path = vp$path, name = text, n = vp$n), 
 		class = c("vpPath", "path"))
 }
+
+#' returns the number at the end of the viewport name
+vpNumber <- function(vp) {
+	text <- as.character(vp$name)
+	m <- nchar(text)
+	last <- substr(text, m, m)
+	if (last %in% c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"))
+		return(last)
+	else
+		return("")
+}
+
 
 #' helper function for programming use
 showVPs <- function() {

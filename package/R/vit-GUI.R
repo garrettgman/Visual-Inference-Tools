@@ -41,7 +41,7 @@ vit <- function() {
 			n <- c("1 (all)" = 1, "1" = 1, "5" = 5, 
 				"20" = 20)[svalue(e$redraw.radio)]
 			for (i in 1:n) {
-				e$c1$plotSample()
+				e$c1$plotSample(vp = graphsPath("sample"), name = "samplePlot")
 				e$c1$drawImage()
 			}
 		})

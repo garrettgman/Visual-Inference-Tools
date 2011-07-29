@@ -8,6 +8,12 @@ plotPointsAndBoxplot <- function(canvas, x, vp, name) {
 	plotPoints(canvas, x, vp, name)
 	plotBoxplot(canvas, x, vp, name)
 }
+
+plotSamplePointsAndBoxplot <- function(canvas, x, vp, name) {
+	plotPoints(canvas, x, vp, name)
+	plotSampleBoxplot(canvas, x, vp, name)
+}
+
 	
 plotPoints <- function(canvas, x, vp, name) {
 	if (length(x) > 100) plotHist(canvas, x, vp, name)
@@ -43,24 +49,31 @@ plotPoints <- function(canvas, x, vp, name) {
 	}
 }
 
-plotBoxplot <- function(canvas, x, vp, name) {
-	box.plot <- boxplotGrob(data = x, name = "boxplot")
+plotSampleBoxplot <- function(canvas, x, vp, name) {
+	bp.name <- paste(name, "boxplot", vpNumber(vp), sep = ".")
+	ghosts.name <- paste(name, "ghosts", vpNumber(vp), sep = ".")
+	
+	if (bp.name %in% childNames(canvas$image)) {
+		old.bp <- getGrob(canvas$image, gPath(bp.name))
 		
-	grob.name <- paste(name, "boxes", sep = ".")
-	
-	if(grob.name %in% childNames(canvas$image)) {
-		old <- getGrob(canvas$image, gPath(grob.name))
-		n <- length(old$children)
-		old$children[[n]] <- makeGhost(canvas, old$children[[n]])
-		boxes <- gList(old$children, box.plot)
-		boxTree <- gTree(children = boxes, vp = vp, name = grob.name)
-	} else {
-		boxTree <- gTree(children = gList(box.plot), vp = vp, name = grob.name)
+		if (ghosts.name %in% childNames(canvas$image)) {
+			ghosts <- getGrob(canvas$image, gPath(ghosts.name))
+			ghosts <- updateGhosts(ghosts, old.bp)
+		} else {
+			ghosts <- makeGhosts(old.bp, vp = vp, name = ghosts.name)
+		}
+		canvas$image <- addGrob(canvas$image, ghosts)
 	}
-	
-	canvas$image <- addGrob(canvas$image, boxTree)
-
+	box.plot <- boxplotGrob(data = x, name = bp.name, vp = vp)
+	canvas$image <- addGrob(canvas$image, box.plot)
 }
+
+plotBoxplot <- function(canvas, x, vp, name) {
+	bp.name <- paste(name, "boxplot", vpNumber(vp), sep = ".")
+	box.plot <- boxplotGrob(data = x, name = bp.name, vp = vp)
+	canvas$image <- addGrob(canvas$image, box.plot)
+}	
+
 
 plotHist <- function(canvas, x, vp, name){
     boxes <- length(hist(x, plot = FALSE)$mids)
@@ -72,15 +85,28 @@ plotHist <- function(canvas, x, vp, name){
 plotPointGroups <- function(canvas, x, vp, name) {
 	n <- 1
 	for (i in unique(canvas$y)) {
-		plotPoints(canvas, x[canvas$y == i],
+		plotPointsAndBoxplot(canvas, x[canvas$y == i],
 			vp = appendPath(vp, n),
 			name = paste(name, n, sep = "."))
 		n <- n + 1
 	}
 }
 
+plotSamplePointGroups <- function(canvas, x, vp, name) {
+	n <- 1
+	for (i in unique(canvas$y)) {
+		plotSamplePointsAndBoxplot(canvas, x[canvas$y == i],
+			vp = appendPath(vp, n),
+			name = paste(name, n, sep = "."))
+		n <- n + 1
+	}
+}
+
+
 plotProportionGroups <-
 plotProportionBars <-
+plotSampleProportionBars <-
+plotSampleProportionGroups <-
 plotTriangleDist <-
 plotCIStack <-
 plotArrow <-

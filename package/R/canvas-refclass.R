@@ -37,6 +37,10 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 		'Plots a vector or dataframe of data points.'
 		PLOT_DATA(.self, x, vp, name)
 	},
+	plotSample = function(vp, name) {
+		'Retreives and plots the next sample.'
+		PLOT_SAMPLE(.self, newSample(), vp, name)
+	},
 	calcStat = function() {
 		'Calculates the sample statistic for a group of data.'
 		CALC_STAT(.self)
@@ -68,13 +72,6 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 		if (which.sample >= 1000) which.sample <<- 0
 		which.sample <<- which.sample + 1
 		invisible(x[samples[[which.sample]]])
-	},
-	plotSample = function() {
-		'Retreives and plots the next sample.'
-#		if ("samplePlot.boxplot" %in% names(image$children))
-#			updateGhosts(.self)
-		plotData(x = newSample(), vp = graphsPath("sample"), 
-			name = "samplePlot")
 	},
 	
 	# Methods for dealing with distribution of sample statistic
