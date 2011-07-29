@@ -25,7 +25,7 @@ loadDetails <- function(x, y, method) {
 		if (is.categorical(x)) {
 			PLOT_DATA <<- plotProportionBars
 		} else {
-			PLOT_DATA <<- plotPoints
+			PLOT_DATA <<- plotPointsAndBoxplot
 		}
 			CALC_STAT <<- list(mean = calcMean, median = calcMedian, 
 				"confidence interval" = calcCI)[[method]]

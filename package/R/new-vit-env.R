@@ -311,6 +311,7 @@ new.vit.env <- function() {
 		loadDetails(e$xData, e$yData, svalue(e$stat))
 		loadImage(e$c1)
 		pushViewport(e$c1$viewports)
+		e$c1$which.ghost <- 1
 		e$c1$plotData(e$xData, graphsPath("data"), "dataPlot")
 		e$c1$drawImage()
 	}

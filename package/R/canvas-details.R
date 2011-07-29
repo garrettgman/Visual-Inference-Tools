@@ -4,6 +4,11 @@
 #'
 #' @param canvas a canvasClass object made with the generator object canvas
 # NOTE: should plotPoints be replaced with a points GROB that calculates stacking in drawDetails? So stacking changes as the plot is resized? ANSWER: Because we would have to repeat all of these calculations for every step of the animations, which would really slow things down.
+plotPointsAndBoxplot <- function(canvas, x, vp, name) {
+	plotPoints(canvas, x, vp, name)
+	plotBoxplot(canvas, x, vp, name)
+}
+	
 plotPoints <- function(canvas, x, vp, name) {
 	if (length(x) > 100) plotHist(canvas, x, vp, name)
 	else {
@@ -34,10 +39,27 @@ plotPoints <- function(canvas, x, vp, name) {
 		canvas$image <- addGrob(canvas$image, pointsGrob(x = df$x, y = df$y,
 			vp = vp, name = paste(name, "points", sep = "."),
 			gp = gpar(col = "grey50")))
-		canvas$image <- addGrob(canvas$image, boxplotGrob(data = x,
-			name = paste(name, "boxplot", sep = "."), vp = vp))
 
 	}
+}
+
+plotBoxplot <- function(canvas, x, vp, name) {
+	box.plot <- boxplotGrob(data = x, name = "boxplot")
+		
+	grob.name <- paste(name, "boxes", sep = ".")
+	
+	if(grob.name %in% childNames(canvas$image)) {
+		old <- getGrob(canvas$image, gPath(grob.name))
+		n <- length(old$children)
+		old$children[[n]] <- makeGhost(canvas, old$children[[n]])
+		boxes <- gList(old$children, box.plot)
+		boxTree <- gTree(children = boxes, vp = vp, name = grob.name)
+	} else {
+		boxTree <- gTree(children = gList(box.plot), vp = vp, name = grob.name)
+	}
+	
+	canvas$image <- addGrob(canvas$image, boxTree)
+
 }
 
 plotHist <- function(canvas, x, vp, name){

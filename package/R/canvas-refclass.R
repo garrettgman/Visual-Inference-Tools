@@ -18,7 +18,7 @@
 #' side of the function. That would be burdensome here because there is so much 
 #' information to keep track of. The reference class approach is an attempt at 
 #' object oriented programming.
-canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.sample", "stat", "stat.dist", "viewports", "image"), 
+canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.sample", "stat", "stat.dist", "viewports", "image", "which.ghost"), 
 	methods = list(initialize = function(x = NULL, y = NULL, ...){
 		require(grid)
 		x <<- x
@@ -28,6 +28,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 			rep(1:1000, each = n))
 		which.sample <<- 0
 		stat.dist <<- vector(length = 1000)
+		which.ghost <<- 1
 		invisible(.self)
 	},
 	
@@ -70,6 +71,8 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 	},
 	plotSample = function() {
 		'Retreives and plots the next sample.'
+#		if ("samplePlot.boxplot" %in% names(image$children))
+#			updateGhosts(.self)
 		plotData(x = newSample(), vp = graphsPath("sample"), 
 			name = "samplePlot")
 	},
