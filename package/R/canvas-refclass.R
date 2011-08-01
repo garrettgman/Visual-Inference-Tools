@@ -43,7 +43,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 	},
 	calcStat = function() {
 		'Calculates the sample statistic for a group of data.'
-		CALC_STAT(.self)
+		CALC_STAT(getSample())
 	},	
 	calcStatDist = function() {
 		'Calculates the distribution of the sample statistic for the 1000 pre-generated samples'
