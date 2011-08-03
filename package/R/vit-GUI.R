@@ -26,18 +26,29 @@ vit <- function() {
 	tbl[1,1] <- glabel("Statistic:    ",container = tbl)
 	tbl[1,2] <- (e$stat <- gcombobox(c(), editable=TRUE, container = tbl,
 		handler = function(h, ...) {
-                    if (svalue(e$stat) == "confidence interval")
-                        enabled(e$cimeth) = TRUE else enabled(e$cimeth) = FALSE
-                    loadStat(svalue(e$stat), svalue(e$cimeth))
+                    if (svalue(e$stat) == "confidence interval"){
+                        enabled(e$cimeth) <- TRUE
+                        if (svalue(e$cimeth) == "normal"){
+                            enabled(e$cistat) <- FALSE
+                            #svalue(e$cistat) <- "mean"
+                        } else enabled(e$cistat) <- TRUE
+                    } else enabled(e$cimeth) <- enabled(e$cistat) <- FALSE
                     if (!is.null(e$xData)) e$resetCanvas()
-		}))
+                    }))
 	e$stat[] <- c("mean", "median", "confidence interval")
 	svalue(e$stat) <- "mean"
-        tbl[2,1] <- glabel("CI Method:    ", container = tbl)
-        tbl[2,2] <- (e$cimeth <- gcombobox(c(), editable = TRUE, container = tbl,
+        tbl[2,1] <- glabel("CI Statistic: ", container = tbl)
+        tbl[2,2] <- (e$cistat <- gradio(c("mean", "median"), editable = TRUE, container = tbl))
+        svalue(e$cistat) <- "mean"
+        enabled(e$cistat) <- FALSE
+        tbl[3,1] <- glabel("CI Method:    ", container = tbl)
+        tbl[3,2] <- (e$cimeth <- gcombobox(c(), editable = TRUE, container = tbl,
                                            handler = function(h, ...) {
-                                               loadStat(svalue(e$stat), svalue(e$cimeth))
-                                               if (!is.null(e$xData)) e$resetCanvas()
+                                               if (svalue(e$cimeth) == "normal"){
+                                                   svalue(e$cistat) <- "mean"
+                                                   enabled(e$cistat) <- FALSE
+                                               }else
+                                               enabled(e$cistat) <- TRUE
                                            }))
         e$cimeth[] <- c("normal", "percentile bootstrap", "normal bootstrap", "t bootstrap")
         svalue(e$cimeth) <- "normal"
@@ -48,14 +59,15 @@ vit <- function() {
 	add(vit.bootbox, e$redraw.radio)
 
 	run1.but  <- gbutton(text = "Run", container = controls.vit,
-		handler = function(h, ...) {
-			n <- c("1 (all)" = 1, "1" = 1, "5" = 5,
-				"20" = 20)[svalue(e$redraw.radio)]
-			for (i in 1:n) {
-				e$c1$plotSample(vp = graphsPath("sample"), name = "samplePlot")
-				e$c1$drawImage()
-			}
-		})
+                             handler = function(h, ...) {
+                                 loadStat(svalue(e$stat), svalue(e$cimeth))
+                                 n <- c("1 (all)" = 1, "1" = 1, "5" = 5,
+                                        "20" = 20)[svalue(e$redraw.radio)]
+                                 for (i in 1:n) {
+                                     e$c1$plotSample(vp = graphsPath("sample"), name = "samplePlot")
+                                     e$c1$drawImage()
+                                 }
+                             })
 	point.but <- gbutton(text = "Track", container = controls.vit)
 	pause.but <- gbutton(text = "Pause", container = controls.vit)
 	addSpace(controls.vit, 40, horizontal=FALSE)
