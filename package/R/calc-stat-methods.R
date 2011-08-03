@@ -15,30 +15,34 @@ calcCIWald <- function(x){
 }
 
 calcCIBootPerc <- function(x){
+    statfun <- eval(parse(text = svalue(e$cistat)))
+    statfun <- mean
     n <- length(x)
-    nboots <- 999
+    nboots <- 9999
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
                     ncol = n)
-    means <- apply(samps, 1, mean)
+    means <- apply(samps, 1, statfun)
     quantile(means, prob = c(0.025, 0.975))
 }
 
 calcCIBootSE <- function(x){
+    statfun <- eval(parse(text = svalue(e$cistat)))
     n <- length(x)
-    nboots <- 1000
+    nboots <- 10000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
                     ncol = n)
-    means <- apply(samps, 1, mean)
+    means <- apply(samps, 1, statfun)
     se <- sd(means)
-    mean(x) + c(-1, 1)*1.96*se
+    mean(x) + c(-1, 1)*2*se
 }
 
 calcCIBootTSE <- function(x){
+    statfun <- eval(parse(text = svalue(e$cistat)))
     n <- length(x)
     nboots <- 1000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
                     ncol = n)
-    means <- apply(samps, 1, mean)
+    means <- apply(samps, 1, statfun)
     se <- sd(means)
     mean(x) + c(-1, 1)*qt(0.975, n - 1)*se
 }
