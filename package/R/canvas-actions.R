@@ -47,7 +47,6 @@ loadDetails <- function(x, y, method) {
 			PLOT_SAMPLE <<- plotSamplePointGroups
 		}
 	} else {
-		PLOT_STAT <<- notYetImplemented
 		PLOT_DATA <<- notYetImplemented
 		PLOT_SAMPLE <<- notYetImplemented
 	}
