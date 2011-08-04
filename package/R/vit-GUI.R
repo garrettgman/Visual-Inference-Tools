@@ -34,11 +34,9 @@ vit <- function() {
         e$cimeth[] <- c("normal", "percentile bootstrap", "normal bootstrap", "t bootstrap")
         tbl[3,1] <- glabel("Sample Size:  ", container = tbl)
         tbl[3,2] <- (e$ssize <- gedit("50", handler = function(h, ...){
-            e$makeSamples()
             if (!is.null(e$xData)) e$resetCanvas()
             }, container = tbl))
         tbl[4,2] <- (e$replace <- gcheckbox("Sample with replacement", handler = function(h, ...){
-            e$makeSamples()
             if (!is.null(e$xData)) e$resetCanvas()
             }, container = tbl))
         svalue(e$replace) <- TRUE
@@ -53,6 +51,7 @@ vit <- function() {
 
 	run1.but  <- gbutton(text = "Run", container = controls.vit,
                              handler = function(h, ...) {
+                                 if (e$c1$which.sample == 0) e$checkSamples()
                                  loadStat(svalue(e$stat), svalue(e$cimeth))
                                  n <- c("1 (all)" = 1, "1" = 1, "5" = 5,
                                         "20" = 20)[svalue(e$redraw.radio)]
