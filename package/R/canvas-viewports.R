@@ -31,6 +31,15 @@ makeViewports <- function(x.scale, y.scale, null.y, n.y) {
 	vpTree(frameVP, vpList(text, graphs))
 }
 
+# for use in confidence interval task. makeSimpleViewports makes the same viewports as above except it omits everything related to the two textbox columns
+makeSimpleViewports <- function(x.scale, y.scale, null.y, n.y) {
+	frameVP <- plotViewport(c(1,1,1,1), name = "canvas.frame")
+	graphs <- graphsBoxVP(x.scale = x.scale, y.scale = y.scale, 
+		n.y = n.y) 
+	vpStack(frameVP, graphs)
+}
+
+
 
 #' Creates the vpTree needed to build the textboxes which display the values of #' the data and the sample. These are the left most two boxes in the visual 
 #' inference tool. textBoxVP creates a viewport tree that contains 30 viewports 
