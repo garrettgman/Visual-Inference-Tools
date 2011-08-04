@@ -293,7 +293,6 @@ new.vit.env <- function() {
 		}
 
 		e$c1 <- canvas$new(x = e$xData, y = e$yData)
-                e$makeSamples()
 		# loads the data dependent details that allow the canvas to perform
 		# its basic actions. NOTE: should actions be stored in e?
 		loadDetails(e$xData, e$yData, svalue(e$stat))
@@ -311,6 +310,7 @@ new.vit.env <- function() {
 		loadDetails(e$xData, e$yData, svalue(e$stat))
 		loadImage(e$c1)
 		pushViewport(e$c1$viewports)
+                e$c1$which.sample <- 0
 		e$c1$which.ghost <- 1
 		e$c1$plotData(e$xData, graphsPath("data"), "dataPlot")
 		e$c1$drawImage()
@@ -330,19 +330,18 @@ new.vit.env <- function() {
         # population (if replace = FALSE) and no smaller than 2. Also
         # allows widgets to be adjusted without the specification of
         # data without errors.
-        e$makeSamples <- function(){
+        e$checkSamples <- function(){
             if (!is.null(e$xData)){
                 if (svalue(e$replace) == FALSE & as.numeric(svalue(e$ssize)) > length(e$xData))
                     svalue(e$ssize) <- length(e$xData)
                 if (as.numeric(svalue(e$ssize)) < 2)
                     svalue(e$ssize) <- 2
-                e$c1$getSamples(size = as.numeric(svalue(e$ssize)), replace = svalue(e$replace))
+                e$c1$makeSamples(size = as.numeric(svalue(e$ssize)), replace = svalue(e$replace))
                 }}
         # Handler for the e$stat combobox. Ensures correct widgets are
         # enabled, and sets up e$cistat if a confidence interval is
         # selected.
 	e$cistatHandler <- function(h, ...){
-            e$makeSamples()
             if (substr(svalue(e$stat), 1, 1) == "c"){
                 svalue(e$replace) <- FALSE
                 enabled(e$cimeth) <- TRUE
