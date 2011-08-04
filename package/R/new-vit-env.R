@@ -1,15 +1,15 @@
 new.vit.env <- function() {
-	e <- new.env() 
-	
+	e <- new.env()
+
 	e$fileReader <- function(){
 		print("Importing file")
 
 		e$specifyFileForImport()
 	}
-	
+
 	e$viewList <- function(h, ...){
 		if(is.null(tag(e$obj, "dataSet"))) {
-			gmessage("Please load a new data set (with named columns)", 
+			gmessage("Please load a new data set (with named columns)",
 				parent = e$win)
 		} else if(names(tag(e$obj, "dataSet"))[1] == "empty") {
 				gmessage("Please load a new data set", parent = e$win)
@@ -20,10 +20,10 @@ new.vit.env <- function() {
 			e$inDataView <- FALSE
       }
     }
-    
+
     e$viewData <- function(h, ...){
     	if(is.null(tag(e$obj, "dataSet"))) {
-			gmessage("Please load a new data set (with named columns)", 
+			gmessage("Please load a new data set (with named columns)",
 				parent = e$win)
 		} else if ((names(tag(e$obj, "dataSet"))[1] == "empty")) {
 			gmessage("Please load a new data set", parent = e$win)
@@ -34,7 +34,7 @@ new.vit.env <- function() {
 			e$inDataView = TRUE
 		}
 	}
-	
+
 	e$specifyFileForImport <- function(...) {
 		e1 <- new.env()
 		importFileWin <- gwindow("File Browser", cont = TRUE, parent = e$win)
@@ -52,7 +52,7 @@ new.vit.env <- function() {
 		popchar <- function(str) paste(pop(unlist(strsplit(str,""))),
 			collapse="")
 
-		filterList <- lapply(fileExtensions, function(i) list(patterns = 
+		filterList <- lapply(fileExtensions, function(i) list(patterns =
 			paste("*.",i,sep="")))
 		#filterList$"All files" = list(patterns=c("*"))
 
@@ -63,7 +63,7 @@ new.vit.env <- function() {
 
 		filetbl[2,2] <- glabel("Local file")
 		filetbl[2,3] <- (filebrowse = gfilebrowse(text="Specify a file",
-			action=invisible, container=filetbl, filter=filterList, 
+			action=invisible, container=filetbl, filter=filterList,
 			quote=FALSE))
 		filetbl[3,2:3] <- gseparator(cont=filetbl)
 		filetbl[4,2] = gettext("File type is")
@@ -74,9 +74,9 @@ new.vit.env <- function() {
 
 		buttonGp <- ggroup(cont = fileMainGp)
 		addSpring(buttonGp)
-		okButton <- gbutton("OK", 
+		okButton <- gbutton("OK",
 			handler = function(h,...) e1$okButtonHandler())
-		cancelButton <- gbutton("Cancel", 
+		cancelButton <- gbutton("Cancel",
 			handler = function(h,...) e1$cancelButtonHandler())
 		add(buttonGp, okButton)
 		add(buttonGp, cancelButton)
@@ -85,7 +85,7 @@ new.vit.env <- function() {
 			"Space for extra options: define NA string, header presence etc."))
 
 		e1$cancelButtonHandler <- function(h,...) dispose(importFileWin)
-	
+
 		e1$okButtonHandler <- function(h,...) {
 			theFile <- svalue(filebrowse)
 			ext <- NULL ## the extension, figure out
@@ -96,7 +96,7 @@ new.vit.env <- function() {
 				fileType <- svalue(filetype)
 				if(fileType != "<use file extension to determine>") {
     	  			## use filterList to get
-					fileType <- paste(fileType,"s", sep="", collapse="") 
+					fileType <- paste(fileType,"s", sep="", collapse="")
 					## append s back
 					ext <- fileExtensions[[fileType]][1]
 				sprintf("Set extension to %s \n",ext)
@@ -107,21 +107,21 @@ new.vit.env <- function() {
 			e1$importFile(theFile, ext)
 			}
 		}
-	
+
 		e1$importFile <- function(theFile, ext){
 			tmp <- unlist(strsplit(basename(theFile), split="\\."))
 			ext.tmp <- tmp[length(tmp)]
-		
+
 			if(length(ext) == 0) {
-				gmessage(title = "Error", message = "Check file type", 
+				gmessage(title = "Error", message = "Check file type",
 					icon = "error", cont = TRUE, parent = importFileWin)
 			} else if(ext.tmp != ext) {
-				gmessage(title = "Error", message = 
-					"Chosen file is different than the selected file type", 
+				gmessage(title = "Error", message =
+					"Chosen file is different than the selected file type",
 			   		icon = "error", cont = TRUE, parent = importFileWin)
 			} else if(ext == "csv") {
-				out <- try(read.csv(theFile, header = TRUE, 
-					na.strings = c("NULL","NA","N/A","#N/A","","<NA>"), 
+				out <- try(read.csv(theFile, header = TRUE,
+					na.strings = c("NULL","NA","N/A","#N/A","","<NA>"),
 					check.names = TRUE))
 				if(inherits(out,"try-error")){
 					sprintf("Error loading file: %s\n",out)
@@ -129,7 +129,7 @@ new.vit.env <- function() {
 					return(TRUE)
 				}else{
 					enabled(okButton) <- FALSE
-					out <- data.frame(ROW_NAME = 1:nrow(out), out, 
+					out <- data.frame(ROW_NAME = 1:nrow(out), out,
 						check.names = TRUE)
 					tag(e$obj,"dataSet") <- out[,-1]
 					tag(e$obj,"rowDataSet") <- out
@@ -143,7 +143,7 @@ new.vit.env <- function() {
 					dispose(importFileWin)
 				}
 	      }else if(ext == "xls" || ext == "xlsx"){
-				channel <- try(odbcConnectExcel2007(theFile, readOnly = TRUE, 
+				channel <- try(odbcConnectExcel2007(theFile, readOnly = TRUE,
 					readOnlyOptimize=TRUE))
 				if(inherits(channel,"try-error")) {
 					sprintf("Error loading file: %s\n",channel)
@@ -153,19 +153,19 @@ new.vit.env <- function() {
 				}else{
 					enabled(okButton) <- FALSE
 					#no na.omit()
-					out <- try(sqlFetch(channel, sqtable = "Sheet1", 
-					na.strings = c("NULL","NA","N/A","#N/A","","<NA>"), 
-						as.is = TRUE))           
+					out <- try(sqlFetch(channel, sqtable = "Sheet1",
+					na.strings = c("NULL","NA","N/A","#N/A","","<NA>"),
+						as.is = TRUE))
 					if(inherits(out,"try-error")){
 						gmessage("Please ensure that the Excel worksheet containing the data is named as Sheet1\n\nIf the error persists, please save the dataset as a CSV (comma separated) file", parent = importFileWin)
 						enabled(okButton) <- TRUE
 					}else{
 						out <- data.frame(ROW_NAME = 1:nrow(out), out)
-						names(out) <- make.names(names(out), unique=TRUE)  
-	
+						names(out) <- make.names(names(out), unique=TRUE)
+
 						for(i in 1:length(names(out))){
 							x <- as.numeric(out[,i])
-							if(all(is.na(x))) 
+							if(all(is.na(x)))
 								out[,i] <- factor(as.character(out[,i]))
 							else out[,i] <- x
 						}
@@ -193,14 +193,14 @@ new.vit.env <- function() {
 		svalue(e$yVar) <- "Drop name here"
 		e$e$yData <- NULL
 	}
-	
+
 	e$odbcCloseAll <- function(){
 		require(RODBC)
 		odbcCloseAll()
 	}
-	
+
 	e$updateData <- function() {
-		names(tag(e$obj,"dataSet")) <- make.names(names(tag(e$obj,"dataSet")), 
+		names(tag(e$obj,"dataSet")) <- make.names(names(tag(e$obj,"dataSet")),
 			unique = TRUE)
 		tag(e$obj,"rowDataSet") <- data.frame( ROW_NAME = tag(e$obj,
 			"rowDataSet")[,1], tag(e$obj, "dataSet"))
@@ -218,19 +218,19 @@ new.vit.env <- function() {
 
 		e$dataSt <- gdf(tag(e$obj,"dataSet"),expand = TRUE)
 		add(e$dataGp, e$dataSt, expand = TRUE)
-		addHandlerChanged(e$dataSt, 
+		addHandlerChanged(e$dataSt,
 			handler = function(h,...) tag(e$obj,"dataSet") = e$dataSt[])
 	    e$inDataView = TRUE
 	}
-	
+
 	e$updateList <- function() {
-		names(tag(e$obj,"dataSet")) <- make.names(names(tag(e$obj,"dataSet")), 
+		names(tag(e$obj,"dataSet")) <- make.names(names(tag(e$obj,"dataSet")),
 			unique = TRUE)
 		tag(e$obj,"rowDataSet") <- data.frame(ROW_NAME = tag(e$obj,
 			"rowDataSet")[,1], tag(e$obj, "dataSet"))
 		names(tag(e$obj,"rowDataSet")) <- make.names(names(tag(e$obj,
 			"rowDataSet")), unique = TRUE)
-		
+
 		if(!is.null(e$dataList))
 			delete(e$dataGp, e$dataList, expand = TRUE)
 		if(!is.null(e$dataList1))
@@ -242,8 +242,8 @@ new.vit.env <- function() {
 
 		N = 19
 		# if(e$sliderCreated && e$sliderCreated2) N = 14
-		
-		if((length(names(tag(e$obj,"dataSet"))) > N) && 
+
+		if((length(names(tag(e$obj,"dataSet"))) > N) &&
 			(length(names(tag(e$obj,"dataSet"))) < 80)){
 				x <- length(names(tag(e$obj,
 					"dataSet"))[(N+1):(length(names(tag(e$obj,"dataSet"))))])
@@ -268,15 +268,15 @@ new.vit.env <- function() {
 
 		e$inDataView <- FALSE
 	}
-	
-	
-# buildCanvas creates a canvas object from the R5 reference class canvas. This 
-# canvas object is saved in the GUI environment and handles all of the graphical 
-# displays in the vit tool. It may help to keep GUI methods (functions that 
-# begin with e$ ) separate in your mind from the canvas methods (functions that 
-# begin with e$c1$	). They behave a little differently. In general GUI methods 
-# affect the gui environment and canvas methods affect the canvas object. 
-# Handler functions that work with both are saved to the top level whenever 
+
+
+# buildCanvas creates a canvas object from the R5 reference class canvas. This
+# canvas object is saved in the GUI environment and handles all of the graphical
+# displays in the vit tool. It may help to keep GUI methods (functions that
+# begin with e$ ) separate in your mind from the canvas methods (functions that
+# begin with e$c1$	). They behave a little differently. In general GUI methods
+# affect the gui environment and canvas methods affect the canvas object.
+# Handler functions that work with both are saved to the top level whenever
 # possible.
 	e$buildCanvas <- function() {
 		grid.newpage()
@@ -290,11 +290,11 @@ new.vit.env <- function() {
 		if (is.categorical(e$xData) & !is.categorical(e$yData) &
 			 !is.null(e$yData)) {
 				e$reverseVariables()
-		}	
-		
+		}
+
 		e$c1 <- canvas$new(x = e$xData, y = e$yData)
-		
-		# loads the data dependent details that allow the canvas to perform 
+                e$makeSamples()
+		# loads the data dependent details that allow the canvas to perform
 		# its basic actions. NOTE: should actions be stored in e?
 		loadDetails(e$xData, e$yData, svalue(e$stat))
 		loadViewports(e$c1, e$xData, e$yData)
@@ -302,9 +302,9 @@ new.vit.env <- function() {
 		pushViewport(e$c1$viewports)
 		e$c1$plotData(e$xData, graphsPath("data"), "dataPlot")
 		e$c1$drawImage()
-	
-	}	
-	
+
+	}
+
 	# like buildCanvas, but retains viewports. For use with e$stat
 	e$resetCanvas <- function() {
 		confidenceCheck(e, e$xData, e$yData, svalue(e$stat))
@@ -315,18 +315,57 @@ new.vit.env <- function() {
 		e$c1$plotData(e$xData, graphsPath("data"), "dataPlot")
 		e$c1$drawImage()
 	}
-	
+
 	e$reverseVariables <- function() {
 		temp <- e$xData
 		e$xData <- e$yData
 		e$yData <- temp
-		
+
 		temp <- svalue(e$xVar)
 		svalue(e$xVar) <- svalue(e$yVar)
 		svalue(e$yVar) <- temp
-	}	
-	
+	}
+        # Function used in handlers to set up the samples to be
+        # plotted. Also ensures that sample size is no larger than the
+        # population (if replace = FALSE) and no smaller than 2. Also
+        # allows widgets to be adjusted without the specification of
+        # data without errors.
+        e$makeSamples <- function(){
+            if (!is.null(e$xData)){
+                if (svalue(e$replace) == FALSE & as.numeric(svalue(e$ssize)) > length(e$xData))
+                    svalue(e$ssize) <- length(e$xData)
+                if (as.numeric(svalue(e$ssize)) < 2)
+                    svalue(e$ssize) <- 2
+                e$c1$getSamples(size = as.numeric(svalue(e$ssize)), replace = svalue(e$replace))
+                }}
+        # Handler for the e$stat combobox. Ensures correct widgets are
+        # enabled, and sets up e$cistat if a confidence interval is
+        # selected.
+	e$cistatHandler <- function(h, ...){
+            e$makeSamples()
+            if (substr(svalue(e$stat), 1, 1) == "c"){
+                svalue(e$replace) <- FALSE
+                enabled(e$cimeth) <- TRUE
+                enabled(e$ssize) <- TRUE
+                enabled(e$replace) <- TRUE
+                e$cistat <- substr(svalue(e$stat), 23, 28)
+                if (e$cistat == "median"){
+                    e$cimeth[] <- c("percentile bootstrap",
+                                    "normal bootstrap", "t bootstrap")
+                    if (svalue(e$cimeth) == "normal")
+                        svalue(e$cimeth) <- "percentile bootstrap"
+                } else
+                e$cimeth[] <- c("normal", "percentile bootstrap",
+                                "normal bootstrap", "t bootstrap")
+            } else{
+                svalue(e$replace) <- TRUE
+                svalue(e$ssize) <- length(e$xData)
+                enabled(e$cimeth) <- FALSE
+                enabled(e$ssize) <- FALSE
+                enabled(e$replace) <- FALSE
+            }
+            if (!is.null(e$xData)) e$resetCanvas()
+        }
 
-	
 	e
 }
