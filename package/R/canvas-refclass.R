@@ -29,7 +29,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 		which.ghost <<- 1
 		invisible(.self)
 	},
-        getSamples = function(size, replace){
+        makeSamples = function(size, replace){
             if (replace)
                 samplevec <- sample(1:length(x), size*1000, replace = TRUE)
             else{
