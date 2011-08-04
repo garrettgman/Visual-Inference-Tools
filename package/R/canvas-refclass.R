@@ -9,30 +9,36 @@
 
 
 
-#' The canvasClass reference class provides a class for making objects that 
-#' manage the visual display of the VIT tool. I used a reference class here 
-#' because we can keep all of the relevant information in one place (the canvas 
-#' object) and use methods to manipulate it. This is different than the normal R 
-#' approach, which is "functional." In the functional approach we must put all 
-#' our information into each function and then collect it again on the other 
-#' side of the function. That would be burdensome here because there is so much 
-#' information to keep track of. The reference class approach is an attempt at 
+#' The canvasClass reference class provides a class for making objects that
+#' manage the visual display of the VIT tool. I used a reference class here
+#' because we can keep all of the relevant information in one place (the canvas
+#' object) and use methods to manipulate it. This is different than the normal R
+#' approach, which is "functional." In the functional approach we must put all
+#' our information into each function and then collect it again on the other
+#' side of the function. That would be burdensome here because there is so much
+#' information to keep track of. The reference class approach is an attempt at
 #' object oriented programming.
-canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.sample", "stat", "stat.dist", "viewports", "image", "which.ghost"), 
+canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.sample", "stat", "stat.dist", "viewports", "image", "which.ghost"),
 	methods = list(initialize = function(x = NULL, y = NULL, ...){
 		require(grid)
 		x <<- x
 		y <<- y
 		n <- length(x)
-		samples <<- split(sample(1:n, n * 1000, replace = TRUE), 
-			rep(1:1000, each = n))
 		which.sample <<- 0
 		stat.dist <<- vector(length = 1000)
 		which.ghost <<- 1
 		invisible(.self)
 	},
-	
-	# Primary Methods (details vary based on x, y, and stat)
+        getSamples = function(size, replace){
+            if (replace)
+                samplevec <- sample(1:length(x), size*1000, replace = TRUE)
+            else{
+                samplevec <- numeric(size*1000)
+                for (i in 1:1000) samplevec[((i - 1)*size + 1):((i - 1)*size + size)] <-
+                    sample(1:length(x), size = size)}
+            samples <<- split(samplevec, rep(1:1000, each = size))
+        },
+        # Primary Methods (details vary based on x, y, and stat)
 	plotData = function(x, vp, name) {
 		'Plots a vector or dataframe of data points.'
 		PLOT_DATA(.self, x, vp, name)
@@ -44,14 +50,14 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 	calcStat = function() {
 		'Calculates the sample statistic for a group of data.'
 		CALC_STAT(getSample())
-	},	
+	},
 	calcStatDist = function() {
 		'Calculates the distribution of the sample statistic for the 1000 pre-generated samples'
 		CALC_STAT_DIST(.self)
 	},
-	plotStat = function(vp) {
+	plotStat = function(vp, name) {
 		'Plots the sample statistic with the sample.'
-		PLOT_STAT(.self, vp)
+		PLOT_STAT(.self, vp, name)
 	},
 	plotStatDist = function() {
 		'Plots the distribution of the sample statistic.'
@@ -73,14 +79,14 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 		which.sample <<- which.sample + 1
 		invisible(x[samples[[which.sample]]])
 	},
-	
+
 	# Methods for dealing with distribution of sample statistic
 	getStatDist = function() {
 		'Returns current distribution of the sampling statistic.'
 		stat.dist[1:which.sample]
 	},
-	
-	# Methods for plotting 
+
+	# Methods for plotting
 	drawImage = function() {
 		'Draws current image in device.'
 		grid.newpage()
@@ -89,17 +95,14 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 	plotBoxplot = function(x, vp, name, ...) {
 		'Plots boxplot of x in specified viewport'
 		image <<- addGrob(image, boxplotGrob(x, vp = vp, name = name, ...))
-		drawCanvas()
 	},
 	writeList = function(x, vp, name, ...) {
 		'Writes text list of x in the specified viewport'
-		image <<- addGrob(image, textlistGrob(x, vp = vp, name = name, ...))		
-		drawCanvas()
+		image <<- addGrob(image, textlistGrob(x, vp = vp, name = name, ...))
 	},
 	writeText = function(x, vp, name, ...) {
 		'Writes text of x in the specified viewport'
-		image <<- addGrob(image, textGrob(x, vp = vp, name = name, ...)) 		
-		# drawCanvas()
+		image <<- addGrob(image, textGrob(x, vp = vp, name = name, ...))
 	}
 ))
 

@@ -14,7 +14,7 @@ plotSamplePointsAndBoxplot <- function(canvas, x, vp, name) {
 	plotSampleBoxplot(canvas, x, vp, name)
 }
 
-	
+
 plotPoints <- function(canvas, x, vp, name) {
 	if (length(x) > 100) plotHist(canvas, x, vp, name)
 	else {
@@ -52,10 +52,10 @@ plotPoints <- function(canvas, x, vp, name) {
 plotSampleBoxplot <- function(canvas, x, vp, name) {
 	bp.name <- paste(name, "boxplot", vpNumber(vp), sep = ".")
 	ghosts.name <- paste(name, "ghosts", vpNumber(vp), sep = ".")
-	
+
 	if (bp.name %in% childNames(canvas$image)) {
 		old.bp <- getGrob(canvas$image, gPath(bp.name))
-		
+
 		if (ghosts.name %in% childNames(canvas$image)) {
 			ghosts <- getGrob(canvas$image, gPath(ghosts.name))
 			ghosts <- updateGhosts(ghosts, old.bp)
@@ -72,7 +72,7 @@ plotBoxplot <- function(canvas, x, vp, name) {
 	bp.name <- paste(name, "boxplot", vpNumber(vp), sep = ".")
 	box.plot <- boxplotGrob(data = x, name = bp.name, vp = vp)
 	canvas$image <- addGrob(canvas$image, box.plot)
-}	
+}
 
 
 plotHist <- function(canvas, x, vp, name){
@@ -80,6 +80,12 @@ plotHist <- function(canvas, x, vp, name){
     canvas$image <- addGrob(canvas$image, histGrob(x, breaks = seq(min(x), max(x), length.out = boxes),
                                                    freq = 0.8, name = paste(name, "hist", sep = "."),
                                                    vp = vp))
+}
+
+plotCI <- function(canvas, vp, name){
+    ci = canvas$calcStat()
+    canvas$image <- addGrob(canvas$image, ciGrob(ci = ci, vp = vp,
+                                                 name = paste(name, "ci", sep = ".")))
 }
 
 plotPointGroups <- function(canvas, x, vp, name) {
