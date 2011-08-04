@@ -22,37 +22,30 @@ vit <- function() {
 
     # adding vit controls
     addSpace(controls.vit, 10, horizontal = FALSE)
-    tbl <- glayout(container = controls.vit)
+        tbl <- glayout(container = controls.vit)
 	tbl[1,1] <- glabel("Statistic:    ",container = tbl)
 	tbl[1,2] <- (e$stat <- gcombobox(c(), editable=TRUE, container = tbl,
-		handler = function(h, ...) {
-                    if (svalue(e$stat) == "confidence interval"){
-                        enabled(e$cimeth) <- TRUE
-                        if (svalue(e$cimeth) == "normal"){
-                            enabled(e$cistat) <- FALSE
-                            #svalue(e$cistat) <- "mean"
-                        } else enabled(e$cistat) <- TRUE
-                    } else enabled(e$cimeth) <- enabled(e$cistat) <- FALSE
-                    if (!is.null(e$xData)) e$resetCanvas()
-                    }))
-	e$stat[] <- c("mean", "median", "confidence interval")
+		handler = e$cistatHandler))
+	e$stat[] <- c("mean", "median", "confidence interval - mean", "confidence interval - median")
 	svalue(e$stat) <- "mean"
-        tbl[2,1] <- glabel("CI Statistic: ", container = tbl)
-        tbl[2,2] <- (e$cistat <- gradio(c("mean", "median"), editable = TRUE, container = tbl))
-        svalue(e$cistat) <- "mean"
-        enabled(e$cistat) <- FALSE
-        tbl[3,1] <- glabel("CI Method:    ", container = tbl)
-        tbl[3,2] <- (e$cimeth <- gcombobox(c(), editable = TRUE, container = tbl,
-                                           handler = function(h, ...) {
-                                               if (svalue(e$cimeth) == "normal"){
-                                                   svalue(e$cistat) <- "mean"
-                                                   enabled(e$cistat) <- FALSE
-                                               }else
-                                               enabled(e$cistat) <- TRUE
-                                           }))
+        tbl[2,1] <- glabel("CI Method:    ", container = tbl)
+        tbl[2,2] <- (e$cimeth <- gcombobox(c(), editable = TRUE, handler = function(h, ...){
+            if (!is.null(e$xData)) e$resetCanvas()}, container = tbl))
         e$cimeth[] <- c("normal", "percentile bootstrap", "normal bootstrap", "t bootstrap")
+        tbl[3,1] <- glabel("Sample Size:  ", container = tbl)
+        tbl[3,2] <- (e$ssize <- gedit("50", handler = function(h, ...){
+            e$makeSamples()
+            if (!is.null(e$xData)) e$resetCanvas()
+            }, container = tbl))
+        tbl[4,2] <- (e$replace <- gcheckbox("Sample with replacement", handler = function(h, ...){
+            e$makeSamples()
+            if (!is.null(e$xData)) e$resetCanvas()
+            }, container = tbl))
+        svalue(e$replace) <- TRUE
         svalue(e$cimeth) <- "normal"
 	enabled(e$cimeth) <- FALSE
+        enabled(e$ssize) <- FALSE
+        enabled(e$replace) <- FALSE
 	addSpace(controls.vit, 10, horizontal = FALSE)
 	vit.bootbox <- gframe("bootstrapping",  container = controls.vit)
 	e$redraw.radio <- gradio(c("1 (all)",1, 5, 20),  horizontal=FALSE)
@@ -167,6 +160,7 @@ vit <- function() {
 		if (e$inDataView) e$xData <- svalue(h$dropdata)
 		else e$xData <- tag(e$obj, "dataSet")[,id(h$dropdata)]
 		e$buildCanvas()
+                svalue(e$ssize) <- length(e$xData)
 	})
 
 	adddroptarget(e$yVar, targetType = "object", handler = function(h, ...) {
@@ -174,6 +168,7 @@ vit <- function() {
 		if (e$inDataView) e$yData <- svalue(h$dropdata)
 		else e$yData <- tag(e$obj, "dataSet")[,id(h$dropdata)]
 		e$buildCanvas()
+                svalue(e$ssize) <- length(e$xData)
 	})
 
 }
