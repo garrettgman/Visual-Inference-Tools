@@ -15,7 +15,7 @@ calcCIWald <- function(x){
 }
 
 calcCIBootPerc <- function(x){
-    statfun <- eval(parse(text = svalue(e$cistat)))
+    statfun <- eval(parse(text = e$cistat))
     statfun <- mean
     n <- length(x)
     nboots <- 9999
@@ -26,7 +26,7 @@ calcCIBootPerc <- function(x){
 }
 
 calcCIBootSE <- function(x){
-    statfun <- eval(parse(text = svalue(e$cistat)))
+    statfun <- eval(parse(text = e$cistat))
     n <- length(x)
     nboots <- 10000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
@@ -37,9 +37,9 @@ calcCIBootSE <- function(x){
 }
 
 calcCIBootTSE <- function(x){
-    statfun <- eval(parse(text = svalue(e$cistat)))
+    statfun <- eval(parse(text = e$cistat))
     n <- length(x)
-    nboots <- 1000
+    nboots <- 10000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
                     ncol = n)
     means <- apply(samps, 1, statfun)
@@ -48,7 +48,7 @@ calcCIBootTSE <- function(x){
 }
 
 loadStat <- function(stat, method){
-    if (stat == "confidence interval"){
+    if (substr(stat, 1, 10) == "confidence"){
         CALC_STAT <<- c(calcCIWald, calcCIBootPerc, calcCIBootSE,
                         calcCIBootTSE)[[which(method == c("normal", "percentile bootstrap",
                                         "normal bootstrap", "t bootstrap"))]]}
