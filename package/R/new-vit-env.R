@@ -295,25 +295,41 @@ new.vit.env <- function() {
 		e$c1 <- canvas$new(x = e$xData, y = e$yData)
 		# loads the data dependent details that allow the canvas to perform
 		# its basic actions. NOTE: should actions be stored in e?
-		loadDetails(e$xData, e$yData, svalue(e$stat))
+		loadPlotDetails(e$xData, e$yData, svalue(e$stat))
+		e$setSamplingMethod()
 		loadViewports(e$c1, e$xData, e$yData)
 		loadImage(e$c1)
 		pushViewport(e$c1$viewports)
 		e$c1$plotData(e$xData, graphsPath("data"), "dataPlot")
-		e$c1$drawImage()
-
 	}
-
-	# like buildCanvas, but retains viewports. For use with e$stat
-	e$resetCanvas <- function() {
-		confidenceCheck(e, e$xData, e$yData, svalue(e$stat))
-		loadDetails(e$xData, e$yData, svalue(e$stat))
-		loadImage(e$c1)
-		pushViewport(e$c1$viewports)
-                e$c1$which.sample <- 0
-		e$c1$which.ghost <- 1
-		e$c1$plotData(e$xData, graphsPath("data"), "dataPlot")
-		e$c1$drawImage()
+	
+	# Arranges all the details for calculating statistics by making samples and 
+	# picking a correct sampling method.
+	e$setSamplingMethod <- function() {
+		# check for potential trouble
+		if (!is.null(e$xData)){
+			if (svalue(e$replace) == FALSE & as.numeric(svalue(e$ssize)) > 
+				length(e$xData)) {
+					grid.newpage()
+					grid.text("Sample size can not exceed data size when sampling without replacement.")
+					svalue(e$ssize) <- length(e$xData)
+					return()
+			}		
+			
+			if (as.numeric(svalue(e$ssize)) < 2) {
+				grid.newpage()
+                grid.text("Sample size must be > 1.")
+                svalue(e$ssize) <- 2
+                return()
+			}
+		}
+		
+		# load stat method
+		loadStat(svalue(e$stat), svalue(e$cimeth))
+		
+		# load samples
+		e$c1$n <- as.numeric(svalue(e$ssize))
+		e$c1$makeSamples(svalue(e$replace)) # note also sets which.samples <- 1
 	}
 
 	e$reverseVariables <- function() {
@@ -325,19 +341,7 @@ new.vit.env <- function() {
 		svalue(e$xVar) <- svalue(e$yVar)
 		svalue(e$yVar) <- temp
 	}
-        # Function used in handlers to set up the samples to be
-        # plotted. Also ensures that sample size is no larger than the
-        # population (if replace = FALSE) and no smaller than 2. Also
-        # allows widgets to be adjusted without the specification of
-        # data without errors.
-        e$checkSamples <- function(){
-            if (!is.null(e$xData)){
-                if (svalue(e$replace) == FALSE & as.numeric(svalue(e$ssize)) > length(e$xData))
-                    svalue(e$ssize) <- length(e$xData)
-                if (as.numeric(svalue(e$ssize)) < 2)
-                    svalue(e$ssize) <- 2
-                e$c1$makeSamples(size = as.numeric(svalue(e$ssize)), replace = svalue(e$replace))
-                }}
+ 
         # Handler for the e$stat combobox. Ensures correct widgets are
         # enabled, and sets up e$cistat if a confidence interval is
         # selected.
@@ -366,5 +370,23 @@ new.vit.env <- function() {
             if (!is.null(e$xData)) e$resetCanvas()
         }
 
+	e$notifySamplingChange <- function() {
+		if (!is.null(e$c1)) e$c1$which.sample <- 0
+	}
+	
+	e$runSamplingOnly <- function(){
+		if(is.null(e$c1$which.sample) | !e$c1$which.sample) {
+			e$buildCanvas()
+		}
+
+		n <- c("1 (all)" = 1, "1" = 1, "5" = 5, 
+			"20" = 20)[svalue(e$redraw.radio)]
+		for (i in 1:n) {
+			# ANIMATE HERE
+			e$c1$plotSample(vp = graphsPath("sample"), name = "samplePlot")
+			e$c1$drawImage()
+		}
+	}
+		
 	e
 }
