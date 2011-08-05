@@ -300,7 +300,7 @@ new.vit.env <- function() {
 		loadViewports(e$c1, e$xData, e$yData)
 		loadImage(e$c1)
 		pushViewport(e$c1$viewports)
-		e$c1$plotData(e$xData, graphsPath("data"), "dataPlot")
+		e$c1$plotData(e$xData, graphPath("data"), "dataPlot")
 	}
 	
 	# Arranges all the details for calculating statistics by making samples and 
@@ -383,7 +383,7 @@ new.vit.env <- function() {
 			"20" = 20)[svalue(e$redraw.radio)]
 		for (i in 1:n) {
 			# ANIMATE HERE
-			e$c1$plotSample(vp = graphsPath("sample"), name = "samplePlot")
+			e$c1$plotSample(vp = graphPath("sample"), name = "samplePlot")
 			e$c1$drawImage()
 		}
 	}

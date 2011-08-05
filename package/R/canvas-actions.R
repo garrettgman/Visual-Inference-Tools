@@ -1,5 +1,4 @@
 # The high level actions performed by the VIT Canvas. The details of how these methods accomplish their goals is set by loadDetails, which chooses the appropriate method based on the type of sata and the statistic being examined
-
 PLOT_DATA <- function(canvas)
 	warning("PLOT_DATA details must be set by loadDetails()")
 
