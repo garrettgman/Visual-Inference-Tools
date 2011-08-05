@@ -5,18 +5,19 @@ License: GPL
 Title: Visual Inference Tools
 LazyData: true
 Type: Package
-Author: Garrett Grolemund <grolemund@rice.edu>, Danny Chang, 
-	Vivian Li, Ben Stevenson
-Description: Traditional methods of teaching statistical 
-	inference rely on concepts that are unfamiliar to students, 
-	such as probability distributions. This may overwhelm a 
-	student's cognitive load and hinder understanding. These 
-	tools simplify the intuition behind inference to a visual 
-	level. They can be used to develop a student's intuitions 
-	about inference before teaching mathematical and 
+Author: Garrett Grolemund <grolemund@rice.edu>,
+	Ben Stevenson <bste085@aucklanduni.ac.nz>,
+	Danny Chang, Vivian Li
+Description: Traditional methods of teaching statistical
+	inference rely on concepts that are unfamiliar to students,
+	such as probability distributions. This may overwhelm a
+	student's cognitive load and hinder understanding. These
+	tools simplify the intuition behind inference to a visual
+	level. They can be used to develop a student's intuitions
+	about inference before teaching mathematical and
 	probabilistic concepts.
-Enhances: 
+Enhances:
 Version: 0.1.0
 Depends: R (>= 2.13)
-Suggests: 
-Collate: 'boxplotData.R' 'boxplotGrob.R' 'calcStatistic-methods.R' 'canvas-actions.R' 'canvas-details.R' 'canvas-refclass.R' 'canvas-viewports.R' 'ciGrob.R' 'confidenceCheck.R' 'drawBackground.R' 'ghostsGrob.R' 'histGrob.R' 'loadImage.R' 'new-vit-env.R' 'plotData.R' 'textlistGrob.R' 'vit-GUI.R' 'writeData.R'
+Suggests:
+Collate: 'boxplotData.R' 'boxplotGrob.R' 'calcStatistic-methods.R' 'canvas-actions.R' 'canvas-details.R' 'canvas-refclass.R' 'canvas-viewports.R' 'ciGrob.R' 'confidenceCheck.R' 'drawBackground.R' 'ghostsGrob.R' 'histGrob.R' 'loadImage.R' 'new-vit-env.R' 'plotData.R' 'propbarGrob.R' 'textlistGrob.R' 'vit-GUI.R' 'writeData.R'
