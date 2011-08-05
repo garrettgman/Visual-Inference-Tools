@@ -29,15 +29,20 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 		which.ghost <<- 1
 		invisible(.self)
 	},
-        makeSamples = function(size, replace){
-            if (replace)
-                samplevec <- sample(1:length(x), size*1000, replace = TRUE)
-            else{
-                samplevec <- numeric(size*1000)
-                for (i in 1:1000) samplevec[((i - 1)*size + 1):((i - 1)*size + size)] <-
-                    sample(1:length(x), size = size)}
-            samples <<- split(samplevec, rep(1:1000, each = size))
-        },
+	makeSamples = function(replace){
+		'Generates sample groups for the vit bootstrap runs.'
+		if (replace)
+			samplevec <- sample(1:length(x), n * 1000, replace = TRUE)
+		else{
+			samplevec <- list()
+			for (i in 1:1000) {
+				samplevec[[i]] <- sample(1:length(x), size = n)
+			}
+			samplevec <- unlist(samplevec)	
+		}
+		samples <<- split(samplevec, rep(1:1000, each = n))
+		which.sample <<- 1
+	},
         # Primary Methods (details vary based on x, y, and stat)
 	plotData = function(x, vp, name) {
 		'Plots a vector or dataframe of data points.'
@@ -91,6 +96,14 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
 		'Draws current image in device.'
 		grid.newpage()
 		grid.draw(image)
+	},
+	clearGhosts = function() {
+		'Removes any ghost boxes that have accumulated.'
+		grob.names <- childNames(image)
+		ghost.names <- grob.names[grep("ghost", grob.names)]
+		print(ghost.names)
+		for(i in seq_along(ghost.names))
+			image <<- removeGrob(image, gPath(ghost.names[i]))
 	},
 	plotBoxplot = function(x, vp, name, ...) {
 		'Plots boxplot of x in specified viewport'

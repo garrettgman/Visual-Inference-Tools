@@ -1,13 +1,4 @@
 # CALC_STAT methods
-
-calc_mean <- function(x) {
-	mean(x)
-}
-
-calc_median <- function(x) {
-	median(x)
-}
-
 calcCIWald <- function(x){
     n <- length(x)
     se <- sd(x)/sqrt(n)
@@ -49,15 +40,11 @@ calcCIBootTSE <- function(x){
 
 loadStat <- function(stat, method){
     if (substr(stat, 1, 10) == "confidence"){
-        CALC_STAT <<- c(calcCIWald, calcCIBootPerc, calcCIBootSE,
-                        calcCIBootTSE)[[which(method == c("normal", "percentile bootstrap",
-                                        "normal bootstrap", "t bootstrap"))]]
-        PLOT_STAT <<- plotCI
-    }
-
-    else{
-        CALC_STAT <<- c(calc_mean,
-                        calc_median)[[which(stat == c("mean", "median"))]]
+        CALC_STAT <<- c(calcCIWald, calcCIBootPerc, calcCIBootSE, 
+        	calcCIBootTSE)[[which(method == c("normal", "percentile bootstrap", 
+        	"normal bootstrap", "t bootstrap"))]]
+    } else {
+        CALC_STAT <<- c(mean, median)[[which(stat == c("mean", "median"))]]
     }
 }
 
