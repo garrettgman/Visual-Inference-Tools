@@ -13,42 +13,14 @@ plotSamplePointsAndBoxplot <- function(canvas, x, vp, name) {
 	plotPoints(canvas, x, vp, name)
 	plotSampleBoxplot(canvas, x, vp, name)
 }
-
-
-#stackPoints <- function(x, vp) # Isolate the stack points functionality below
+	
 
 plotPoints <- function(canvas, x, vp, name) {
-	if (length(x) > 100) plotHist(canvas, x, vp, name)
-	else {
-		# drawing points
-		if (length(x) <= 1) df <- data.frame(x = x, y = 0)
-		else {
-			seekViewport(vp)
-			pheight <- convertHeight(unit(1, "char"), "native",
-				valueOnly = TRUE) * 0.8
-			binwidth <- convertWidth(unit(1, "char"), "native", 
-				valueOnly = TRUE)
-  			nbins <- ceiling(diff(range(x)) / binwidth)
-			breaks <- min(x) + c(0:(nbins)) * binwidth
-			group <- cut(x, breaks, include.lowest = TRUE)
-			max.stack <- max(table(group))
-			ydist <- min(0.5/max.stack, as.numeric(pheight))
-			df <- data.frame(x = x, group = group)
-			df$y <- NA
-			for (i in levels(group)) {
-				igroup <- which(df$group == i)
-				j <- nrow(df[igroup, ])
-				if (j > 0) df[igroup, ]$y <- seq_len(j)
-			}
-
-			df$y <- (df$y - 1) * ydist + 0.5
-
-		}
-		canvas$image <- addGrob(canvas$image, pointsGrob(x = df$x, y = df$y,
-			vp = vp, name = paste(name, "points", sep = "."),
-			gp = gpar(col = "grey50", lwd = 2)))
-
-	}
+	y <- stackPoints(x, vp)
+	
+	canvas$image <- addGrob(canvas$image, pointsGrob(x = x, y = y, vp = vp, 
+		name = paste(name, "points", sep = "."), gp = gpar(col = "grey50", 
+		lwd = 2)))
 }
 
 plotSampleBoxplot <- function(canvas, x, vp, name) {
