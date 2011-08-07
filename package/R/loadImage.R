@@ -1,9 +1,9 @@
 # loads an initial image for a canvas object. The initial image is just the background, with nothing added.
 
 loadImage <- function(canvas){
-	dataAxis <- xaxisGrob(name = "dataAxis", vp = statPath("data"))
-	sampleAxis <- xaxisGrob(name = "sampleAxis", vp = statPath("sample"))
-	statAxis <- xaxisGrob(name = "statAxis", vp = statPath("stat"))
+	dataAxis <- xaxisGrob(name = "dataAxis", vp = graphPath("data"))
+	sampleAxis <- xaxisGrob(name = "sampleAxis", vp = graphPath("sample"))
+	statAxis <- xaxisGrob(name = "statAxis", vp = graphPath("stat"))
 	
 #	dataTextBox <- roundrectGrob(gp=gpar(fill = "#0000FF0D"), 
 #		name = "dataTextBox", 

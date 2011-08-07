@@ -9,32 +9,18 @@ makeVitGraphViewports <- function(x.scale, nlevels.y) {
 	
 	
 	animation.layout <- grid.layout(nrow = 3)
-	animation.field <- dataViewport(xscale = x.scale, yscale = c(0, 6), 
-		layout.pos.row = 1, layout = animation.layout, name = "animation.field")	
-	stat.stat <- dataViewport(xscale = x.scale, yscale = c(0, 2), 
-		layout.pos.row = 2, name = "stat.stat")
-		
-	
-	stat.placer.layout <- grid.layout(nrow = 4, 
-		heights = unit(1, c("line", "null", "line", "null")))
-	stat.placer <- viewport(layout.pos.row = 2:3, layout = stat.placer.layout,
-		name = "stat.placer")
-	
-	data.stat <- dataViewport(xscale = x.scale, yscale = c(0, 2), 
-		layout.pos.row = 1, name = "data.stat")
-	sample.stat <- dataViewport(xscale = x.scale, yscale = c(0, 2), 
-		layout.pos.row = 3, name = "sample.stat")
+	animation.field <- dataViewport(xscale = x.scale, yscale = c(0, 3), 
+		layout = animation.layout, name = "animation.field")	
 		
 	data <- splitDataPane(x.scale = x.scale, n = nlevels.y, layout.pos.row = 1, 
 		name = "data.data")
 	sample <- splitDataPane(x.scale = x.scale, n = nlevels.y, 
 		layout.pos.row = 2, name = "sample.data")
-	stat <- dataViewport(xscale = x.scale, yscale = c(0, 2), layout.pos.row = 3, 
+	stat <- dataViewport(xscale = x.scale, yscale = c(0, 1), layout.pos.row = 3, 
 		name = "stat.data.1")
 		
 		vpTree(canvas.frame, vpList(vpTree(animation.field, 
-			vpList(vpTree(stat.placer, vpList(data.stat, sample.stat)), data, 
-			sample, stat)), stat.stat))
+			vpList(data, sample, stat))))
 }
 
 splitDataPane <- function(x.scale, n, layout.pos.row, name) {
@@ -45,26 +31,13 @@ splitDataPane <- function(x.scale, n, layout.pos.row, name) {
 	
 	data.vps <- list()
 	for(i in 1:n) {
-		data.vps[[i]] <- dataViewport(xscale = x.scale, yscale = c(0, 2), 
-			layout.pos.row = i, name = paste(name, i, sep = "."))
+		data.vps[[i]] <- dataViewport(xscale = x.scale, yscale = c(0, 1), 
+			layout.pos.row = n - i + 1, name = paste(name, i, sep = "."))
 	}
 		
 	vpTree(frame, do.call("vpList", data.vps))
 }
 
-# returns the vpPath to the statistic viewport for the specified field. Note the 
-# statistic appears above this viewport, but it is not actually plotted in it. 
-# The viewport is just used for plotting the xaxis
-statPath <- function(field) {
-	if(!(field %in% c("data", "sample", "stat")))
-		stop("field must be \'data', \'sample', or \'stat'.")
-	
-	if (field == "stat")
-		vpPath("canvas.frame", "stat.stat")
-	else
-		vpPath("canvas.frame", "animation.field", "stat.placer", 
-			paste(field, "stat", sep = "."))
-}
 
 # returns the vpPath to the graph viewport for the specified field.
 graphPath <- function(plot.name = "sample", number = "1") {
@@ -118,6 +91,18 @@ vpNumber <- function(vp) {
 }
 	
 	
+#' appends a vpPath to include the number n on the bottommost viewport. If the 
+#' bottom most viewport ends in a number, it replaces that number with n.
+appendPath <- function(vp, n) {
+	text <- as.character(vp$name)
+	m <- nchar(text)
+	if (substr(text, m - 1, m - 1) == ".") substr(text, m, m) <- as.character(n)
+	else text <- paste(text, n, sep = ".")
+	
+	structure(list(path = vp$path, name = text, n = vp$n), 
+		class = c("vpPath", "path"))
+}	
+	
 #' helper function for programming use
 showVPs <- function() {
 	vps <- as.character(current.vpTree())
@@ -135,3 +120,4 @@ showVPs <- function() {
 		grid.rect(gp = gpar(col = "black", alpha = 0.5))
 	}
 } 
+
