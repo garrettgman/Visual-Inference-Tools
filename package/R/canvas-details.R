@@ -15,6 +15,8 @@ plotSamplePointsAndBoxplot <- function(canvas, x, vp, name) {
 }
 
 
+#stackPoints <- function(x, vp) # Isolate the stack points functionality below
+
 plotPoints <- function(canvas, x, vp, name) {
 	if (length(x) > 100) plotHist(canvas, x, vp, name)
 	else {
@@ -30,7 +32,7 @@ plotPoints <- function(canvas, x, vp, name) {
 			breaks <- min(x) + c(0:(nbins)) * binwidth
 			group <- cut(x, breaks, include.lowest = TRUE)
 			max.stack <- max(table(group))
-			ydist <- min(1/max.stack, as.numeric(pheight))
+			ydist <- min(0.5/max.stack, as.numeric(pheight))
 			df <- data.frame(x = x, group = group)
 			df$y <- NA
 			for (i in levels(group)) {
@@ -39,7 +41,8 @@ plotPoints <- function(canvas, x, vp, name) {
 				if (j > 0) df[igroup, ]$y <- seq_len(j)
 			}
 
-			df$y <- (df$y - 1) * ydist + 1
+			df$y <- (df$y - 1) * ydist + 0.5
+
 		}
 		canvas$image <- addGrob(canvas$image, pointsGrob(x = df$x, y = df$y,
 			vp = vp, name = paste(name, "points", sep = "."),

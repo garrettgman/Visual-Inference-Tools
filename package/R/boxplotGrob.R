@@ -19,9 +19,9 @@ grid.boxplot <- function(...){
 #' @param name A name for the grob to be constructed
 #' @param gp graphical parameters for the boxplot, constructed with gpar()
 #' @param vp A default viewport to be used when drawing the grob
-boxplotGrob <- function(data, at = unit(0.5, "npc"), height = unit(0.5, "npc"), 
-	box.color = "black", median.color = "black", show.w = TRUE, name = NULL, 
-	gp = NULL, vp = NULL){
+boxplotGrob <- function(data, at = unit(0.25, "native"), 
+	height = unit(0.375, "native"), box.color = "black", median.color = "black", 
+	show.w = TRUE, name = NULL, gp = gpar(lwd = 2), vp = NULL){
 	
 		bpgt <- gTree(data = data, at = at, height = height, 
 			box.color = box.color, median.color = median.color, show.w = show.w, 
