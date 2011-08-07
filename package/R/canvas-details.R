@@ -22,11 +22,11 @@ plotPoints <- function(canvas, x, vp, name) {
 		if (length(x) <= 1) df <- data.frame(x = x, y = 0)
 		else {
 			seekViewport(vp)
-
-			pheight <- convertY(unit(1, "char"), "native",
+			pheight <- convertHeight(unit(1, "char"), "native",
 				valueOnly = TRUE) * 0.8
-			binwidth <- pheight * diff(range(x)) * 0.5
-  			nbins <- ceiling(diff(range(x) / binwidth))
+			binwidth <- convertWidth(unit(1, "char"), "native", 
+				valueOnly = TRUE)
+  			nbins <- ceiling(diff(range(x)) / binwidth)
 			breaks <- min(x) + c(0:(nbins)) * binwidth
 			group <- cut(x, breaks, include.lowest = TRUE)
 			max.stack <- max(table(group))
@@ -39,12 +39,11 @@ plotPoints <- function(canvas, x, vp, name) {
 				if (j > 0) df[igroup, ]$y <- seq_len(j)
 			}
 
-			df$y <- (df$y - 1) * ydist
+			df$y <- (df$y - 1) * ydist + 1
 		}
-
 		canvas$image <- addGrob(canvas$image, pointsGrob(x = df$x, y = df$y,
 			vp = vp, name = paste(name, "points", sep = "."),
-			gp = gpar(col = "grey50")))
+			gp = gpar(col = "grey50", lwd = 2)))
 
 	}
 }
