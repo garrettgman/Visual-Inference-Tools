@@ -9,9 +9,9 @@ makeVitGraphViewports <- function(x.scale, nlevels.y) {
 	
 	
 	animation.layout <- grid.layout(nrow = 3)
-	animation.field <- dataViewport(xscale = x.scale, yscale = c(0, 3), 
+	animation.field <- dataViewport(xscale = x.scale, yscale = c(0, 6), 
 		layout.pos.row = 1, layout = animation.layout, name = "animation.field")	
-	stat.stat <- dataViewport(xscale = x.scale, yscale = c(0, 1), 
+	stat.stat <- dataViewport(xscale = x.scale, yscale = c(0, 2), 
 		layout.pos.row = 2, name = "stat.stat")
 		
 	
@@ -20,16 +20,16 @@ makeVitGraphViewports <- function(x.scale, nlevels.y) {
 	stat.placer <- viewport(layout.pos.row = 2:3, layout = stat.placer.layout,
 		name = "stat.placer")
 	
-	data.stat <- dataViewport(xscale = x.scale, yscale = c(0, 1), 
+	data.stat <- dataViewport(xscale = x.scale, yscale = c(0, 2), 
 		layout.pos.row = 1, name = "data.stat")
-	sample.stat <- dataViewport(xscale = x.scale, yscale = c(0, 1), 
+	sample.stat <- dataViewport(xscale = x.scale, yscale = c(0, 2), 
 		layout.pos.row = 3, name = "sample.stat")
 		
 	data <- splitDataPane(x.scale = x.scale, n = nlevels.y, layout.pos.row = 1, 
 		name = "data.data")
 	sample <- splitDataPane(x.scale = x.scale, n = nlevels.y, 
 		layout.pos.row = 2, name = "sample.data")
-	stat <- dataViewport(xscale = x.scale, yscale = c(0,1), layout.pos.row = 3, 
+	stat <- dataViewport(xscale = x.scale, yscale = c(0, 2), layout.pos.row = 3, 
 		name = "stat.data.1")
 		
 		vpTree(canvas.frame, vpList(vpTree(animation.field, 
@@ -45,7 +45,7 @@ splitDataPane <- function(x.scale, n, layout.pos.row, name) {
 	
 	data.vps <- list()
 	for(i in 1:n) {
-		data.vps[[i]] <- dataViewport(xscale = x.scale, yscale = c(0,1), 
+		data.vps[[i]] <- dataViewport(xscale = x.scale, yscale = c(0, 2), 
 			layout.pos.row = i, name = paste(name, i, sep = "."))
 	}
 		
@@ -118,3 +118,20 @@ vpNumber <- function(vp) {
 }
 	
 	
+#' helper function for programming use
+showVPs <- function() {
+	vps <- as.character(current.vpTree())
+	vps <- gsub("viewport\\[", "", vps)
+	vps <- gsub("\\]", "", vps)
+	vps <- gsub("\\(", "", vps)
+	vps <- gsub("\\)", "", vps)
+	vps <- gsub(" ", "", vps)
+	vps <- gsub("->", ",", vps)
+	
+	vlist <- strsplit(vps, ",")
+	
+	for (name in vlist[[1]][-1]) {
+		seekViewport(name)		
+		grid.rect(gp = gpar(col = "black", alpha = 0.5))
+	}
+} 
