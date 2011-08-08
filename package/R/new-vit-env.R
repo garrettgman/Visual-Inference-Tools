@@ -382,7 +382,7 @@ new.vit.env <- function() {
 		n <- c("1 (all)" = 1, "1" = 1, "5" = 5, 
 			"20" = 20)[svalue(e$redraw.radio)]
 		for (i in 1:n) {
-			dropPoints(e$c1, 10)
+		if (svalue(e$animate.sample)) dropPoints(e$c1, 10)
 			e$c1$plotSample(vp = graphPath("sample"), name = "samplePlot")
 			e$c1$drawImage()
 		}

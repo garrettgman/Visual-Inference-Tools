@@ -42,8 +42,11 @@ vit <- function() {
 		
 	tbl[4,2] <- (e$replace <- gcheckbox("Sample with replacement", 
 		container = tbl, handler = function(h,...) e$notifySamplingChange()))
+	tbl[5,2] <- (e$animate.sample <- gcheckbox("Animate sampling", 
+		container = tbl))
 		
 	svalue(e$replace) <- TRUE
+	svalue(e$animate.sample) <- TRUE
 	svalue(e$cimeth) <- "normal"
 	enabled(e$cimeth) <- FALSE
 	
