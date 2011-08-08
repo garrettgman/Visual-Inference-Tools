@@ -1,27 +1,35 @@
+error_check <- function(e, x, y, method) {
+	
+		# 2d checks
+		if (!is.null(x) & !is.null(y)) {
+			if (method %in% c("confidence interval - mean", 
+				"confidence interval - median"))
+				confidence_check(e)
+		}
+}
+
+
 #' Ensures that confidence intervals are not being attempted with multivariate data. Vit does not currently support them.
 #'
 #' @param x the vit gui's e$xData
 #' @param y the vit gui's e$yData
 #' @param method the selected value of the gui's e$stat combobox
-confidenceCheck <- function(e, x, y, method){
-	if (!is.null(x) & !is.null(y) & method %in% c("confidence interval - mean", 
-		"confidence interval - median")) {
-			confirmDialog(
+confidence_check <- function(e) {
+	confirm_dialog(
 "VIT cannot apply confidence interval methods to 
 more than one variable at a time. The statistic
 of interest will be changed to the mean.", 
-				handler = function(h, ...) { 
-					svalue(e$stat) <- "mean"
-					dispose(h$obj)
-				}
-			)
-	}	
+		handler = function(h, ...) { 
+			svalue(e$stat) <- "mean"
+			dispose(h$obj)
+		}
+	)	
 } 
 	
 
 
 # code borrowed straight from gwidgets vignette
-confirmDialog <- function(message, handler=NULL)  {
+confirm_dialog <- function(message, handler=NULL)  {
 	window <- gwindow("Confirm")
 	group <- ggroup(container = window)
 	gimage("info", dirname="stock", size="dialog", container=group)

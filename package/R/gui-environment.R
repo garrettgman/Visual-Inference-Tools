@@ -287,7 +287,7 @@ new.vit.env <- function() {
 			return()
 		}
 
-		confidenceCheck(e, e$xData, e$yData, svalue(e$stat))
+		error_check(e, e$xData, e$yData, svalue(e$stat))
 
 		if (is.categorical(e$xData) & !is.categorical(e$yData) &
 			 !is.null(e$yData)) {
@@ -326,10 +326,7 @@ new.vit.env <- function() {
 		}
 		
 		# load stat method
-		loadStat(svalue(e$stat), svalue(e$cimeth))
-		
-		# load plot stat method
-		loadPlotStat(svalue(e$stat))
+		loadStatDetails(e)
 		
 		# load samples
 		e$c1$n <- as.numeric(svalue(e$ssize))

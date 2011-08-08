@@ -4,9 +4,11 @@ loadPlotDetails <- function(x, y) {
 		if (is.categorical(x)) {
 			PLOT_DATA <<- plotProportionBars
 			PLOT_SAMPLE <<- plotSampleProportionBars
+			ANIMATE_SAMPLE <<- notYetImplemented
 		} else {
 			PLOT_DATA <<- plotPointsAndBoxplot
 			PLOT_SAMPLE <<- plotSamplePointsAndBoxplot
+			ANIMATE_SAMPLE <<- dropPoints
 		}
 	} else if (is.categorical(y)) {
 		PLOT_STAT <<- plotArrow
@@ -14,28 +16,36 @@ loadPlotDetails <- function(x, y) {
 		if (is.categorical(x)) {
 			PLOT_DATA <<- plotProportionGroups
 			PLOT_SAMPLE <<- plotSampleProportionGroups
+			ANIMATE_SAMPLE <<- notYetImplemented
 		} else {
 			PLOT_DATA <<- plotPointGroups
 			PLOT_SAMPLE <<- plotSamplePointGroups
+			ANIMATE_SAMPLE <<- notYetImplemented
 		}
 	} else {
 		PLOT_DATA <<- notYetImplemented
 		PLOT_SAMPLE <<- notYetImplemented
+		ANIMATE_SAMPLE <<- notYetImplemented
 	}
 }
 
-loadPlotStat <- function(stat.method) {
+loadStatDetails<- function(e) {
+	stat.method <- svalue(e$stat)
 	PLOT_STAT <<- c("mean" = plotTriangle, "median" = plotTriangle, 
 		"confidence interval - mean" = plotCI,
-		"confidence interval - median" = plotCI)[stat.method]
-}
-
-loadStat <- function(stat, method){
-    if (substr(stat, 1, 10) == "confidence"){
-        CALC_STAT <<- c(calcCIWald, calcCIBootPerc, calcCIBootSE, 
-        	calcCIBootTSE)[[which(method == c("normal", "percentile bootstrap", 
-        	"normal bootstrap", "t bootstrap"))]]
-    } else {
-        CALC_STAT <<- c(mean, median)[[which(stat == c("mean", "median"))]]
-    }
+		"confidence interval - median" = plotCI)[[stat.method]]
+	PLOT_STAT_DIST <<- notYetImplemented
+	ANIMATE_STAT <<- notYetImplemented
+	DISPLAY_RESULTS <<- notYetImplemented
+		 
+	if (stat.method %in% c("confidence interval - mean", 
+		"confidence interval - median")) {
+			ci.method <- svalue(e$cimeth)
+			CALC_STAT <<- c("normal" = calcCIWald, 
+				"percentile bootstrap" = calcCIBootPerc, 
+				"normal bootstrap" = calcCIBootSE, 
+				"t bootstrap" = calcCIBootTSE)[[ci.method]]
+	} else {
+		CALC_STAT <<- c("mean" = mean, "median" = median)[[stat.method]]
+	}
 }
