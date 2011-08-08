@@ -1,6 +1,6 @@
-# loads an initial image for a canvas object. The initial image is just the background, with nothing added.
+# builds an initial image for a canvas object. The initial image is just the background, with nothing added.
 
-loadImage <- function(canvas){
+buildImage <- function(canvas){
 	dataAxis <- xaxisGrob(name = "dataAxis", vp = graphPath("data"))
 	sampleAxis <- xaxisGrob(name = "sampleAxis", vp = graphPath("sample"))
 	statAxis <- xaxisGrob(name = "statAxis", vp = graphPath("stat"))

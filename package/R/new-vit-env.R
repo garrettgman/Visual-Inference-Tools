@@ -297,10 +297,9 @@ new.vit.env <- function() {
 		e$c1 <- canvas$new(x = e$xData, y = e$yData)
 		# loads the data dependent details that allow the canvas to perform
 		# its basic actions. NOTE: should actions be stored in e?
-		loadPlotDetails(e$xData, e$yData, svalue(e$stat))
-		e$setSamplingMethod()
+		loadPlotDetails(e$xData, e$yData)
 		loadViewports(e$c1, e$xData, e$yData)
-		loadImage(e$c1)
+		buildImage(e$c1)
 		pushViewport(e$c1$viewports)
 		e$c1$plotData(e$xData, graphPath("data"), "dataPlot")
 	}
@@ -328,6 +327,9 @@ new.vit.env <- function() {
 		
 		# load stat method
 		loadStat(svalue(e$stat), svalue(e$cimeth))
+		
+		# load plot stat method
+		loadPlotStat(svalue(e$stat))
 		
 		# load samples
 		e$c1$n <- as.numeric(svalue(e$ssize))
@@ -378,14 +380,16 @@ new.vit.env <- function() {
 	
 	e$runSamplingOnly <- function(){
 		if(is.null(e$c1$which.sample) | !e$c1$which.sample) {
-			e$buildCanvas()
+			e$setSamplingMethod()
 		}
 
 		n <- svalue(e$redraw.radio)
 		for (i in 1:n) {
-			if (svalue(e$animate.sample)) dropPoints(e$c1, 10, e)
+			if (svalue(e$animate.sample)) dropPoints(e$c1, 10)
 			e$c1$plotSample(vp = graphPath("sample"), name = "samplePlot")
+			e$c1$plotStat(vp = graphPath("sample"), name = "samplePlot")
 			e$c1$drawImage()
+			e$c1$which.sample <- e$c1$which.sample + 1
 		}
 	}
 		
