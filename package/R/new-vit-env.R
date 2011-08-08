@@ -291,7 +291,7 @@ new.vit.env <- function() {
 			 !is.null(e$yData)) {
 				e$reverseVariables()
 		}
-
+		
 		e$c1 <- canvas$new(x = e$xData, y = e$yData)
 		# loads the data dependent details that allow the canvas to perform
 		# its basic actions. NOTE: should actions be stored in e?
@@ -382,7 +382,7 @@ new.vit.env <- function() {
 		n <- c("1 (all)" = 1, "1" = 1, "5" = 5, 
 			"20" = 20)[svalue(e$redraw.radio)]
 		for (i in 1:n) {
-			# ANIMATE HERE
+			dropPoints(e$c1, 10)
 			e$c1$plotSample(vp = graphPath("sample"), name = "samplePlot")
 			e$c1$drawImage()
 		}

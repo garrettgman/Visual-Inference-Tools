@@ -4,7 +4,7 @@ makeVitGraphViewports <- function(x.scale, nlevels.y) {
 	
 	canvas.frame.layout <- grid.layout(nrow = 2, heights = unit(1, 
 		c("null", "line")))
-	canvas.frame <- plotViewport(c(3, 1, 0, 1), layout = canvas.frame.layout,
+	canvas.frame <- plotViewport(c(3, 3, 0, 1), layout = canvas.frame.layout,
 		name = "canvas.frame")
 	
 	

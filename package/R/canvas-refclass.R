@@ -18,8 +18,10 @@
 #' side of the function. That would be burdensome here because there is so much
 #' information to keep track of. The reference class approach is an attempt at
 #' object oriented programming.
-canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.sample", "stat", "stat.dist", "viewports", "image", "which.ghost"),
-	methods = list(initialize = function(x = NULL, y = NULL, ...){
+canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", 
+	"which.sample", "stat", "stat.dist", "viewports", "image", "which.ghost"),
+	methods = list(
+	initialize = function(x = NULL, y = NULL, ...){
 		require(grid)
 		x <<- x
 		y <<- y
@@ -46,11 +48,13 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", "which.samp
         # Primary Methods (details vary based on x, y, and stat)
 	plotData = function(x, vp, name) {
 		'Plots a vector or dataframe of data points.'
+		if (is.null(y)) y <<- stackPoints(x, graphPath("data"))
 		PLOT_DATA(.self, x, vp, name)
 	},
 	plotSample = function(vp, name) {
 		'Retreives and plots the next sample.'
-		PLOT_SAMPLE(.self, newSample(), vp, name)
+		PLOT_SAMPLE(.self, getSample(), vp, name)
+		which.sample <<- which.sample + 1
 	},
 	calcStat = function() {
 		'Calculates the sample statistic for a group of data.'
