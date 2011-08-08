@@ -25,12 +25,22 @@ vit <- function() {
         tbl <- glayout(container = controls.vit)
 	tbl[1,1] <- glabel("Statistic:    ",container = tbl)
 	tbl[1,2] <- (e$stat <- gcombobox(c(), editable=TRUE, container = tbl,
-		handler = function(h, ...) e$notifySamplingChange() ))
+		handler = function(h, ...) {
+			if (svalue(e$stat) %in% c("confidence interval - mean", 
+				"confidence interval - median")) {
+					enabled(e$cimeth) <- TRUE
+					enabled(e$cilabel) <- TRUE
+			} else {
+				enabled(e$cimeth) <- FALSE
+				enabled(e$cilabel) <- FALSE
+			}
+			e$notifySamplingChange() 
+		}))
 	e$stat[] <- c("mean", "median", "confidence interval - mean", 
 		"confidence interval - median")
 	svalue(e$stat) <- "mean"
 	
-	tbl[2,1] <- glabel("CI Method:    ", container = tbl)
+	tbl[2,1] <- (e$cilabel <- glabel("CI Method:    ", container = tbl))
 	tbl[2,2] <- (e$cimeth <- gcombobox(c(), editable = TRUE, 
 		container = tbl, handler = function(h, ...) e$notifySamplingChange() ))
 	e$cimeth[] <- c("normal", "percentile bootstrap", "normal bootstrap", 
@@ -49,6 +59,7 @@ vit <- function() {
 	svalue(e$animate.sample) <- TRUE
 	svalue(e$cimeth) <- "normal"
 	enabled(e$cimeth) <- FALSE
+	enabled(e$cilabel) <- FALSE
 	
 	addSpace(controls.vit, 10, horizontal = FALSE)
 	vit.bootbox <- gframe("bootstrapping",  container = controls.vit)
