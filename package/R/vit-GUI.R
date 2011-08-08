@@ -22,14 +22,22 @@ vit <- function() {
 
     # adding vit controls
     addSpace(controls.vit, 10, horizontal = FALSE)
-        tbl <- glayout(container = controls.vit)
-	tbl[1,1] <- glabel("Statistic:    ",container = tbl)
+    tbl <- glayout(container = controls.vit)
+	tbl[1,1] <- glabel("Statistic:    ", container = tbl)
 	tbl[1,2] <- (e$stat <- gcombobox(c(), editable=TRUE, container = tbl,
 		handler = function(h, ...) {
 			if (svalue(e$stat) %in% c("confidence interval - mean", 
 				"confidence interval - median")) {
 					enabled(e$cimeth) <- TRUE
 					enabled(e$cilabel) <- TRUE
+				if (svalue(e$stat) %in% c("confidence interval - median")) {
+					e$cimeth[] <- c("percentile bootstrap", "normal bootstrap", 
+						"t bootstrap")
+					svalue(e$cimeth) <- "percentile bootstrap"
+				} else {
+					e$cimeth[] <- c("normal", "percentile bootstrap", 
+						"normal bootstrap", "t bootstrap")
+				}
 			} else {
 				enabled(e$cimeth) <- FALSE
 				enabled(e$cilabel) <- FALSE
@@ -62,34 +70,40 @@ vit <- function() {
 	enabled(e$cilabel) <- FALSE
 	
 	addSpace(controls.vit, 10, horizontal = FALSE)
-	vit.bootbox <- gframe("bootstrapping",  container = controls.vit)
-	e$redraw.radio <- gradio(c("1 (all)",1, 5, 20),  horizontal=FALSE)
+	vit.bootbox <- gframe("Get bootstrapped sample(s)",  
+		container = controls.vit)
+	e$redraw.radio <- gradio(c(1, 5, 20),  horizontal=FALSE)
 	add(vit.bootbox, e$redraw.radio)
-
-	run1.but  <- gbutton(text = "Run", container = controls.vit,
-		handler = function(h, ...) e$runSamplingOnly() )
-	point.but <- gbutton(text = "Track", container = controls.vit)
-	pause.but <- gbutton(text = "Pause", container = controls.vit)
+	
+	buttons1 <- ggroup(container = controls.vit)
+	run1.but <- gbutton(text = "Run", expand = TRUE,
+		container = buttons1, handler = function(h, ...) { 
+			enabled(e$pause.but) <- TRUE
+			e$runSamplingOnly()
+			enabled(e$pause.but) <- FALSE
+		})
+	e$pause.but <- gbutton(text = "Pause", expand = TRUE, container = buttons1, 
+		handler = function(h, ...) e$handlerPause )
 	addSpace(controls.vit, 40, horizontal=FALSE)
 
-	vit.diffbox <- gframe("Capture Bootstrapping Difference",
+	vit.diffbox <- gframe("Observe sample statistic(s)",
 		container = controls.vit)
-	bootstrap.radio <- gradio(c("1 (all)", 1, 5, 20, 1000),
+	bootstrap.radio <- gradio(c(1, 5, 20, 1000),
 		horizontal = FALSE)
 	add(vit.diffbox, bootstrap.radio)
 
-	run2.but <- gbutton(text = "Run", container = controls.vit)
-	show.ci.but <- gbutton(text = "Show Confidence Interval",
-		container = controls.vit)
+	buttons2 <- ggroup(container = controls.vit)
+	run2.but <- gbutton(text = "Run", expand = TRUE, container = buttons2)
+	show.ci.but <- gbutton(text = "Show Confidence Interval", expand = TRUE,
+		container = buttons2)
 	addSpace(controls.vit, 10, horizontal = FALSE)
 
 	status <- glabel("", container = controls.vit)
 
 	#enabled(run1.but)      = FALSE
-	enabled(pause.but)     = FALSE
+	enabled(e$pause.but)     = FALSE
 	enabled(run2.but)      = FALSE
 	enabled(show.ci.but)   = FALSE
-	enabled(point.but)     = FALSE
 
 
 	# adding iNZight controls

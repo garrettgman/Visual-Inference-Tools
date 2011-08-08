@@ -1,5 +1,7 @@
 new.vit.env <- function() {
 	e <- new.env()
+	
+	e$pause <- FALSE
 
 	e$fileReader <- function(){
 		print("Importing file")
@@ -379,14 +381,14 @@ new.vit.env <- function() {
 			e$buildCanvas()
 		}
 
-		n <- c("1 (all)" = 1, "1" = 1, "5" = 5, 
-			"20" = 20)[svalue(e$redraw.radio)]
+		n <- svalue(e$redraw.radio)
 		for (i in 1:n) {
-		if (svalue(e$animate.sample)) dropPoints(e$c1, 10)
+			if (svalue(e$animate.sample)) dropPoints(e$c1, 10, e)
 			e$c1$plotSample(vp = graphPath("sample"), name = "samplePlot")
 			e$c1$drawImage()
 		}
 	}
+		
 		
 	e
 }

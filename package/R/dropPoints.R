@@ -1,6 +1,6 @@
 #' Animates a sample of points dropping down from the collection of points in the data window.
 
-dropPoints <- function(canvas, n.steps) {
+dropPoints <- function(canvas, n.steps, env) {
 	index <- canvas$samples[[canvas$which.sample]]
 	x <- canvas$x[index]
 	y.start <- canvas$y[index] + 2 # to place in data vp
@@ -38,4 +38,5 @@ dropPoints <- function(canvas, n.steps) {
 	canvas$image <- removeGrob(canvas$image, gPath(c("temp")))
 	canvas$image <- removeGrob(canvas$image, gPath(c("highlight")))
 }
+
 		
