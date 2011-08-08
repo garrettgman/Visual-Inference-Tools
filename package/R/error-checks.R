@@ -39,3 +39,18 @@ confirmDialog <- function(message, handler=NULL)  {
   		
   	return()
 }
+
+# this list needs trimmed
+plotProportionGroups <-
+plotProportionBars <-
+plotSampleProportionBars <-
+plotSampleProportionGroups <-
+plotTriangleDist <-
+plotCIStack <-
+plotArrow <-
+splitViewports <-
+plotTriangleDist <-
+yAxisViewports <- function() {
+	notYetImplemented()
+	stop("method does not exist yet.")
+}

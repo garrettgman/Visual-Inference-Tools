@@ -58,7 +58,7 @@ graphPath <- function(plot.name = "sample", number = "1") {
 }
 
 
-loadViewports <- function(canvas, x, y = NULL) {
+buildViewports <- function(canvas, x, y = NULL) {
 	if (is.categorical(x)) x.scale <- c(0, length(x))
 	else x.scale <- range(x)
 	

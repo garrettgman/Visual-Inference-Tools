@@ -1,4 +1,17 @@
-# CALC_STAT methods
+#' methods for exploring the coverage of confidence intervals calculated in varying ways from the data.
+
+#' confidence coverage method for PLOT_STAT
+plotCI <- function(canvas, vp, name) {
+	bounds <- canvas$getStat()
+	x <- mean(bounds)
+	canvas$image <- addGrob(canvas$image, rectGrob(x = unit(x, "native"), 
+		y = unit(0.5, "native"), width = diff(bounds), 
+		height = unit(0.125, "native"), gp = gpar(col = "grey50", 
+		fill = "grey50"), vp = vp, name = paste(name, "CI", sep = ".")))
+	canvas$drawImage()
+}
+
+#' the various confidence coverage methods for CALC_STAT
 calcCIWald <- function(x){
     n <- length(x)
     se <- sd(x)/sqrt(n)
@@ -37,15 +50,3 @@ calcCIBootTSE <- function(x){
     se <- sd(means)
     mean(x) + c(-1, 1)*qt(0.975, n - 1)*se
 }
-
-loadStat <- function(stat, method){
-    if (substr(stat, 1, 10) == "confidence"){
-        CALC_STAT <<- c(calcCIWald, calcCIBootPerc, calcCIBootSE, 
-        	calcCIBootTSE)[[which(method == c("normal", "percentile bootstrap", 
-        	"normal bootstrap", "t bootstrap"))]]
-    } else {
-        CALC_STAT <<- c(mean, median)[[which(stat == c("mean", "median"))]]
-    }
-}
-
-

@@ -19,4 +19,20 @@ Description: Traditional methods of teaching statistical
 Enhances:
 Version: 0.1.0
 Depends: R (>= 2.13)
-Collate: 'boxplotData.R' 'boxplotGrob.R' 'calc-stat-methods.R' 'calcStatistic-methods.R' 'canvas-actions.R' 'canvas-details.R' 'canvas-refclass.R' 'canvas-viewports.R' 'ciGrob.R' 'confidenceCheck.R' 'drawBackground.R' 'dropPoints.R' 'ghostsGrob.R' 'histGrob.R' 'loadImage.R' 'new-vit-env.R' 'plotData.R' 'propbarGrob.R' 'stackPoints.R' 'textlistGrob.R' 'vit-GUI.R' 'writeData.R'
+Collate: 
+	'gui-interface.R'
+	'gui-environment.R'
+	'canvas-viewports.R' 
+	'canvas-refclass.R'
+	'grob-boxplot.R'
+	'grob-ghosts.R'
+	'grob-hist.R'
+	'grob-propbar.R'
+	'actions.R'
+	'load-functions.R'
+	'helpers.R'
+	'error-checks.R'
+	'data-methods-1d-numeric.R'
+	'data-methods-2d-mixed.R'
+	'methods-bootstrapping.R'
+	'methods-confidence-coverage.R'

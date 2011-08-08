@@ -78,9 +78,7 @@ vit <- function() {
 	buttons1 <- ggroup(container = controls.vit)
 	run1.but <- gbutton(text = "Run", expand = TRUE,
 		container = buttons1, handler = function(h, ...) { 
-			enabled(e$pause.but) <- TRUE
 			e$runSamplingOnly()
-			enabled(e$pause.but) <- FALSE
 		})
 	e$pause.but <- gbutton(text = "Pause", expand = TRUE, container = buttons1, 
 		handler = function(h, ...) e$handlerPause )
@@ -197,16 +195,6 @@ vit <- function() {
 	})
 
 }
-######################################################################
-######################################################################
-######################################################################
-######################################################################
-######################################################################
-######################################################################
-######################################################################
 
-updateCanvas <- function() {
-	print("Coming Soon!")
-}
 
 
