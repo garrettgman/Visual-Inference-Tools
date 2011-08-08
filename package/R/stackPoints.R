@@ -8,6 +8,8 @@ stackPoints <- function(x, vp, y.min = 0.5, y.max = 1) {
 				valueOnly = TRUE) * 0.8
 			binwidth <- convertWidth(unit(1, "char"), "native", 
 				valueOnly = TRUE)
+			upViewport(0)
+			
   			nbins <- ceiling(diff(range(x)) / binwidth)
 			breaks <- min(x) + c(0:(nbins)) * binwidth
 			group <- cut(x, breaks, include.lowest = TRUE)
