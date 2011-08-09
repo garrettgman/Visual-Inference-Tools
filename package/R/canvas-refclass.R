@@ -20,7 +20,7 @@
 #' object oriented programming.
 canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", 
 	"which.sample", "stat", "stat.dist", "viewports", "image", "which.ghost", 
-	"n"),
+	"n", "indexes"),
 	methods = list(
 	initialize = function(x = NULL, y = NULL, ...){
 		require(grid)
@@ -28,32 +28,34 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples",
 		y <<- y
 		n <<- length(x)
 		which.sample <<- 0
-		stat.dist <<- vector(length = 1000)
 		which.ghost <<- 1
+		stat.dist <<- NULL
 		invisible(.self)
 	},
 	makeSamples = function(replace){
 		'Generates sample groups for the vit bootstrap runs.'
 		if (replace)
-			samplevec <- sample(1:length(x), n * 1000, replace = TRUE)
-		else{
-			samplevec <- list()
+			index.vec <- sample(1:length(x), n * 1000, replace = TRUE)
+		else {
+			index.vec <- list()
 			for (i in 1:1000) {
-				samplevec[[i]] <- sample(1:length(x), size = n)
+				index.vec[[i]] <- sample(1:length(x), size = n)
 			}
-			samplevec <- unlist(samplevec)	
+			index.vec <- unlist(index.vec)	
 		}
-		samples <<- split(samplevec, rep(1:1000, each = n))
+		
+		sample.vec <- x[index.vec]
+		samples <<- split(sample.vec, rep(1:1000, each = n))
+		indexes <<- split(index.vec, rep(1:1000, each = n))
 		which.sample <<- 1
 	},
 	makeStatDistribution = function(){
 		'Calculates the statistic for all 1000 samples'
-		for (i in 1:1000) {
-			stat.dist[[i]] <<- calcStat(i)
-		}
+		stat.dist <<- lapply(samples, CALC_STAT)
 	},
 	getStat = function(i = which.sample) {
 		'Returns the statistic for the ith distribution'
+		if (is.null(stat.dist)) makeStatDistribution()
 		stat.dist[[i]]
 	},
     # Primary Methods (details vary based on x, y, and stat)
@@ -72,11 +74,11 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples",
 	},
 	calcStat = function(i) {
 		'Calculates the sample statistic for a group of data.'
-		CALC_STAT(getSample(i))
+		CALC_STAT(samples[[i]])
 	},
-	plotStat = function(vp, name) {
+	plotStat = function(vp) {
 		'Plots the sample statistic with the sample.'
-		PLOT_STAT(.self, vp, name)
+		PLOT_STAT(.self, vp)
 	},
 	plotStatDist = function() {
 		'Plots the distribution of the sample statistic.'
@@ -94,13 +96,13 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples",
 	# Methods for dealing with sample distribution
 	getSample = function(i = which.sample) {
 		'Returns ith sample of data. Defaults to current sample.'
-		x[samples[[i]]]
+		samples[[i]]
 	},
 	newSample = function() {
 		'Takes new sample of data and returns it invisibly.'
 		if (which.sample >= 1000) which.sample <<- 0
 		which.sample <<- which.sample + 1
-		invisible(x[samples[[which.sample]]])
+		invisible(samples[[which.sample]])
 	},
 
 	# Methods for dealing with distribution of sample statistic
@@ -137,4 +139,3 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples",
 			children = gList(dataAxis, sampleAxis, statAxis))
 	}
 ))
-

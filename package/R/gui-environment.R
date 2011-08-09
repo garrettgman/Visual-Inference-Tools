@@ -325,12 +325,17 @@ new.vit.env <- function() {
 			}
 		}
 		
+		# clear image
+		e$c1$buildImage()
+		e$c1$plotData(e$xData, graphPath("data"), "dataPlot")
+		
 		# load stat method
 		loadStatDetails(e)
 		
 		# load samples
 		e$c1$n <- as.numeric(svalue(e$ssize))
 		e$c1$makeSamples(svalue(e$replace)) # note also sets which.samples <- 1
+		e$c1$stat.dist <- NULL	
 	}
 
 	e$reverseVariables <- function() {
@@ -342,34 +347,6 @@ new.vit.env <- function() {
 		svalue(e$xVar) <- svalue(e$yVar)
 		svalue(e$yVar) <- temp
 	}
- 
-        # Handler for the e$stat combobox. Ensures correct widgets are
-        # enabled, and sets up e$cistat if a confidence interval is
-        # selected.
-	e$cistatHandler <- function(h, ...){
-            if (substr(svalue(e$stat), 1, 1) == "c"){
-                svalue(e$replace) <- FALSE
-                enabled(e$cimeth) <- TRUE
-                enabled(e$ssize) <- TRUE
-                enabled(e$replace) <- TRUE
-                e$cistat <- substr(svalue(e$stat), 23, 28)
-                if (e$cistat == "median"){
-                    e$cimeth[] <- c("percentile bootstrap",
-                                    "normal bootstrap", "t bootstrap")
-                    if (svalue(e$cimeth) == "normal")
-                        svalue(e$cimeth) <- "percentile bootstrap"
-                } else
-                e$cimeth[] <- c("normal", "percentile bootstrap",
-                                "normal bootstrap", "t bootstrap")
-            } else{
-                svalue(e$replace) <- TRUE
-                svalue(e$ssize) <- length(e$xData)
-                enabled(e$cimeth) <- FALSE
-                enabled(e$ssize) <- FALSE
-                enabled(e$replace) <- FALSE
-            }
-            if (!is.null(e$xData)) e$resetCanvas()
-        }
 
 	e$notifySamplingChange <- function() {
 		if (!is.null(e$c1)) e$c1$which.sample <- 0
@@ -382,9 +359,20 @@ new.vit.env <- function() {
 
 		n <- svalue(e$redraw.radio)
 		for (i in 1:n) {
-			if (svalue(e$animate.sample)) dropPoints(e$c1, 10)
+			if (svalue(e$animate.sample)) e$c1$animateSample(10)
 			e$c1$plotSample(vp = graphPath("sample"), name = "samplePlot")
-			e$c1$plotStat(vp = graphPath("sample"), name = "samplePlot")
+			e$c1$plotStat(vp = graphPath("sample"))
+			e$c1$drawImage()
+			e$c1$which.sample <- e$c1$which.sample + 1
+		}
+	}
+	
+	e$runSamplingAndStat <- function(){
+		n <- svalue(e$bootstrap.radio)
+		for (i in 1:n) {
+			e$runSamplingOnly()
+			if (svalue(e$animate.stat)) e$c1$animateStat(10)
+			# e$c1$plotStatDist()
 			e$c1$drawImage()
 			e$c1$which.sample <- e$c1$which.sample + 1
 		}

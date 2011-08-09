@@ -82,25 +82,34 @@ vit <- function() {
 		})
 	e$pause.but <- gbutton(text = "Pause", expand = TRUE, container = buttons1, 
 		handler = function(h, ...) e$handlerPause )
-	addSpace(controls.vit, 40, horizontal=FALSE)
+	addSpace(controls.vit, 20, horizontal=FALSE)
 
+	vd.table <- glayout(container = controls.vit)
+	vd.table[1,1] <- glabel("                       ", container = vd.table)
+	vd.table[1,2] <- (e$animate.stat <- gcheckbox("Animate statistics", 
+		container = vd.table))
+	enabled(e$animate.stat) <- TRUE
+		
 	vit.diffbox <- gframe("Observe sample statistic(s)",
 		container = controls.vit)
-	bootstrap.radio <- gradio(c(1, 5, 20, 1000),
+	e$bootstrap.radio <- gradio(c(1, 5, 20, 1000),
 		horizontal = FALSE)
-	add(vit.diffbox, bootstrap.radio)
+	add(vit.diffbox,e$bootstrap.radio)
+
 
 	buttons2 <- ggroup(container = controls.vit)
-	run2.but <- gbutton(text = "Run", expand = TRUE, container = buttons2)
+	run2.but <- gbutton(text = "Run", expand = TRUE, container = buttons2, 
+		handler = function(h, ...) { 
+			e$runSamplingAndStat()
+		}
+	)
 	show.ci.but <- gbutton(text = "Show Confidence Interval", expand = TRUE,
 		container = buttons2)
 	addSpace(controls.vit, 10, horizontal = FALSE)
 
 	status <- glabel("", container = controls.vit)
 
-	#enabled(run1.but)      = FALSE
-	enabled(e$pause.but)     = FALSE
-	enabled(run2.but)      = FALSE
+	enabled(e$pause.but)   = FALSE
 	enabled(show.ci.but)   = FALSE
 
 

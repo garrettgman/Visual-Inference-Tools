@@ -37,36 +37,9 @@ plotHist <- function(canvas, x, vp, name) {
 		sep = "."), vp = vp))
 }
 
-#' PLOT_SAMPLE method for numeric, 1d data. Also used for 2d data when one varible is numeric
-plotSamplePointsAndBoxplot <- function(canvas, x, vp, name) {
-	plotPoints(canvas, x, vp, name)
-	plotSampleBoxplot(canvas, x, vp, name)
-}
-
-#' helper function for plotting numeric samples. Unlike plotBoxplot, plotSampleBoxplot manages the creation and maitenance of ghost boxplots
-plotSampleBoxplot <- function(canvas, x, vp, name) {
-	bp.name <- paste(name, "boxplot", vpNumber(vp), sep = ".")
-	ghosts.name <- paste(name, "ghosts", vpNumber(vp), sep = ".")
-
-	if (bp.name %in% childNames(canvas$image)) {
-		old.bp <- getGrob(canvas$image, gPath(bp.name))
-
-		if (ghosts.name %in% childNames(canvas$image)) {
-			ghosts <- getGrob(canvas$image, gPath(ghosts.name))
-			ghosts <- updateGhosts(ghosts, old.bp)
-		} else {
-			ghosts <- makeGhosts(old.bp, vp = vp, name = ghosts.name)
-		}
-		canvas$image <- addGrob(canvas$image, ghosts)
-	}
-	box.plot <- boxplotGrob(data = x, name = bp.name, vp = vp)
-	canvas$image <- addGrob(canvas$image, box.plot)
-}
-
-
 #' Animates a sample of points dropping down from the collection of points in the data window. The ANIMATE_SAMPLE method for numeric, one dimensional data.
 dropPoints <- function(canvas, n.steps) {
-	index <- canvas$samples[[canvas$which.sample]]
+	index <- canvas$indexes[[canvas$which.sample]]
 	x <- canvas$x[index]
 	y.start <- canvas$y[index] + 2 # to place in data vp
 	y.end <- stackPoints(x, graphPath("sample")) + 1
@@ -102,10 +75,6 @@ dropPoints <- function(canvas, n.steps) {
 	}
 	canvas$image <- removeGrob(canvas$image, gPath(c("temp")))
 	canvas$image <- removeGrob(canvas$image, gPath(c("highlight")))
-}
-
-dropCI <- function(canvas, nsteps) {
-
 }
 
 #' Calculates y values for a vector of overlapping x values. Y values are designed to prevent overlapping by creating the appearance of stacked data. A helper function for numeric 1d Data. Also used for 2d data where one dimension is numeric, and one is categorical.

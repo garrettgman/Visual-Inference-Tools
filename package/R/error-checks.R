@@ -58,6 +58,7 @@ plotCIStack <-
 plotArrow <-
 splitViewports <-
 plotTriangleDist <-
+dropTriangle <-
 yAxisViewports <- function() {
 	notYetImplemented()
 	stop("method does not exist yet.")

@@ -7,7 +7,7 @@ loadPlotDetails <- function(x, y) {
 			ANIMATE_SAMPLE <<- notYetImplemented
 		} else {
 			PLOT_DATA <<- plotPointsAndBoxplot
-			PLOT_SAMPLE <<- plotSamplePointsAndBoxplot
+			PLOT_SAMPLE <<- plotPointsAndBoxplot
 			ANIMATE_SAMPLE <<- dropPoints
 		}
 	} else if (is.categorical(y)) {
@@ -35,17 +35,25 @@ loadStatDetails<- function(e) {
 		"confidence interval - mean" = plotCI,
 		"confidence interval - median" = plotCI)[[stat.method]]
 	PLOT_STAT_DIST <<- notYetImplemented
-	ANIMATE_STAT <<- notYetImplemented
 	DISPLAY_RESULTS <<- notYetImplemented
 		 
-	if (stat.method %in% c("confidence interval - mean", 
-		"confidence interval - median")) {
-			ci.method <- svalue(e$cimeth)
-			CALC_STAT <<- c("normal" = calcCIWald, 
-				"percentile bootstrap" = calcCIBootPerc, 
-				"normal bootstrap" = calcCIBootSE, 
-				"t bootstrap" = calcCIBootTSE)[[ci.method]]
+	if (stat.method == "confidence interval - mean") { 
+		ci.method <- svalue(e$cimeth)
+		CALC_STAT <<- c("normal" = calcCIWald, 
+			"percentile bootstrap" = calcCIBootPercMean, 
+			"normal bootstrap" = calcCIBootSEMean, 
+			"t bootstrap" = calcCIBootTSEMean)[[ci.method]]
+		addLine(e$c1, mean) 
+		ANIMATE_STAT <<- dropCI
+	} else if (stat.method == "confidence interval - median") {
+		ci.method <- svalue(e$cimeth)
+		CALC_STAT <<- c("percentile bootstrap" = calcCIBootPercMedian, 
+			"normal bootstrap" = calcCIBootSEMedian, 
+			"t bootstrap" = calcCIBootTSEMedian)[[ci.method]]
+		addLine(e$c1, median)
+		ANIMATE_STAT <<- dropCI
 	} else {
 		CALC_STAT <<- c("mean" = mean, "median" = median)[[stat.method]]
+		ANIMATE_STAT <<- dropTriangle
 	}
 }
