@@ -19,9 +19,10 @@ dropCI <- function(canvas, n.steps) {
 	canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
 	
 	y.start <- 1.25	
-	y.end <- .02 * min(canvas$which.sample, 41)
+	y.end <- .02 * min(canvas$which.sample - 1, 41)
 	
 	step <- (y.start - y.end)/n.steps
+	print(c(canvas$which.sample, step, y.end))
 	
 	for (i in 1:n.steps) {
 		canvas$image <- addGrob(canvas$image, rectGrob(x = grob.x, 
@@ -41,6 +42,51 @@ addLine <- function(canvas, fun) {
 		y1 = 3, default.units = "native", gp = gpar(col = "grey60"), 
 		vp = vpPath("canvas.frame", "animation.field"), name = "hline"))
 }
+
+#' confidence convergence methods for PLOT_STAT_DIST
+plotCIDistMean <- function(canvas) {
+	i <- canvas$which.sample - 1
+	bounds <- canvas$getStat(i)
+	x <- mean(bounds) 
+	X <- mean(canvas$x)
+	if (X >= bounds[1] & X <= bounds[2]) color <- "green"
+	else color <- "red"
+	current <- data.frame(x = x, width = diff(c(bounds)), color = color)
+	
+	if ("stat.dist" %in% childNames(canvas$image)) {
+		dist.grob <- getGrob(canvas$image, gPath(c("stat.dist")))
+		dist.df <- dist.grob$data
+		if (nrow(dist.df) >= 40) dist.df <- dist.df[-1,]
+		dist.df <- rbind(dist.df[, -4], current)
+	} else dist.df <- current
+	
+	dist.df$y <- 0.02 * 1:nrow(dist.df)
+	green <- dist.df[dist.df$color == "green",]
+	red <- dist.df[dist.df$color == "red",]
+	
+	if (nrow(green) > 0) {
+		greenRects <- rectGrob(x = unit(green$x, "native"), 
+			y = unit(green$y, "native"), width = unit(green$width, "native"), 
+			height = unit(0.015, "native"), vp = graphPath("stat"), 
+			gp = gpar(col = NA, fill = "green"))
+	} else greenRects <- NULL
+	
+	if (nrow(red) > 0) {	
+		redRects <- rectGrob(x = unit(red$x, "native"), 
+			y = unit(red$y, "native"), width = unit(red$width, "native"),
+			height = unit(0.015, "native"), vp = graphPath("stat"), 
+			gp = gpar(col = NA, fill = "red"))
+	} else redRects <- NULL
+	
+	new.dist <- gTree(data = dist.df, name = "stat.dist", 
+		childrenvp = canvas$viewports, children = gList(greenRects, redRects))
+		
+	canvas$image <- addGrob(canvas$image, new.dist)
+}
+
+#' confidence coverage method for DISPLAY_RESULT
+CIcounter <- function() # START HERE
+
 
 
 #' the various confidence coverage methods for CALC_STAT

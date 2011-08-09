@@ -372,9 +372,8 @@ new.vit.env <- function() {
 		for (i in 1:n) {
 			e$runSamplingOnly()
 			if (svalue(e$animate.stat)) e$c1$animateStat(10)
-			# e$c1$plotStatDist()
+			e$c1$plotStatDist()
 			e$c1$drawImage()
-			e$c1$which.sample <- e$c1$which.sample + 1
 		}
 	}
 		
