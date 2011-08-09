@@ -25,3 +25,5 @@ ANIMATE_STAT <- function(canvas)
 
 DISPLAY_RESULT <- function(canvas)
 	warning("DISPLAY_RESULT details must be set by loadDetails()")
+HANDLE_1000 <- function(e)
+	warning("DISPLAY_RESULT details must be set by loadDetails()")

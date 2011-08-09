@@ -352,12 +352,11 @@ new.vit.env <- function() {
 		if (!is.null(e$c1)) e$c1$which.sample <- 0
 	}
 	
-	e$runSamplingOnly <- function(){
+	e$runSamplingOnly <- function(n = svalue(e$redraw.radio)){
 		if(is.null(e$c1$which.sample) | !e$c1$which.sample) {
 			e$setSamplingMethod()
 		}
 
-		n <- svalue(e$redraw.radio)
 		for (i in 1:n) {
 			if (svalue(e$animate.sample)) e$c1$animateSample(10)
 			e$c1$plotSample(vp = graphPath("sample"), name = "samplePlot")
@@ -368,15 +367,22 @@ new.vit.env <- function() {
 	}
 	
 	e$runSamplingAndStat <- function(){
-		n <- svalue(e$bootstrap.radio)
-		for (i in 1:n) {
-			e$runSamplingOnly()
-			if (svalue(e$animate.stat)) e$c1$animateStat(10)
-			e$c1$plotStatDist()
-			e$c1$drawImage()
+		if(is.null(e$c1$which.sample) | !e$c1$which.sample) {
+			e$setSamplingMethod()
 		}
-	}
 		
+		n <- svalue(e$bootstrap.radio)
+		if (n == 1000) {
+			HANDLE_1000(e)
+		} else {
+			for (i in 1:n) {
+				e$runSamplingOnly(1)
+				if (svalue(e$animate.stat) & n != 1000) e$c1$animateStat(10)
+				e$c1$plotStatDist()
+				e$c1$drawImage()
+			}
+		}
+	}	
 		
 	e
 }

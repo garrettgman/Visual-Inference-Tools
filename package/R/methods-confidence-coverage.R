@@ -22,7 +22,6 @@ dropCI <- function(canvas, n.steps) {
 	y.end <- .02 * min(canvas$which.sample - 1, 41)
 	
 	step <- (y.start - y.end)/n.steps
-	print(c(canvas$which.sample, step, y.end))
 	
 	for (i in 1:n.steps) {
 		canvas$image <- addGrob(canvas$image, rectGrob(x = grob.x, 
@@ -84,8 +83,49 @@ plotCIDistMean <- function(canvas) {
 	canvas$image <- addGrob(canvas$image, new.dist)
 }
 
+plotCIDistMedian <- function(canvas) {
+	i <- canvas$which.sample - 1
+	bounds <- canvas$getStat(i)
+	x <- mean(bounds) 
+	X <- median(canvas$x)
+	if (X >= bounds[1] & X <= bounds[2]) color <- "green"
+	else color <- "red"
+	current <- data.frame(x = x, width = diff(c(bounds)), color = color)
+	
+	if ("stat.dist" %in% childNames(canvas$image)) {
+		dist.grob <- getGrob(canvas$image, gPath(c("stat.dist")))
+		dist.df <- dist.grob$data
+		if (nrow(dist.df) >= 40) dist.df <- dist.df[-1,]
+		dist.df <- rbind(dist.df[, -4], current)
+	} else dist.df <- current
+	
+	dist.df$y <- 0.02 * 1:nrow(dist.df)
+	green <- dist.df[dist.df$color == "green",]
+	red <- dist.df[dist.df$color == "red",]
+	
+	if (nrow(green) > 0) {
+		greenRects <- rectGrob(x = unit(green$x, "native"), 
+			y = unit(green$y, "native"), width = unit(green$width, "native"), 
+			height = unit(0.015, "native"), vp = graphPath("stat"), 
+			gp = gpar(col = NA, fill = "green"))
+	} else greenRects <- NULL
+	
+	if (nrow(red) > 0) {	
+		redRects <- rectGrob(x = unit(red$x, "native"), 
+			y = unit(red$y, "native"), width = unit(red$width, "native"),
+			height = unit(0.015, "native"), vp = graphPath("stat"), 
+			gp = gpar(col = NA, fill = "red"))
+	} else redRects <- NULL
+	
+	new.dist <- gTree(data = dist.df, name = "stat.dist", 
+		childrenvp = canvas$viewports, children = gList(greenRects, redRects))
+		
+	canvas$image <- addGrob(canvas$image, new.dist)
+}
+
+
 #' confidence coverage method for DISPLAY_RESULT
-CIcounter <- function() # START HERE
+CIcounter <- function(a) {a} # START HERE
 
 
 
@@ -102,6 +142,7 @@ CIcounter <- function() # START HERE
 # apply(samps, 1, median)
 #    user  system elapsed 
 #129.160   3.507 133.886 
+
 calcCIWald <- function(x){
     n <- length(x)
     se <- sd(x)/sqrt(n)
@@ -164,4 +205,15 @@ calcCIBootTSEMedian <- function(x){
     medians <- apply(samps, 1, median)
     se <- sd(medians)
     median(x) + c(-1, 1) * qt(0.975, n - 1) * se
+}
+
+#' confidence coverage method for HANDLE_1000: how to display the results of 1000 bootstrap samples
+ci1000 <- function(e){
+	print("handling 1000")
+	for (i in seq(1 , 1000, by = 10)) {
+			e$c1$plotStat(vp = graphPath("sample"))
+			e$c1$which.sample <- e$c1$which.sample + 10
+			e$c1$plotStatDist()
+			e$c1$drawImage()
+	}
 }
