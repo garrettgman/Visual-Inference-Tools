@@ -45,7 +45,6 @@ addLine <- function(canvas, fun) {
 #' confidence convergence methods for PLOT_STAT_DIST
 plotCIDistMean <- function(canvas) {
 	i <- canvas$which.sample - 1
-	print(i)
 	bounds <- canvas$getStat(i)
 	x <- mean(bounds) 
 	X <- mean(canvas$x)
@@ -143,7 +142,9 @@ CIcounter <- function(canvas, env) {
 
 #' prepares way for CIcounter
 ci_miscellaneous <- function(env) {
-	env$ci.counter <- glabel(container = env$controls.vit)
+	if (!is.null(env$ci.counter)) delete(env$controls.vit, env$ci.counter)
+	env$ci.counter <- glabel()
+	add(env$controls.vit, env$ci.counter)
 	env$results <- NULL
 }
 
