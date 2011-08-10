@@ -88,9 +88,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples",
 		'Animates the creation of the distribution of the statistic from the samples.'
 		ANIMATE_STAT(.self, n.steps)	
 	},
-	displayResult = function() {
+	displayResult = function(env) {
 		'Displays the final result of the VIT simulation.'
-		DISPLAY_RESULT(.self)
+		DISPLAY_RESULT(.self, env)
 	},
 
 	# Methods for dealing with sample distribution

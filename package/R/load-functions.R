@@ -34,7 +34,7 @@ loadStatDetails<- function(e) {
 	PLOT_STAT <<- c("mean" = plotTriangle, "median" = plotTriangle, 
 		"confidence interval - mean" = plotCI,
 		"confidence interval - median" = plotCI)[[stat.method]]
-	DISPLAY_RESULTS <<- notYetImplemented
+
 		 
 	if (stat.method == "confidence interval - mean") { 
 		ci.method <- svalue(e$cimeth)
@@ -46,6 +46,8 @@ loadStatDetails<- function(e) {
 		ANIMATE_STAT <<- dropCI
 		PLOT_STAT_DIST <<- plotCIDistMean
 		HANDLE_1000 <<- ci1000
+		DISPLAY_RESULT <<- CIcounter
+		MISCELLANEOUS <<- ci_miscellaneous
 	} else if (stat.method == "confidence interval - median") {
 		ci.method <- svalue(e$cimeth)
 		CALC_STAT <<- c("percentile bootstrap" = calcCIBootPercMedian, 
@@ -55,10 +57,14 @@ loadStatDetails<- function(e) {
 		ANIMATE_STAT <<- dropCI
 		PLOT_STAT_DIST <<- plotCIDistMedian
 		HANDLE_1000 <<- ci1000
+		DISPLAY_RESULT <<- CIcounter
+		MISCELLANEOUS <<- ci_miscellaneous
 	} else {
 		CALC_STAT <<- c("mean" = mean, "median" = median)[[stat.method]]
 		ANIMATE_STAT <<- dropTriangle
 		PLOT_STAT_DIST <<- notYetImplemented
 		HANDLE_1000 <<- notYetImplemented
+		DISPLAY_RESULT <<- notYetImplemented
+		MISCELLANEOUS <<- notYetImplemented
 	}
 }

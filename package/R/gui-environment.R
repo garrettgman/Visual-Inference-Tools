@@ -336,6 +336,8 @@ new.vit.env <- function() {
 		e$c1$n <- as.numeric(svalue(e$ssize))
 		e$c1$makeSamples(svalue(e$replace)) # note also sets which.samples <- 1
 		e$c1$stat.dist <- NULL	
+		
+		MISCELLANEOUS(e)
 	}
 
 	e$reverseVariables <- function() {
@@ -380,6 +382,7 @@ new.vit.env <- function() {
 				if (svalue(e$animate.stat) & n != 1000) e$c1$animateStat(10)
 				e$c1$plotStatDist()
 				e$c1$drawImage()
+				e$c1$displayResult(e)
 			}
 		}
 	}	

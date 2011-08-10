@@ -25,5 +25,9 @@ ANIMATE_STAT <- function(canvas)
 
 DISPLAY_RESULT <- function(canvas)
 	warning("DISPLAY_RESULT details must be set by loadDetails()")
+
 HANDLE_1000 <- function(e)
-	warning("DISPLAY_RESULT details must be set by loadDetails()")
+	warning("HANDLE_1000 details must be set by loadDetails()")
+
+MISCELLANEOUS <- function(env)
+	warning("MISCELLANEOUS details must be set by loadDetails()")

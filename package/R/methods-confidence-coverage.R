@@ -125,9 +125,26 @@ plotCIDistMedian <- function(canvas) {
 
 
 #' confidence coverage method for DISPLAY_RESULT
-CIcounter <- function(a) {a} # START HERE
+CIcounter <- function(canvas, env) {
+	if (is.null(env$results)) {
+		bounds <- do.call("rbind", canvas$stat.dist)
+		X <- mean(CALC_STAT(canvas$x))
+		env$results <- X >= bounds[,1] & X <= bounds[,2]
+	}
+	
+	total <- canvas$which.sample - 1
+	success <- sum(env$results[1:total])
+	
+	svalue(env$ci.counter) <- paste(success, "of", total, "contain true value:", 
+		round(success/total*100, 1), "%")
+	
+}
 
-
+#' prepares way for CIcounter
+ci_miscellaneous <- function(env) {
+	env$ci.counter <- glabel(container = env$controls.vit)
+	env$results <- NULL
+}
 
 #' the various confidence coverage methods for CALC_STAT
 #' note that the percentile bootstrap methods do not perform very well. Here's the speed of makeStatDistribution when using different version of them on an original data of size 80
