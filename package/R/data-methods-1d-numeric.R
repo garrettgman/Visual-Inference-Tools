@@ -8,8 +8,11 @@
 # NOTE: should plotPoints be replaced with a points GROB that calculates stacking in drawDetails? So stacking changes as the plot is resized? ANSWER: Because we would have to repeat all of these calculations for every step of the animations, which would really slow things down.
 #' PLOT_DATA method for numeric, 1d data. Also used for 2d data when one varible is numeric
 plotPointsAndBoxplot <- function(canvas, x, vp, name) {
-	plotPoints(canvas, x, vp, name)
-	plotBoxplot(canvas, x, vp, name)
+	if (length(x) >= 100) plotHist(canvas, x, vp, name)
+	else {
+		plotPoints(canvas, x, vp, name)
+		plotBoxplot(canvas, x, vp, name)
+	}
 }
 
 	

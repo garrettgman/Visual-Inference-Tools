@@ -5,7 +5,7 @@ plotCI <- function(canvas, vp) {
 	bounds <- canvas$getStat()
 	x <- mean(bounds)
 	canvas$image <- addGrob(canvas$image, rectGrob(x = unit(x, "native"), 
-		y = unit(0.25, "native"), width = unit(diff(bounds), "native"), 
+		y = unit(0.2, "native"), width = unit(diff(bounds), "native"), 
 		height = unit(0.015, "native"), gp = gpar(col = "blue", 
 		fill = "blue"), vp = vp, name = "sample.stat"))
 }
@@ -18,7 +18,7 @@ dropCI <- function(canvas, n.steps) {
 	grob.x <- stat.grob$x
 	canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
 	
-	y.start <- 1.25	
+	y.start <- 1.2	
 	y.end <- .02 * min(canvas$which.sample - 1, 41)
 	
 	step <- (y.start - y.end)/n.steps
