@@ -364,6 +364,7 @@ new.vit.env <- function() {
 			e$c1$plotSample(vp = graphPath("sample"), name = "samplePlot")
 			e$c1$plotStat(vp = graphPath("sample"))
 			e$c1$drawImage()
+			if (e$c1$which.sample >= 1000) e$c1$which.sample <- 0
 			e$c1$which.sample <- e$c1$which.sample + 1
 		}
 	}

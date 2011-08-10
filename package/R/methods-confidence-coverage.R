@@ -45,6 +45,7 @@ addLine <- function(canvas, fun) {
 #' confidence convergence methods for PLOT_STAT_DIST
 plotCIDistMean <- function(canvas) {
 	i <- canvas$which.sample - 1
+	print(i)
 	bounds <- canvas$getStat(i)
 	x <- mean(bounds) 
 	X <- mean(canvas$x)
@@ -171,7 +172,7 @@ calcCIBootPercMean <- function(x){
     nboots <- 999
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
     	ncol = n)
-    means <- colMeans(samps)
+    means <- rowMeans(samps)
     quantile(means, prob = c(0.025, 0.975))
 }
 
@@ -226,11 +227,21 @@ calcCIBootTSEMedian <- function(x){
 
 #' confidence coverage method for HANDLE_1000: how to display the results of 1000 bootstrap samples
 ci1000 <- function(e){
-	print("handling 1000")
-	for (i in seq(1 , 1000, by = 10)) {
+	for (j in seq(1 , 1000, by = 10)) {
 			e$c1$plotStat(vp = graphPath("sample"))
-			e$c1$which.sample <- e$c1$which.sample + 10
+			e$c1$which.sample <- j + 1
 			e$c1$plotStatDist()
 			e$c1$drawImage()
 	}
+	
+	if (is.null(e$results)) {
+		bounds <- do.call("rbind", e$c1$stat.dist)
+		X <- mean(CALC_STAT(e$c1$x))
+		e$results <- X >= bounds[,1] & X <= bounds[,2]
+	}
+	
+	success <- sum(e$results)
+	
+	svalue(e$ci.counter) <- paste(success, "of", 1000, "contain true value:", 
+		success/10, "%")
 }
