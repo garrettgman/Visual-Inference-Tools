@@ -10,3 +10,5 @@ plotTriangle <- function(canvas, vp, name) {
 plot_ghosts <- function(canvas, name, vp = graphPath("sample")) {
 	i <- canvas$which.sample - 1
 }
+
+bootstrap_miscellaneous <- function(e) return()

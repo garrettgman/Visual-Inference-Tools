@@ -4,7 +4,7 @@ loadPlotDetails <- function(x, y) {
 		if (is.categorical(x)) {
 			PLOT_DATA <<- plotProportionBars
 			PLOT_SAMPLE <<- plotSampleProportionBars
-			ANIMATE_SAMPLE <<- notYetImplemented
+			ANIMATE_SAMPLE <<- notYetImplemented("ANIMATE_SAMPLE")
 		} else {
 			PLOT_DATA <<- plotPointsAndBoxplot
 			PLOT_SAMPLE <<- plotPointsAndBoxplot
@@ -16,16 +16,16 @@ loadPlotDetails <- function(x, y) {
 		if (is.categorical(x)) {
 			PLOT_DATA <<- plotProportionGroups
 			PLOT_SAMPLE <<- plotSampleProportionGroups
-			ANIMATE_SAMPLE <<- notYetImplemented
+			ANIMATE_SAMPLE <<- notYetImplemented("ANIMATE_SAMPLE")
 		} else {
 			PLOT_DATA <<- plotPointGroups
 			PLOT_SAMPLE <<- plotSamplePointGroups
-			ANIMATE_SAMPLE <<- notYetImplemented
+			ANIMATE_SAMPLE <<- notYetImplemented("ANIMATE_SAMPLE")
 		}
 	} else {
-		PLOT_DATA <<- notYetImplemented
-		PLOT_SAMPLE <<- notYetImplemented
-		ANIMATE_SAMPLE <<- notYetImplemented
+		PLOT_DATA <<- notYetImplemented("PLOT_DATA")
+		PLOT_SAMPLE <<- notYetImplemented("PLOT_SAMPLE")
+		ANIMATE_SAMPLE <<- notYetImplemented("ANIMATE_SAMPLE")
 	}
 }
 
@@ -62,9 +62,9 @@ loadStatDetails<- function(e) {
 	} else {
 		CALC_STAT <<- c("mean" = mean, "median" = median)[[stat.method]]
 		ANIMATE_STAT <<- dropTriangle
-		PLOT_STAT_DIST <<- notYetImplemented
-		HANDLE_1000 <<- notYetImplemented
-		DISPLAY_RESULT <<- notYetImplemented
-		MISCELLANEOUS <<- notYetImplemented
+		PLOT_STAT_DIST <<- notYetImplemented("PLOT_STAT_DIST")
+		HANDLE_1000 <<- notYetImplemented("HANDLE_1000")
+		DISPLAY_RESULT <<- notYetImplemented("DISPLAY_RESULT")
+		MISCELLANEOUS <<- bootstrap_miscellaneous
 	}
 }
