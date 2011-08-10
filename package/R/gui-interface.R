@@ -78,10 +78,17 @@ vit <- function() {
 	buttons1 <- ggroup(container = e$controls.vit)
 	run1.but <- gbutton(text = "Run", expand = TRUE,
 		container = buttons1, handler = function(h, ...) { 
+			enabled(e$pause.but) <- TRUE
 			e$runSamplingOnly()
-		})
+			enabled(e$pause.but) <- FALSE
+		}
+	)
 	e$pause.but <- gbutton(text = "Pause", expand = TRUE, container = buttons1, 
-		handler = function(h, ...) e$handlerPause )
+		handler = function(h, ...) {
+			print("pause") # can't click while R is running a for loop?
+			e$pause <- !e$pause
+		}
+	)
 	addSpace(e$controls.vit, 20, horizontal=FALSE)
 
 	vd.table <- glayout(container = e$controls.vit)

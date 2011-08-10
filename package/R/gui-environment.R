@@ -358,6 +358,11 @@ new.vit.env <- function() {
 		if(is.null(e$c1$which.sample) | !e$c1$which.sample) {
 			e$setSamplingMethod()
 		}
+		
+		pause <- function(){
+    		while(e$pause) {
+    		}  
+    	}  
 
 		for (i in 1:n) {
 			if (svalue(e$animate.sample)) e$c1$animateSample(10)
@@ -366,6 +371,7 @@ new.vit.env <- function() {
 			e$c1$drawImage()
 			if (e$c1$which.sample >= 1000) e$c1$which.sample <- 0
 			e$c1$which.sample <- e$c1$which.sample + 1
+			pause()
 		}
 	}
 	
