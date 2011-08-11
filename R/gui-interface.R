@@ -196,6 +196,7 @@ vit <- function() {
 		svalue(e$xVar) <- id(h$dropdata)
 		if (e$inDataView) e$xData <- svalue(h$dropdata)
 		else e$xData <- tag(e$obj, "dataSet")[,id(h$dropdata)]
+		if (is.integer(e$xData)) e$xData <- as.numeric(e$xData)
 		svalue(e$ssize) <- length(e$xData)
 		e$buildCanvas()
 		e$c1$drawImage()
@@ -205,7 +206,8 @@ vit <- function() {
 		svalue(e$yVar) <- id(h$dropdata)
 		if (e$inDataView) e$yData <- svalue(h$dropdata)
 		else e$yData <- tag(e$obj, "dataSet")[,id(h$dropdata)]
-		svalue(e$ssize) <- length(e$xData)
+		if (is.integer(e$yData)) e$yData <- as.numeric(e$yData)
+		svalue(e$ssize) <- length(e$yData)
 		e$buildCanvas()
 		e$c1$drawImage()
 	})
