@@ -228,6 +228,11 @@ calcCIBootTSEMedian <- function(x){
 
 #' confidence coverage method for HANDLE_1000: how to display the results of 1000 bootstrap samples
 ci1000 <- function(e){
+	if ("samplePlot.points" %in% childNames(e$c1$image))
+		e$c1$image <- removeGrob(e$c1$image, gPath("samplePlot.points"))
+	if ("samplePlot.boxplot.1" %in% childNames(e$c1$image))
+		e$c1$image <- removeGrob(e$c1$image, gPath("samplePlot.boxplot.1"))
+	
 	for (j in seq(1 , 1000, by = 10)) {
 			e$c1$plotStat(vp = graphPath("sample"))
 			e$c1$which.sample <- j + 1
