@@ -5,7 +5,8 @@ vit <- function() {
 	e <- new.vit.env()
 	e$win <- gwindow("Visual Inference Tools", visible = TRUE, width = 870,
     		height = 600)
-
+	e$loaded <- FALSE
+	
     # separates space into controls and plot
     g <- gpanedgroup(container = e$win, expand = TRUE)
     e$obj <- g
@@ -42,60 +43,85 @@ vit <- function() {
 				enabled(e$cimeth) <- FALSE
 				enabled(e$cilabel) <- FALSE
 			}
-			e$notifySamplingChange() 
 		}))
 	e$stat[] <- c("mean", "median", "confidence interval - mean", 
 		"confidence interval - median")
 	svalue(e$stat) <- "mean"
 	
 	tbl[2,1] <- (e$cilabel <- glabel("CI Method:    ", container = tbl))
-	tbl[2,2] <- (e$cimeth <- gcombobox(c(), editable = TRUE, 
-		container = tbl, handler = function(h, ...) e$notifySamplingChange() ))
-	e$cimeth[] <- c("normal", "percentile bootstrap", "normal bootstrap", 
-		"t bootstrap")
+	tbl[2,2] <- (e$cimeth <- gcombobox(c("normal", "percentile bootstrap", 
+		"normal bootstrap", "t bootstrap"), editable = TRUE, container = tbl))
 		
-	tbl[3,1] <- glabel("Sample Size:  ", container = tbl)
+	tbl[3,1] <- (e$sizelabel <- glabel("Sample Size:  50", container = tbl))
 	tbl[3,2] <- (e$ssize <- gedit("50", container = tbl, 
-		handler = function(h, ...) e$notifySamplingChange() ))
+		handler = function(h, ...) {
+			svalue(e$sizelabel) <- paste("Sample Size: ",
+				as.character(svalue(e$ssize))) 
+		} 
+	))
 		
 	tbl[4,2] <- (e$replace <- gcheckbox("Sample with replacement", 
-		container = tbl, handler = function(h,...) e$notifySamplingChange()))
-	tbl[5,2] <- (e$animate.sample <- gcheckbox("Animate sampling", 
 		container = tbl))
+	
+	gbutton("Load details", container = e$controls.vit, expand = TRUE, 
+		handler = function(h,...) {				
+			e$sample_check()
+			loadStatDetails(e)
+			e$c1$makeSamples(svalue(e$replace))
+			e$c1$makeStatistics() 
+			e$c1$plotDataStat() #use this to rerun PLOT_DATA for your method if necessary
+		})
 		
 	svalue(e$replace) <- TRUE
-	svalue(e$animate.sample) <- TRUE
 	svalue(e$cimeth) <- "normal"
 	enabled(e$cimeth) <- FALSE
 	enabled(e$cilabel) <- FALSE
 	
 	addSpace(e$controls.vit, 10, horizontal = FALSE)
+	
+	vb.table <- glayout(container = e$controls.vit)
+	vb.table[1,1] <- glabel("                       ", container = vb.table)
+	vb.table[1,2] <- (e$animate.sample <- gcheckbox("Animate sampling", 
+		container = vb.table))
+	vb.table[2,1] <- glabel("                       ", container = vb.table)
+	vb.table[2,2] <- (e$animate.stat <- gcheckbox("Animate statistics", 
+		container = vb.table))
+	enabled(e$animate.sample) <- TRUE
+	enabled(e$animate.stat) <- TRUE
+	
 	vit.bootbox <- gframe("Get bootstrapped sample(s)",  
 		container = e$controls.vit)
 	e$redraw.radio <- gradio(c(1, 5, 20),  horizontal=FALSE)
 	add(vit.bootbox, e$redraw.radio)
 	
+	e$advance <- FALSE
+	
 	buttons1 <- ggroup(container = e$controls.vit)
-	run1.but <- gbutton(text = "Run", expand = TRUE,
-		container = buttons1, handler = function(h, ...) { 
-			enabled(e$pause.but) <- TRUE
-			e$runSamplingOnly()
-			enabled(e$pause.but) <- FALSE
+	get.sample <- gbutton(text = "Generate sample", expand = TRUE,
+		container = buttons1, handler = function(h, ...) {
+			loaded_check(e)
+			n <- svalue(e$redraw.radio)
+			for (i in 1:n) {
+				if (e$advance) e$c1$advanceWhichSample()
+				if (svalue(e$animate.sample)) e$c1$animateSample(10)
+				e$c1$plotSample()
+				e$c1$plotSampleStat()
+				e$c1$drawImage()
+				e$advance <- TRUE
+			}
 		}
 	)
-	e$pause.but <- gbutton(text = "Pause", expand = TRUE, container = buttons1, 
-		handler = function(h, ...) {
-			print("pause") # can't click while R is running a for loop?
-			e$pause <- !e$pause
+	add.stat <- gbutton(text = "Add statistic below", expand = TRUE, 
+		container = buttons1, handler = function(h, ...) {
+			if (svalue(e$animate.sample)) e$c1$animateStat(10)
+			e$c1$plotStatDist()
+			e$c1$displayResult(e)
+			e$c1$drawImage()
+			e$c1$advanceWhichSample()
+			e$advance <- FALSE
 		}
 	)
 	addSpace(e$controls.vit, 20, horizontal=FALSE)
-
-	vd.table <- glayout(container = e$controls.vit)
-	vd.table[1,1] <- glabel("                       ", container = vd.table)
-	vd.table[1,2] <- (e$animate.stat <- gcheckbox("Animate statistics", 
-		container = vd.table))
-	enabled(e$animate.stat) <- TRUE
 		
 	vit.diffbox <- gframe("Observe sample statistic(s)",
 		container = e$controls.vit)
@@ -104,20 +130,32 @@ vit <- function() {
 	add(vit.diffbox,e$bootstrap.radio)
 
 
-	buttons2 <- ggroup(container = e$controls.vit)
-	run2.but <- gbutton(text = "Run", expand = TRUE, container = buttons2, 
-		handler = function(h, ...) { 
-			e$runSamplingAndStat()
+	buttons2 <- ggroup(horizontal = FALSE, container = e$controls.vit)
+	get.dist <- gbutton(text = "Generate statistic distribution", expand = TRUE, 
+		container = buttons2, handler = function(h, ...) { 
+			loaded_check(e)
+			if (svalue(e$bootstrap.radio) == 1000) e$c1$handle1000(e)
+			else {
+				n <- svalue(e$bootstrap.radio)
+				for (i in 1:n) {
+					if (svalue(e$animate.sample)) e$c1$animateSample(10)
+					e$c1$plotSample()
+					e$c1$plotSampleStat()
+					if (svalue(e$animate.stat)) e$c1$animateStat(10)
+					e$c1$plotStatDist()
+					e$c1$displayResult(e)
+					e$c1$drawImage()
+					e$c1$advanceWhichSample()
+				}
+				e$advance <- FALSE
+			}
 		}
 	)
-	show.ci.but <- gbutton(text = "Show Confidence Interval", expand = TRUE,
-		container = buttons2)
+	
+	# be sure to disable this button for confidence coverage methods
+	e$show.ci <- gbutton(text = "Show Confidence Interval", expand = TRUE,
+		container = buttons2, handler = function(h, ...) e$c1$displayResult(e))
 	addSpace(e$controls.vit, 10, horizontal = FALSE)
-
-	status <- glabel("", container = e$controls.vit)
-
-	enabled(e$pause.but)   = FALSE
-	enabled(show.ci.but)   = FALSE
 
 
 	# adding iNZight controls
@@ -175,12 +213,18 @@ vit <- function() {
 	tbl[3,7, anchor = c(0,0)] <- gbutton("clear", handler = function(h,...) {
 		e$xData <- NULL
 		svalue(e$xVar) <- "Drop name here"
+		e$variable_check()
+		clear_actions(e)
+		loadPlotDetails(e$xData, e$yData)
 		e$buildCanvas()
 		e$c1$drawImage()
 	})
 	tbl[5,7, anchor = c(0,0)] <- gbutton("clear", handler = function(h,...) {
 		e$yData <- NULL
 		svalue(e$yVar) <- "Drop name here"
+		e$variable_check()
+		clear_actions(e)
+		loadPlotDetails(e$xData, e$yData)
 		e$buildCanvas()
 		e$c1$drawImage()
 	})
@@ -193,21 +237,26 @@ vit <- function() {
 
 	# adding drop zones
 	adddroptarget(e$xVar, targetType = "object", handler = function(h, ...) {
-		svalue(e$xVar) <- id(h$dropdata)
+		svalue(e$xVar) <- gWidgets::id(h$dropdata)
 		if (e$inDataView) e$xData <- svalue(h$dropdata)
 		else e$xData <- tag(e$obj, "dataSet")[,id(h$dropdata)]
 		if (is.integer(e$xData)) e$xData <- as.numeric(e$xData)
 		svalue(e$ssize) <- length(e$xData)
+		e$variable_check()
+		clear_actions(e)
+		loadPlotDetails(e$xData, e$yData)
 		e$buildCanvas()
 		e$c1$drawImage()
 	})
 
 	adddroptarget(e$yVar, targetType = "object", handler = function(h, ...) {
-		svalue(e$yVar) <- id(h$dropdata)
+		svalue(e$yVar) <- gWidgets::id(h$dropdata)
 		if (e$inDataView) e$yData <- svalue(h$dropdata)
 		else e$yData <- tag(e$obj, "dataSet")[,id(h$dropdata)]
 		if (is.integer(e$yData)) e$yData <- as.numeric(e$yData)
-		svalue(e$ssize) <- length(e$yData)
+		e$variable_check()
+		clear_actions(e)
+		loadPlotDetails(e$xData, e$yData)
 		e$buildCanvas()
 		e$c1$drawImage()
 	})

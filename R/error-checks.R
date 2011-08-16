@@ -1,11 +1,12 @@
-error_check <- function(e, x, y, method) {
-	
-		# 2d checks
-		if (!is.null(x) & !is.null(y)) {
-			if (method %in% c("confidence interval - mean", 
-				"confidence interval - median"))
-				confidence_check(e)
-		}
+
+
+loaded_check <- function(e) {
+	if(!e$loaded) {
+		confirm_dialog("Please choose which inference method you would like to use and click 'Load details.'", handler = function(h, ...) { 
+				dispose(h$obj)
+			}
+		)
+	}
 }
 
 
@@ -15,15 +16,17 @@ error_check <- function(e, x, y, method) {
 #' @param y the vit gui's e$yData
 #' @param method the selected value of the gui's e$stat combobox
 confidence_check <- function(e) {
-	confirm_dialog(
+	if (!is.null(e$xData) & !is.null(e$yData)) {
+		confirm_dialog(
 "VIT cannot apply confidence interval methods to 
 more than one variable at a time. The statistic
 of interest will be changed to the mean.", 
-		handler = function(h, ...) { 
-			svalue(e$stat) <- "mean"
-			dispose(h$obj)
-		}
-	)	
+			handler = function(h, ...) { 
+				svalue(e$stat) <- "mean"
+				dispose(h$obj)
+			}
+		)
+	}	
 } 
 	
 

@@ -3,38 +3,16 @@ new.vit.env <- function() {
 	
 	e$pause <- FALSE
 
+	# methods specifically for loading data
 	e$fileReader <- function(){
 		print("Importing file")
 
 		e$specifyFileForImport()
 	}
-
-	e$viewList <- function(h, ...){
-		if(is.null(tag(e$obj, "dataSet"))) {
-			gmessage("Please load a new data set (with named columns)",
-				parent = e$win)
-		} else if(names(tag(e$obj, "dataSet"))[1] == "empty") {
-				gmessage("Please load a new data set", parent = e$win)
-		} else {
-			enabled(h$obj) <- FALSE
-			e$updateList()
-			enabled(e$dataView) <- TRUE
-			e$inDataView <- FALSE
-      }
-    }
-
-    e$viewData <- function(h, ...){
-    	if(is.null(tag(e$obj, "dataSet"))) {
-			gmessage("Please load a new data set (with named columns)",
-				parent = e$win)
-		} else if ((names(tag(e$obj, "dataSet"))[1] == "empty")) {
-			gmessage("Please load a new data set", parent = e$win)
-		} else {
-			enabled(h$obj) = FALSE
-			e$updateData()
-			enabled(e$listView) = TRUE
-			e$inDataView = TRUE
-		}
+	
+	e$odbcCloseAll <- function(){
+		require(RODBC)
+		odbcCloseAll()
 	}
 
 	e$specifyFileForImport <- function(...) {
@@ -188,19 +166,6 @@ new.vit.env <- function() {
 		}
 	}
 
-	e$clearAllSlots = function(){
-		svalue(e$xVar) <- "Drop name here"
-		e$e$xData <- NULL
-		tag(e$obj,"e$xVarData") <- NULL
-		svalue(e$yVar) <- "Drop name here"
-		e$e$yData <- NULL
-	}
-
-	e$odbcCloseAll <- function(){
-		require(RODBC)
-		odbcCloseAll()
-	}
-
 	e$updateData <- function() {
 		names(tag(e$obj,"dataSet")) <- make.names(names(tag(e$obj,"dataSet")),
 			unique = TRUE)
@@ -271,42 +236,70 @@ new.vit.env <- function() {
 		e$inDataView <- FALSE
 	}
 
+    e$viewData <- function(h, ...){
+    	if(is.null(tag(e$obj, "dataSet"))) {
+			gmessage("Please load a new data set (with named columns)",
+				parent = e$win)
+		} else if ((names(tag(e$obj, "dataSet"))[1] == "empty")) {
+			gmessage("Please load a new data set", parent = e$win)
+		} else {
+			enabled(h$obj) = FALSE
+			e$updateData()
+			enabled(e$listView) = TRUE
+			e$inDataView = TRUE
+		}
+	}
 
-# buildCanvas creates a canvas object from the R5 reference class canvas. This
-# canvas object is saved in the GUI environment and handles all of the graphical
-# displays in the vit tool. It may help to keep GUI methods (functions that
-# begin with e$ ) separate in your mind from the canvas methods (functions that
-# begin with e$c1$	). They behave a little differently. In general GUI methods
-# affect the gui environment and canvas methods affect the canvas object.
-# Handler functions that work with both are saved to the top level whenever
-# possible.
+	e$viewList <- function(h, ...){
+		if(is.null(tag(e$obj, "dataSet"))) {
+			gmessage("Please load a new data set (with named columns)",
+				parent = e$win)
+		} else if(names(tag(e$obj, "dataSet"))[1] == "empty") {
+				gmessage("Please load a new data set", parent = e$win)
+		} else {
+			enabled(h$obj) <- FALSE
+			e$updateList()
+			enabled(e$dataView) <- TRUE
+			e$inDataView <- FALSE
+      }
+    }
+
+
+	# Handlers and widget construction
+
+	# buildCanvas creates a canvas object from the R5 reference class canvas. This canvas object is saved in the GUI environment and handles all of the graphical displays in the vit tool. It may help to keep GUI methods (functions that begin with e$ ) separate in your mind from the canvas methods (functions that begin with e$c1$	). They behave a little differently. In general GUI methods affect the gui environment and canvas methods affect the canvas object. Handler functions that work with both are saved to the top level whenever possible.
 	e$buildCanvas <- function() {
-		grid.newpage()
-		if (is.null(e$xData)) {
-			grid.text("Please select Variable 1")
-			return()
-		}
-
-		error_check(e, e$xData, e$yData, svalue(e$stat))
-
-		if (is.categorical(e$xData) & !is.categorical(e$yData) &
-			 !is.null(e$yData)) {
-				e$reverseVariables()
-		}
 		
-		e$c1 <- canvas$new(x = e$xData, y = e$yData)
+		e$c1 <- canvas$new(x = e$xData, levels = e$yData)
 		# loads the data dependent details that allow the canvas to perform
 		# its basic actions. NOTE: should actions be stored in e?
-		loadPlotDetails(e$xData, e$yData)
 		buildViewports(e$c1, e$xData, e$yData)
 		e$c1$buildImage()
 		pushViewport(e$c1$viewports)
-		e$c1$plotData(e$xData, graphPath("data"), "dataPlot")
+		e$c1$plotData()
+	}
+	
+	e$clearAllSlots = function(){
+		svalue(e$xVar) <- "Drop name here"
+		e$e$xData <- NULL
+		tag(e$obj,"e$xVarData") <- NULL
+		svalue(e$yVar) <- "Drop name here"
+		e$e$yData <- NULL
+	}
+	
+	e$reverseVariables <- function() {
+		temp <- e$xData
+		e$xData <- e$yData
+		e$yData <- temp
+
+		temp <- svalue(e$xVar)
+		svalue(e$xVar) <- svalue(e$yVar)
+		svalue(e$yVar) <- temp
 	}
 	
 	# Arranges all the details for calculating statistics by making samples and 
 	# picking a correct sampling method.
-	e$setSamplingMethod <- function() {
+	e$sample_check <- function() {
 		# check for potential trouble
 		if (!is.null(e$xData)){
 			if (svalue(e$replace) == FALSE & as.numeric(svalue(e$ssize)) > 
@@ -324,75 +317,43 @@ new.vit.env <- function() {
                 return()
 			}
 		}
-		
-		# clear image
-		e$c1$buildImage()
-		e$c1$plotData(e$xData, graphPath("data"), "dataPlot")
-		
-		# load stat method
-		loadStatDetails(e)
-		
-		# load samples
-		e$c1$n <- as.numeric(svalue(e$ssize))
-		e$c1$makeSamples(svalue(e$replace)) # note also sets which.samples <- 1
-		e$c1$stat.dist <- NULL	
-		
-		MISCELLANEOUS(e)
-	}
-
-	e$reverseVariables <- function() {
-		temp <- e$xData
-		e$xData <- e$yData
-		e$yData <- temp
-
-		temp <- svalue(e$xVar)
-		svalue(e$xVar) <- svalue(e$yVar)
-		svalue(e$yVar) <- temp
-	}
-
-	e$notifySamplingChange <- function() {
-		if (!is.null(e$c1)) e$c1$which.sample <- 0
 	}
 	
-	e$runSamplingOnly <- function(n = svalue(e$redraw.radio)){
-		if(is.null(e$c1$which.sample) | !e$c1$which.sample) {
-			e$setSamplingMethod()
+	e$variable_check <- function() {
+		if (is.null(e$xData)) {
+			grid.newpage()
+			grid.text("Please select Variable 1")
+			return()
+		}
+
+		if (is.categorical(e$xData) & !is.categorical(e$yData) &
+			 !is.null(e$yData)) {
+				e$reverseVariables()
 		}
 		
-		pause <- function(){
-    		while(e$pause) {
-    		}  
-    	}  
-
-		for (i in 1:n) {
-			if (svalue(e$animate.sample)) e$c1$animateSample(10)
-			e$c1$plotSample(vp = graphPath("sample"), name = "samplePlot")
-			e$c1$plotStat(vp = graphPath("sample"))
-			e$c1$drawImage()
-			if (e$c1$which.sample >= 1000) e$c1$which.sample <- 0
-			e$c1$which.sample <- e$c1$which.sample + 1
-			pause()
+		if (is.categorical(e$xData) & is.categorical(e$yData)) {
+			grid.newpage()
+			grid.text("Methods do not yet exist for this type of data.")
+			print("Methods have not yet been implemented for 2D categorical data.")
+			return()
 		}
+		
+		if (!is.categorical(e$xData) & !is.categorical(e$yData) &
+			!is.null(e$yData)) {
+				grid.newpage()
+				grid.text("Methods do not yet exist for this type of data.")
+				print("Methods have not yet been implemented for 2D numerical data.")
+				return()
+		}
+		
+		if (is.categorical(e$xData) & is.null(e$yData)) {
+				grid.newpage()
+				grid.text("Methods do not yet exist for this type of data.")
+				print("Methods have not yet been implemented for 1D categorical data.")
+				return()
+		}
+		
 	}
 	
-	e$runSamplingAndStat <- function(){
-		if(is.null(e$c1$which.sample) | !e$c1$which.sample) {
-			e$setSamplingMethod()
-		}
-		
-		n <- svalue(e$bootstrap.radio)
-		if (n == 1000) {
-			HANDLE_1000(e)
-		} else {
-			for (i in 1:n) {
-				e$runSamplingOnly(1)
-				if (svalue(e$animate.stat) & n != 1000) e$c1$animateStat(10)
-				e$c1$plotStatDist()
-				e$c1$drawImage()
-				e$c1$displayResult(e)
-			}
-		}
-	}	
-		
 	e
 }

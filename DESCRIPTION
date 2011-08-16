@@ -1,5 +1,5 @@
 Package: vit
-Imports: grid, gWidgets, RGtk2, gWidgetsRGtk2
+Imports: grid, gWidgets, RGtk2, gWidgetsRGtk2, plyr
 Maintainer: Garrett Grolemund <grolemund@rice.edu>
 License: GPL
 Title: Visual Inference Tools
@@ -20,19 +20,21 @@ Enhances:
 Version: 0.1.0
 Depends: R (>= 2.13)
 Collate: 
-	'gui-interface.R'
-	'gui-environment.R'
-	'canvas-viewports.R' 
+	'actions.R'
 	'canvas-refclass.R'
+	'canvas-viewports.R' 
+	'data-methods-1d-numeric.R'
+	'data-methods-2d-mixed.R'
+	'error-checks.R'
 	'grob-boxplot.R'
 	'grob-ghosts.R'
 	'grob-hist.R'
 	'grob-propbar.R'
-	'actions.R'
-	'load-functions.R'
+	'gui-environment.R'
+	'gui-interface.R'
 	'helpers.R'
-	'error-checks.R'
-	'data-methods-1d-numeric.R'
-	'data-methods-2d-mixed.R'
-	'methods-bootstrapping.R'
-	'methods-confidence-coverage.R'
+	'load-functions.R'
+	'methods-CI-mean.R'
+	'methods-CI-median.R'
+	'stackPoints.R'
+	'unimplemented-stuff.R'

@@ -18,19 +18,94 @@
 #' side of the function. That would be burdensome here because there is so much
 #' information to keep track of. The reference class approach is an attempt at
 #' object oriented programming.
-canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples", 
-	"which.sample", "stat", "stat.dist", "viewports", "image", "which.ghost", 
-	"n", "indexes"),
+canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n", 
+	"samples", "indexes", "which.sample", "stat.dist", "viewports", "image"),
 	methods = list(
-	initialize = function(x = NULL, y = NULL, ...){
+	initialize = function(x = NULL, y = NULL, levels = NULL, ...){
 		require(grid)
 		x <<- x
 		y <<- y
+		levels <<- levels
 		n <<- length(x)
 		which.sample <<- 0
-		which.ghost <<- 1
 		stat.dist <<- NULL
 		invisible(.self)
+	},
+	
+	# ACTIONS
+	animateSample = function(n.steps) {
+		'Animates the selection of the sampel from the data.'
+		ANIMATE_SAMPLE(.self, n.steps)
+	},
+	animateStat = function(n.steps) {
+		'Animates the creation of the distribution of the statistic from the samples.'
+		ANIMATE_STAT(.self, n.steps)	
+	},
+	calcStat = function(i = which.sample) {
+		'Calculates the sample statistic for a group of data.'
+		CALC_STAT(samples[[i]])
+	},
+	displayResult = function(env) {
+		'Displays the final result of the VIT simulation.'
+		DISPLAY_RESULT(.self, env)
+	},
+	handle1000 = function(env) {
+		'Runs simulation that uses all 1000 pre-calculated samples.'
+		HANDLE_1000(.self, env)
+	},
+	plotData = function() {
+		'Plots a vector or dataframe of data points.'
+		PLOT_DATA(.self)
+	},
+	plotDataStat = function() {
+		'Plots the sample statistic with the sample.'
+		PLOT_DATA_STAT(.self)
+	},
+	plotSample = function(i = which.sample) {
+		'Retreives and plots the next sample.'
+		PLOT_SAMPLE(.self, i)
+	},
+	plotSampleStat = function(i = which.sample) {
+		'Plots the sample statistic with the sample.'
+		PLOT_SAMPLE_STAT(.self, i)
+	},
+	plotStatDist = function() {
+		'Plots the distribution of the sample statistic.'
+		PLOT_STAT_DIST(.self)
+	},
+
+	# Helpers
+	advanceWhichSample = function() {
+		'Advances which.sample.'
+		if (which.sample >= 1000) which.sample <<- 0
+		which.sample <<- which.sample + 1
+	},
+	buildImage = function() {
+		'builds an initial image for a canvas object. The initial image is just the background, with nothing added.'
+		dataAxis <- xaxisGrob(name = "dataAxis", vp = graphPath("data"))
+		sampleAxis <- xaxisGrob(name = "sampleAxis", vp = graphPath("sample"))
+		statAxis <- xaxisGrob(name = "statAxis", vp = graphPath("stat"))
+
+		image <<- gTree(name = "image", childrenvp = viewports, 
+			children = gList(dataAxis, sampleAxis, statAxis))
+	},
+	drawImage = function() {
+		'Draws current image in device.'
+		grid.newpage()
+		grid.draw(image)
+	},
+	getSample = function(i = which.sample) {
+		'Returns ith sample of data. Defaults to current sample.'
+		samples[[i]]
+	},
+	getStat = function(i = which.sample) {
+		'Returns the statistic for the ith distribution'
+		if (is.null(stat.dist)) makeStatDistribution()
+		stat.dist[[i]]
+	},
+	getStatDist = function() {
+		'Returns current distribution of the sampling statistic.'
+		stat.dist[1:which.sample]
 	},
 	makeSamples = function(replace){
 		'Generates sample groups for the vit bootstrap runs.'
@@ -49,93 +124,10 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "samples",
 		indexes <<- split(index.vec, rep(1:1000, each = n))
 		which.sample <<- 1
 	},
-	makeStatDistribution = function(){
-		'Calculates the statistic for all 1000 samples'
-		stat.dist <<- lapply(samples, CALC_STAT)
-	},
-	getStat = function(i = which.sample) {
-		'Returns the statistic for the ith distribution'
-		if (is.null(stat.dist)) makeStatDistribution()
-		stat.dist[[i]]
-	},
-    # Primary Methods (details vary based on x, y, and stat)
-	plotData = function(x, vp, name) {
-		'Plots a vector or dataframe of data points.'
-		if (is.null(y)) y <<- stackPoints(x, graphPath("data"))
-		PLOT_DATA(.self, x, vp, name)
-	},
-	plotSample = function(vp, name) {
-		'Retreives and plots the next sample.'
-		PLOT_SAMPLE(.self, getSample(), vp, name)
-	},
-	animateSample = function(n.steps) {
-		'Animates the selection of the sampel from the data.'
-		ANIMATE_SAMPLE(.self, n.steps)
-	},
-	calcStat = function(i) {
-		'Calculates the sample statistic for a group of data.'
-		CALC_STAT(samples[[i]])
-	},
-	plotStat = function(vp) {
-		'Plots the sample statistic with the sample.'
-		PLOT_STAT(.self, vp)
-	},
-	plotStatDist = function() {
-		'Plots the distribution of the sample statistic.'
-		PLOT_STAT_DIST(.self)
-	},
-	animateStat = function(n.steps) {
-		'Animates the creation of the distribution of the statistic from the samples.'
-		ANIMATE_STAT(.self, n.steps)	
-	},
-	displayResult = function(env) {
-		'Displays the final result of the VIT simulation.'
-		DISPLAY_RESULT(.self, env)
-	},
+	makeStatistics = function(){
+		'Calculates the statistic for all 1000 samples. Shows progress in a progress bar on the console.'
+		stat.dist <<- plyr::llply(samples, CALC_STAT, .progress = "text")
 
-	# Methods for dealing with sample distribution
-	getSample = function(i = which.sample) {
-		'Returns ith sample of data. Defaults to current sample.'
-		samples[[i]]
-	},
-	newSample = function() {
-		'Takes new sample of data and returns it invisibly.'
-		if (which.sample >= 1000) which.sample <<- 0
-		which.sample <<- which.sample + 1
-		invisible(samples[[which.sample]])
-	},
-
-	# Methods for dealing with distribution of sample statistic
-	getStatDist = function() {
-		'Returns current distribution of the sampling statistic.'
-		stat.dist[1:which.sample]
-	},
-
-	# Methods for plotting
-	drawImage = function() {
-		'Draws current image in device.'
-		grid.newpage()
-		grid.draw(image)
-	},
-	clearGhosts = function() {
-		'Removes any ghost boxes that have accumulated.'
-		grob.names <- childNames(image)
-		ghost.names <- grob.names[grep("ghost", grob.names)]
-		print(ghost.names)
-		for(i in seq_along(ghost.names))
-			image <<- removeGrob(image, gPath(ghost.names[i]))
-	},
-	plotBoxplot = function(x, vp, name, ...) {
-		'Plots boxplot of x in specified viewport'
-		image <<- addGrob(image, boxplotGrob(x, vp = vp, name = name, ...))
-	},
-	buildImage = function() {
-		'builds an initial image for a canvas object. The initial image is just the background, with nothing added.'
-		dataAxis <- xaxisGrob(name = "dataAxis", vp = graphPath("data"))
-		sampleAxis <- xaxisGrob(name = "sampleAxis", vp = graphPath("sample"))
-		statAxis <- xaxisGrob(name = "statAxis", vp = graphPath("stat"))
-
-		image <<- gTree(name = "image", childrenvp = viewports, 
-			children = gList(dataAxis, sampleAxis, statAxis))
 	}
+
 ))
