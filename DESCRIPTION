@@ -19,10 +19,11 @@ Description: Traditional methods of teaching statistical
 Enhances:
 Version: 0.1.0
 Depends: R (>= 2.13)
-Collate: 
+Collate:
 	'actions.R'
+	'animation-test.R'
 	'canvas-refclass.R'
-	'canvas-viewports.R' 
+	'canvas-viewports.R'
 	'data-methods-1d-numeric.R'
 	'data-methods-2d-mixed.R'
 	'error-checks.R'
