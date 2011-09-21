@@ -18,7 +18,7 @@
 #' side of the function. That would be burdensome here because there is so much
 #' information to keep track of. The reference class approach is an attempt at
 #' object oriented programming.
-canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n", 
+canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 	"samples", "indexes", "which.sample", "stat.dist", "viewports", "image"),
 	methods = list(
 	initialize = function(x = NULL, y = NULL, levels = NULL, ...){
@@ -31,15 +31,15 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		stat.dist <<- NULL
 		invisible(.self)
 	},
-	
+
 	# ACTIONS
-	animateSample = function(n.steps) {
+	animateSample = function(n.steps, n.slow) {
 		'Animates the selection of the sampel from the data.'
-		ANIMATE_SAMPLE(.self, n.steps)
+		ANIMATE_SAMPLE(.self, n.steps, n.slow)
 	},
 	animateStat = function(n.steps) {
 		'Animates the creation of the distribution of the statistic from the samples.'
-		ANIMATE_STAT(.self, n.steps)	
+		ANIMATE_STAT(.self, n.steps)
 	},
 	calcStat = function(i = which.sample) {
 		'Calculates the sample statistic for a group of data.'
@@ -86,7 +86,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		sampleAxis <- xaxisGrob(name = "sampleAxis", vp = graphPath("sample"))
 		statAxis <- xaxisGrob(name = "statAxis", vp = graphPath("stat"))
 
-		image <<- gTree(name = "image", childrenvp = viewports, 
+		image <<- gTree(name = "image", childrenvp = viewports,
 			children = gList(dataAxis, sampleAxis, statAxis))
 	},
 	drawImage = function() {
@@ -116,9 +116,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 			for (i in 1:1000) {
 				index.vec[[i]] <- sample(1:length(x), size = n)
 			}
-			index.vec <- unlist(index.vec)	
+			index.vec <- unlist(index.vec)
 		}
-		
+
 		sample.vec <- x[index.vec]
 		samples <<- split(sample.vec, rep(1:1000, each = n))
 		indexes <<- split(index.vec, rep(1:1000, each = n))

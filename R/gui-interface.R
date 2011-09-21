@@ -110,7 +110,8 @@ vit <- function(in.window = FALSE) {
 			n <- svalue(e$redraw.radio)
 			for (i in 1:n) {
 				if (e$advance) e$c1$advanceWhichSample()
-				if (svalue(e$animate.sample)) e$c1$animateSample(10)
+				if (svalue(e$redraw.radio) == 1) e$c1$animateSample(10, 5)
+                                if (svalue(e$redraw.radio) == 5) e$c1$animateSample(10, 0)
 				e$c1$plotSample()
 				e$c1$plotSampleStat()
 				e$c1$drawImage()
@@ -145,7 +146,7 @@ vit <- function(in.window = FALSE) {
 			else {
 				n <- svalue(e$bootstrap.radio)
 				for (i in 1:n) {
-					if (svalue(e$animate.sample)) e$c1$animateSample(10)
+					if (svalue(e$animate.sample)) e$c1$animateSample(10, 0)
 					e$c1$plotSample()
 					e$c1$plotSampleStat()
 					if (svalue(e$animate.stat)) e$c1$animateStat(10)

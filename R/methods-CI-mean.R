@@ -140,50 +140,49 @@ plotCIDistMean <- function(canvas) {
 }
 
 #' Animates a sample of points dropping down from the collection of points in the data window. The ANIMATE_SAMPLE method for numeric, one dimensional data.
-dropPoints1d <- function(canvas, n.steps) {
+dropPoints1d <- function(canvas, n.steps, n.slow) {
 	if ("samplePlot.points.1" %in% childNames(canvas$image))
-		canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
-
+            canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
+        if ("samplePlot.points" %in% childNames(canvas$image))
+            canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.points")))
 	index <- canvas$indexes[[canvas$which.sample]]
 	x <- canvas$x[index]
 	y.start <- canvas$y[index] + 2 # to place in data vp
 	y.end <- stackPoints(x, vp = graphPath("sample")) + 1
-
+        step <- (max(y.start) - 1.5) / n.steps
 	n <- length(x):1
-	m <- length(x)
-
-
-        n1 <- c((3:1)*n.steps, rep(0, m - 3))
-        m1 <- 3*n.steps
-	step <- (max(y.start) - 1.5) / n.steps
-        n[1:3] <- (y.start[1:3] - y.end[1:3])/step + m
-	if ("samplePlot.points" %in% childNames(canvas$image))
-		canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.points")))
-        for (i in 1:(3*n.steps)){
-            o <- pmax(n1 - m1, 0)*step
-            canvas$image <- addGrob(canvas$image, pointsGrob
-                                    (x, y = pmax(y.start - o, y.end),
-                                     vp = vpPath("canvas.frame",
-                                     "animation.field"), gp = gpar(lwd = 2, col = "grey50"),
-                                     name = "temp"))
-            if ((i - 1) %% n.steps == 0){
+        m <- length(x)
+        if (n.slow != 0){
+            if (length(x) < n.slow) n.slow <- length(x)
+            n1 <- c((n.slow:1)*n.steps, rep(0, m - n.slow))
+            m1 <- n.slow*n.steps
+            n[1:n.slow] <- (y.start[1:n.slow] - y.end[1:n.slow])/step + m
+            for (i in 1:(n.slow*n.steps)){
+                o <- pmax(n1 - m1, 0)*step
                 canvas$image <- addGrob(canvas$image, pointsGrob
-                                        (x[i %/% n.steps + 1], y = y.start[i %/% n.steps + 1],
-                                         vp = vpPath("canvas.frame", "animation.field"),
-                                         pch = 19, name = "highlight"))
+                                        (x, y = pmax(y.start - o, y.end),
+                                         vp = vpPath("canvas.frame",
+                                         "animation.field"), gp = gpar(lwd = 2, col = "grey50"),
+                                         name = "temp"))
+                if ((i - 1) %% n.steps == 0){
+                    canvas$image <- addGrob(canvas$image, pointsGrob
+                                            (x[i %/% n.steps + 1], y = y.start[i %/% n.steps + 1],
+                                             vp = vpPath("canvas.frame", "animation.field"),
+                                             pch = 19, name = "highlight"))
+                }
+                m1 <- m1 - 1
+                canvas$drawImage()
             }
-            m1 <- m1 - 1
-            canvas$drawImage()
+            m <- m - n.slow
         }
-
-	for (i in 1:(length(x) + n.steps)) {
+	for (i in (n.slow + 1):(length(x) + n.steps)) {
 
 		o <- pmax(n - m, 0) * step
 		canvas$image <- addGrob(canvas$image, pointsGrob(x,
 			y = pmax(y.start - o, y.end), vp = vpPath("canvas.frame",
 			"animation.field"), gp = gpar(lwd = 2, col = "grey50"),
 			name = "temp"))
-		if (i < length(x)) {
+		if (i <= length(x)) {
 			canvas$image <- addGrob(canvas$image, pointsGrob(x[i],
 				y = y.start[i], vp = vpPath("canvas.frame",
 				"animation.field"), pch = 19,
