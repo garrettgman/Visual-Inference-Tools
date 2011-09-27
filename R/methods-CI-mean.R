@@ -68,7 +68,7 @@ calcCIBootSEMean <- function(x){
     nboots <- 1000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
     	ncol = n)
-    means <- colMeans(samps)
+    means <- rowMeans(samps)
     se <- sd(means)
     mean(x) + c(-1, 1) * 2 * se
 }
@@ -248,32 +248,54 @@ CIcounter <- function(canvas, env) {
 
 #' confidence coverage method for HANDLE_1000: how to display the results of 1000 bootstrap samples
 ci1000 <- function(canvas, e){
-	if ("samplePlot.points.1" %in% childNames(canvas$image))
-		canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
-	if ("samplePlot.boxplot.1" %in% childNames(e$c1$image))
-		canvas$image <- removeGrob(canvas$image, gPath("samplePlot.boxplot.1"))
+    if ("samplePlot.points.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
+    if ("samplePlot.boxplot.1" %in% childNames(e$c1$image))
+        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.boxplot.1"))
+    bounds <- do.call("rbind", canvas$stat.dist)
+    X <- mean(CALC_STAT(canvas$x))
+    e$results <- X >= bounds[,1] & X <= bounds[,2]
+    ## Overall coverage percentage
+    totperc <- mean(!e$results)
+    ## Required 'red' CIs for final display of 40 CIs.
+    noreq <- ceiling(40*totperc)
+    if (noreq > 0){
+        plotted.index <- (canvas$which.sample + 61):(canvas$which.sample + 100)
+        plotted.samples <- canvas$samples[plotted.index]
+        diff <- sum(!e$results[plotted.index]) - noreq
+        if (diff != 0) {
+            if (diff > 0) {
+                index.changeout <- sample(which(!e$results[plotted.index]),
+                                          size = diff) + canvas$which.sample + 60
+                index.changein <- sample(which(e$results), size = diff)
+            } else {
+                index.changeout <- sample(which(e$results[plotted.index]),
+                                          size = abs(diff)) + canvas$which.sample + 60
+                index.changein <- sample(which(!e$results), size = abs(diff))
+            }
+            for (i in 1:abs(diff)){
+                samples.changeout <- canvas$samples[[index.changeout[i]]]
+                canvas$samples[[index.changeout[i]]] <- canvas$samples[[index.changein[i]]]
+                canvas$samples[[index.changein[i]]] <- samples.changeout
+                statdist.changeout <- canvas$stat.dist[[index.changeout[i]]]
+                canvas$stat.dist[[index.changeout[i]]] <- canvas$stat.dist[[index.changein[i]]]
+                canvas$stat.dist[[index.changein[i]]] <- statdist.changeout
+            }
+        }
+    }
+    svalue(e$ci.counter) <- c("                                              ")
 
-	if (is.null(e$results)) {
-		bounds <- do.call("rbind", canvas$stat.dist)
-		X <- mean(CALC_STAT(canvas$x))
-		e$results <- X >= bounds[,1] & X <= bounds[,2]
-	}
-
-	svalue(e$ci.counter) <- c("                                              ")
-
-	for (j in c(seq(1 , 1000, by = 10), 1000)) {
-			canvas$plotSampleStat()
-			canvas$plotStatDist()
-			canvas$drawImage()
-			canvas$advanceWhichSample()
-
-			success <- sum(e$results[1:j])
-			svalue(e$ci.counter) <- paste(success, "of", j,
-				"contain true value:", round(success/j * 100, 2), "%")
-
-	}
-	canvas$image <- removeGrob(canvas$image, gPath("sample.stat"))
-	canvas$drawImage()
+    for (j in c(seq(1 , 1000, by = 10), 1000)) {
+        canvas$plotSampleStat()
+        canvas$plotStatDist()
+        canvas$drawImage()
+        canvas$advanceWhichSample()
+        success <- sum(e$results[1:j])
+        svalue(e$ci.counter) <- paste(success, "of", j,
+                                      "contain true value:", round(success/j * 100, 2), "%")
+    }
+    canvas$image <- removeGrob(canvas$image, gPath("sample.stat"))
+    canvas$drawImage()
 }
 
 
