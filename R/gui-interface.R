@@ -34,49 +34,51 @@ vit <- function(in.window = FALSE) {
 	tbl[1,1] <- glabel("Statistic:    ", container = tbl)
 	tbl[1,2] <- (e$stat <- gcombobox(c(), editable=TRUE, container = tbl,
 		handler = function(h, ...) {
-			if (svalue(e$stat) %in% c("confidence interval - mean",
-				"confidence interval - median")) {
-					enabled(e$cimeth) <- TRUE
-					enabled(e$cilabel) <- TRUE
-				if (svalue(e$stat) %in% c("confidence interval - median")) {
+                    if (svalue(e$stat) %in% c("confidence interval - mean",
+                                              "confidence interval - median")) {
+                        enabled(e$cimeth) <- TRUE
+                        enabled(e$cilabel) <- TRUE
+                        if (svalue(e$stat) %in% c("confidence interval - median")) {
 					e$cimeth[] <- c("percentile bootstrap", "normal bootstrap",
-						"t bootstrap")
+                                                        "t bootstrap")
 					svalue(e$cimeth) <- "percentile bootstrap"
-				} else {
+                                    } else {
 					e$cimeth[] <- c("normal", "percentile bootstrap",
-						"normal bootstrap", "t bootstrap")
-				}
-			} else {
-				enabled(e$cimeth) <- FALSE
-				enabled(e$cilabel) <- FALSE
-			}
+                                                        "normal bootstrap", "t bootstrap")
+                                    }
+                    } else {
+                        enabled(e$cimeth) <- FALSE
+                        enabled(e$cilabel) <- FALSE
+                    }
 		}))
 	e$stat[] <- c("mean", "median", "confidence interval - mean",
-		"confidence interval - median")
+                      "confidence interval - median")
 	svalue(e$stat) <- "mean"
 
 	tbl[2,1] <- (e$cilabel <- glabel("CI Method:    ", container = tbl))
 	tbl[2,2] <- (e$cimeth <- gcombobox(c("normal", "percentile bootstrap",
-		"normal bootstrap", "t bootstrap"), editable = TRUE, container = tbl))
+                                             "normal bootstrap", "t bootstrap"), editable = TRUE,
+                                           container = tbl))
 
 	tbl[3,1] <- (e$sizelabel <- glabel("Sample Size:  50", container = tbl))
 	tbl[3,2] <- (e$ssize <- gedit("50", container = tbl,
-		handler = function(h, ...) {
-			svalue(e$sizelabel) <- paste("Sample Size: ",
-				as.character(svalue(e$ssize)))
-		}
-	))
+                                      handler = function(h, ...) {
+                                          svalue(e$sizelabel) <- paste("Sample Size: ",
+                                           as.character(svalue(e$ssize)))
+                                      }
+                                      ))
 
 	tbl[4,2] <- (e$replace <- gcheckbox("Sample with replacement",
-		container = tbl))
+                                            container = tbl))
 
 	gbutton("Load details", container = e$controls.vit, expand = TRUE,
 		handler = function(h,...) {
-			e$sample_check()
-			loadStatDetails(e)
-			e$c1$makeSamples(svalue(e$replace))
-			e$c1$makeStatistics()
-			e$c1$plotDataStat() #use this to rerun PLOT_DATA for your method if necessary
+                    e$resetCanvas()
+                    e$sample_check()
+                    loadStatDetails(e)
+                    e$c1$makeSamples(svalue(e$replace))
+                    e$c1$makeStatistics()
+                    e$c1$plotDataStat() #use this to rerun PLOT_DATA for your method if necessary
 		})
 
 	svalue(e$replace) <- TRUE
@@ -86,15 +88,15 @@ vit <- function(in.window = FALSE) {
 
 	addSpace(e$controls.vit, 10, horizontal = FALSE)
 
-	vb.table <- glayout(container = e$controls.vit)
-	vb.table[1,1] <- glabel("                       ", container = vb.table)
-	vb.table[1,2] <- (e$animate.sample <- gcheckbox("Animate sampling",
-		container = vb.table))
-	vb.table[2,1] <- glabel("                       ", container = vb.table)
-	vb.table[2,2] <- (e$animate.stat <- gcheckbox("Animate statistics",
-		container = vb.table))
-	enabled(e$animate.sample) <- TRUE
-	enabled(e$animate.stat) <- TRUE
+	#vb.table <- glayout(container = e$controls.vit)
+	#vb.table[1,1] <- glabel("                       ", container = vb.table)
+	#vb.table[1,2] <- (e$animate.sample <- gcheckbox("Animate sampling",
+#		container = vb.table))
+	#vb.table[2,1] <- glabel("                       ", container = vb.table)
+	#vb.table[2,2] <- (e$animate.stat <- gcheckbox("Animate statistics",
+	#	container = vb.table))
+	#enabled(e$animate.sample) <- TRUE
+	#enabled(e$animate.stat) <- TRUE
 
 	vit.bootbox <- gframe("Get bootstrapped sample(s)",
 		container = e$controls.vit)
@@ -121,12 +123,12 @@ vit <- function(in.window = FALSE) {
 	)
 	add.stat <- gbutton(text = "Add statistic below", expand = TRUE,
 		container = buttons1, handler = function(h, ...) {
-			if (svalue(e$animate.sample)) e$c1$animateStat(10)
-			e$c1$plotStatDist()
-			e$c1$displayResult(e)
-			e$c1$drawImage()
-			e$c1$advanceWhichSample()
-			e$advance <- FALSE
+                    e$c1$animateStat(10)
+                    e$c1$plotStatDist()
+                    e$c1$displayResult(e)
+                    e$c1$drawImage()
+                    e$c1$advanceWhichSample()
+                    e$advance <- FALSE
 		}
 	)
 	addSpace(e$controls.vit, 20, horizontal=FALSE)
@@ -146,10 +148,10 @@ vit <- function(in.window = FALSE) {
 			else {
 				n <- svalue(e$bootstrap.radio)
 				for (i in 1:n) {
-					if (svalue(e$animate.sample)) e$c1$animateSample(10, 0)
+					if (svalue(e$bootstrap.radio) != 20) e$c1$animateSample(10, 0)
 					e$c1$plotSample()
 					e$c1$plotSampleStat()
-					if (svalue(e$animate.stat)) e$c1$animateStat(10)
+					if (svalue(e$bootstrap.radio) != 20) e$c1$animateStat(10)
 					e$c1$plotStatDist()
 					e$c1$displayResult(e)
 					e$c1$drawImage()
@@ -164,7 +166,6 @@ vit <- function(in.window = FALSE) {
 	e$show.ci <- gbutton(text = "Show Confidence Interval", expand = TRUE,
 		container = buttons2, handler = function(h, ...) e$c1$displayResult(e))
 	addSpace(e$controls.vit, 10, horizontal = FALSE)
-
 
 	# adding iNZight controls
 	# top three buttons
