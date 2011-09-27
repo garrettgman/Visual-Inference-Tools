@@ -14,22 +14,29 @@ load_numeric_1d <- function() {
 # NOTE: should plotPoints be replaced with a points GROB that calculates stacking in drawDetails? So stacking changes as the plot is resized? ANSWER: Because we would have to repeat all of these calculations for every step of the animations, which would really slow things down.
 #' PLOT_DATA method for numeric, 1d data. Also used for 2d data when one varible is numeric
 plotPointsAndBoxplot <- function(canvas) {
-	canvas$y <- stackPoints(canvas$x, vp = graphPath("data"))
-	if (length(canvas$x) >= 100) 
-		plotHist(canvas, canvas$x, graphPath("data"), "dataPlot")
-	else {
-		plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")
-		plotBoxplot(canvas, canvas$x, graphPath("data"), "dataPlot")
-	}
+    canvas$y <- stackPoints(canvas$x, vp = graphPath("data"))
+    if (length(canvas$x) >= 100)
+        plotHist(canvas, canvas$x, graphPath("data"), "dataPlot")
+    else {
+        plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")
+        plotBoxplot(canvas, canvas$x, graphPath("data"), "dataPlot")
+    }
 }
 
-	
+
 #' helper function for plotting numeric data
-plotPoints <- function(canvas, x, y, vp, name) {
-	points.name <- paste(name, "points", vpNumber(vp), sep = ".")
-	canvas$image <- addGrob(canvas$image, pointsGrob(x = x, y = y, 
-		vp = vp, name = points.name, 
-		gp = gpar(col = "grey50", lwd = 2)))
+plotPoints <- function(canvas, x, y, vp, name, black = FALSE) {
+    if (black){
+        pch = 19
+        col = "black"
+    } else {
+        pch = 1
+        col = "grey50"
+    }
+    points.name <- paste(name, "points", vpNumber(vp), sep = ".")
+    canvas$image <- addGrob(canvas$image,
+                            pointsGrob(x = x, y = y, vp = vp, name = points.name,
+                                       gp = gpar(col = col, lwd = 2), pch = pch))
 }
 
 #' helper function for plotting numeric data
@@ -42,7 +49,7 @@ plotBoxplot <- function(canvas, x, vp, name) {
 #' helper function for plotting numeric data
 plotHist <- function(canvas, x, vp, name) {
 	boxes <- length(hist(x, plot = FALSE)$mids)
-	canvas$image <- addGrob(canvas$image, histGrob(x, breaks = seq(min(x), 
-		max(x), length.out = boxes), freq = 0.8, name = paste(name, "hist", 
+	canvas$image <- addGrob(canvas$image, histGrob(x, breaks = seq(min(x),
+		max(x), length.out = boxes), freq = 0.8, name = paste(name, "hist",
 		sep = "."), vp = vp))
 }

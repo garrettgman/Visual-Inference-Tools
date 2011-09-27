@@ -2,8 +2,32 @@
 
 # R5 implementation for canvas object
 
-# Basic description of Vit package.
-# The vit package has three parts: the gui interface, a canvas object that manages what is displayed in the gui's graphic space, and a collection of functions that handle the interactions between the gui and the canvas. The canvas object stores information necessary to making the vit plots and has a collection of methods that help move this information onto the canvas in a sensible way. These methods are organized in a two-tiered heirarchy. The first tier handles the basic actions of the canvas, such as drawing a standard background which includes axiis and an initial plot of the data, drawing the current sample, drawing the current distribution of the sample statistic and then displaying the final results of an analysis. The methods are called by handler functions associated with the "analyze" data page of the gui notebook. The second tier of methods provide the details the first tier of methods need to  complete their job. These details will change between different instances of the vit tool. For example, plotting numeric data will involve points and boxplots, but plotting categorical data will involve dual shaded bars. The second tier methods interact with handler functions associated with the "load data" page of the gui notebook. A typical application of vit, will see the user first load the data to be analyzed. This attaches the appropriate second tier (detail) methods of the canvas to the first tier (action) methods. Next the user will analyze the data which will implement the first tier methods. This arrangement simplifies the vit package and allows new methods to be quickly written and implemented.
+# Basic description of Vit package.  The vit package has three parts:
+# the gui interface, a canvas object that manages what is displayed in
+# the gui's graphic space, and a collection of functions that handle
+# the interactions between the gui and the canvas. The canvas object
+# stores information necessary to making the vit plots and has a
+# collection of methods that help move this information onto the
+# canvas in a sensible way. These methods are organized in a
+# two-tiered heirarchy. The first tier handles the basic actions of
+# the canvas, such as drawing a standard background which includes
+# axiis and an initial plot of the data, drawing the current sample,
+# drawing the current distribution of the sample statistic and then
+# displaying the final results of an analysis. The methods are called
+# by handler functions associated with the "analyze" data page of the
+# gui notebook. The second tier of methods provide the details the
+# first tier of methods need to complete their job. These details will
+# change between different instances of the vit tool. For example,
+# plotting numeric data will involve points and boxplots, but plotting
+# categorical data will involve dual shaded bars. The second tier
+# methods interact with handler functions associated with the "load
+# data" page of the gui notebook. A typical application of vit, will
+# see the user first load the data to be analyzed. This attaches the
+# appropriate second tier (detail) methods of the canvas to the first
+# tier (action) methods. Next the user will analyze the data which
+# will implement the first tier methods. This arrangement simplifies
+# the vit package and allows new methods to be quickly written and
+# implemented.
 
 
 
@@ -33,9 +57,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 	},
 
 	# ACTIONS
-	animateSample = function(n.steps, n.slow) {
+	animateSample = function(n.steps, n.slow, move) {
 		'Animates the selection of the sampel from the data.'
-		ANIMATE_SAMPLE(.self, n.steps, n.slow)
+		ANIMATE_SAMPLE(.self, n.steps, n.slow, move)
 	},
 	animateStat = function(n.steps) {
 		'Animates the creation of the distribution of the statistic from the samples.'

@@ -24,14 +24,14 @@ load_CI_mean <- function(e) {
 
 
 plotSamplePointsAndBoxplot <- function(canvas, i) {
-	x <- canvas$samples[[i]]
-	if (length(x) >= 100)
-		plotHist(canvas, x, graphPath("data"), "dataPlot")
-	else {
-		y <- stackPoints(x, vp = graphPath("sample"))
-		plotPoints(canvas, x, y, graphPath("sample"), "samplePlot")
-		plotBoxplot(canvas, x, graphPath("sample"), "samplePlot")
-	}
+    x <- canvas$samples[[i]]
+    if (length(x) >= 100)
+        plotHist(canvas, x, graphPath("data"), "dataPlot")
+    else {
+        y <- stackPoints(x, vp = graphPath("sample"))
+        plotPoints(canvas, x, y, graphPath("sample"), "samplePlot", black = TRUE)
+        plotBoxplot(canvas, x, graphPath("sample"), "samplePlot")
+    }
 }
 
 
@@ -140,64 +140,43 @@ plotCIDistMean <- function(canvas) {
 }
 
 #' Animates a sample of points dropping down from the collection of points in the data window. The ANIMATE_SAMPLE method for numeric, one dimensional data.
-dropPoints1d <- function(canvas, n.steps, n.slow) {
-	if ("samplePlot.points.1" %in% childNames(canvas$image))
-            canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
-        if ("samplePlot.points" %in% childNames(canvas$image))
-            canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.points")))
-	index <- canvas$indexes[[canvas$which.sample]]
-	x <- canvas$x[index]
-	y.start <- canvas$y[index] + 2 # to place in data vp
-	y.end <- stackPoints(x, vp = graphPath("sample")) + 1
-        step <- (max(y.start) - 1.5) / n.steps
-	n <- length(x):1
-        m <- length(x)
-        if (n.slow != 0){
-            if (length(x) < n.slow) n.slow <- length(x)
-            n1 <- c((n.slow:1)*n.steps, rep(0, m - n.slow))
-            m1 <- n.slow*n.steps
-            n[1:n.slow] <- (y.start[1:n.slow] - y.end[1:n.slow])/step + m
-            for (i in 1:(n.slow*n.steps)){
-                o <- pmax(n1 - m1, 0)*step
-                canvas$image <- addGrob(canvas$image, pointsGrob
-                                        (x, y = pmax(y.start - o, y.end),
-                                         vp = vpPath("canvas.frame",
-                                         "animation.field"), gp = gpar(lwd = 2, col = "grey50"),
-                                         name = "temp"))
-                if ((i - 1) %% n.steps == 0){
-                    canvas$image <- addGrob(canvas$image, pointsGrob
-                                            (x[i %/% n.steps + 1], y = y.start[i %/% n.steps + 1],
-                                             vp = vpPath("canvas.frame", "animation.field"),
-                                             pch = 19, name = "highlight"))
-                }
-                m1 <- m1 - 1
-                canvas$drawImage()
-            }
-            m <- m - n.slow
+dropPoints1d <- function(canvas, n.steps, n.slow, move = TRUE) {
+    if ("samplePlot.points.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
+    if ("samplePlot.points" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.points")))
+    index <- canvas$indexes[[canvas$which.sample]]
+    x <- canvas$x[index]
+    y.start <- y.pos <- canvas$y[index] + 2 # to place in data vp
+    y.end <- stackPoints(x, vp = graphPath("sample")) + 1
+    y.step <- (y.start - y.end)/n.steps
+    n.slow <- min(n.slow, length(x))
+    if (move){
+        for (i in 1:length(x)){
+            canvas$image <- addGrob(canvas$image,
+                                    pointsGrob(x[1:i], y = (canvas$y[index])[1:i],
+                                               vp = graphPath("data"),
+                                               pch = 19,
+                                               name = "data.samp"))
+            if (i <= n.slow) speed = 10 else speed = 1
+            for (j in 1:speed) canvas$drawImage()
         }
-	for (i in (n.slow + 1):(length(x) + n.steps)) {
-
-		o <- pmax(n - m, 0) * step
-		canvas$image <- addGrob(canvas$image, pointsGrob(x,
-			y = pmax(y.start - o, y.end), vp = vpPath("canvas.frame",
-			"animation.field"), gp = gpar(lwd = 2, col = "grey50"),
-			name = "temp"))
-		if (i <= length(x)) {
-			canvas$image <- addGrob(canvas$image, pointsGrob(x[i],
-				y = y.start[i], vp = vpPath("canvas.frame",
-				"animation.field"), pch = 19,
-				name = "highlight"))
-		} else {
-			canvas$image <- addGrob(canvas$image, pointsGrob(NA,
-				y = NA, vp = vpPath("canvas.frame",
-				"animation.field"), gp = gpar(fill = "black"),
-				name = "highlight"))
-		}
-		canvas$drawImage()
-		m <- m - 1
-	}
-	canvas$image <- removeGrob(canvas$image, gPath(c("temp")))
-	canvas$image <- removeGrob(canvas$image, gPath(c("highlight")))
+    }
+    canvas$image <- addGrob(canvas$image,
+                            pointsGrob(x, y = canvas$y[index], vp = graphPath("data"),
+                                       pch = 19,
+                                       name = "data.samp"))
+    if (move){
+        for (i in 1:n.steps){
+            y.pos <- y.pos - y.step
+            canvas$image <- addGrob(canvas$image,
+                                    pointsGrob(x, y.pos, vp = vpPath("canvas.frame",
+                                                         "animation.field"), pch = 19,
+                                               name = "temp"))
+            canvas$drawImage()
+        }
+        canvas$image <- removeGrob(canvas$image, gPath(c("temp")))
+    }
 }
 
 
@@ -252,6 +231,9 @@ ci1000 <- function(canvas, e){
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
     if ("samplePlot.boxplot.1" %in% childNames(e$c1$image))
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.boxplot.1"))
+    if ("data.samp" %in% childNames(e$c1$image))
+        canvas$image <- removeGrob(canvas$image, gPath("data.samp"))
+    if (canvas$which.sample >= 900) canvas$which.sample <- round(runif(1, 0, 100))
     bounds <- do.call("rbind", canvas$stat.dist)
     X <- mean(CALC_STAT(canvas$x))
     e$results <- X >= bounds[,1] & X <= bounds[,2]
@@ -284,7 +266,7 @@ ci1000 <- function(canvas, e){
         }
     }
     svalue(e$ci.counter) <- c("                                              ")
-
+    ## If running out of samples, select a random starting point in first 100.
     for (j in c(seq(1 , 1000, by = 10), 1000)) {
         canvas$plotSampleStat()
         canvas$plotStatDist()
