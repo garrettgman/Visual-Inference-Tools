@@ -1,6 +1,6 @@
 new.vit.env <- function() {
 	e <- new.env()
-	
+
 	e$pause <- FALSE
 
 	# methods specifically for loading data
@@ -9,7 +9,7 @@ new.vit.env <- function() {
 
 		e$specifyFileForImport()
 	}
-	
+
 	e$odbcCloseAll <- function(){
 		require(RODBC)
 		odbcCloseAll()
@@ -269,7 +269,7 @@ new.vit.env <- function() {
 
 	# buildCanvas creates a canvas object from the R5 reference class canvas. This canvas object is saved in the GUI environment and handles all of the graphical displays in the vit tool. It may help to keep GUI methods (functions that begin with e$ ) separate in your mind from the canvas methods (functions that begin with e$c1$	). They behave a little differently. In general GUI methods affect the gui environment and canvas methods affect the canvas object. Handler functions that work with both are saved to the top level whenever possible.
 	e$buildCanvas <- function() {
-		
+
 		e$c1 <- canvas$new(x = e$xData, levels = e$yData)
 		# loads the data dependent details that allow the canvas to perform
 		# its basic actions. NOTE: should actions be stored in e?
@@ -278,7 +278,7 @@ new.vit.env <- function() {
 		pushViewport(e$c1$viewports)
 		e$c1$plotData()
 	}
-	
+
 	e$clearAllSlots = function(){
 		svalue(e$xVar) <- "Drop name here"
 		e$e$xData <- NULL
@@ -286,7 +286,7 @@ new.vit.env <- function() {
 		svalue(e$yVar) <- "Drop name here"
 		e$e$yData <- NULL
 	}
-	
+
 	e$reverseVariables <- function() {
 		temp <- e$xData
 		e$xData <- e$yData
@@ -296,20 +296,20 @@ new.vit.env <- function() {
 		svalue(e$xVar) <- svalue(e$yVar)
 		svalue(e$yVar) <- temp
 	}
-	
-	# Arranges all the details for calculating statistics by making samples and 
+
+	# Arranges all the details for calculating statistics by making samples and
 	# picking a correct sampling method.
 	e$sample_check <- function() {
 		# check for potential trouble
 		if (!is.null(e$xData)){
-			if (svalue(e$replace) == FALSE & as.numeric(svalue(e$ssize)) > 
+			if (svalue(e$replace) == FALSE & as.numeric(svalue(e$ssize)) >
 				length(e$xData)) {
 					grid.newpage()
 					grid.text("Sample size can not exceed data size when sampling without replacement.")
 					svalue(e$ssize) <- length(e$xData)
 					return()
-			}		
-			
+			}
+
 			if (as.numeric(svalue(e$ssize)) < 2) {
 				grid.newpage()
                 grid.text("Sample size must be > 1.")
@@ -318,7 +318,7 @@ new.vit.env <- function() {
 			}
 		}
 	}
-	
+
 	e$variable_check <- function() {
 		if (is.null(e$xData)) {
 			grid.newpage()
@@ -330,14 +330,14 @@ new.vit.env <- function() {
 			 !is.null(e$yData)) {
 				e$reverseVariables()
 		}
-		
+
 		if (is.categorical(e$xData) & is.categorical(e$yData)) {
 			grid.newpage()
 			grid.text("Methods do not yet exist for this type of data.")
 			print("Methods have not yet been implemented for 2D categorical data.")
 			return()
 		}
-		
+
 		if (!is.categorical(e$xData) & !is.categorical(e$yData) &
 			!is.null(e$yData)) {
 				grid.newpage()
@@ -345,15 +345,21 @@ new.vit.env <- function() {
 				print("Methods have not yet been implemented for 2D numerical data.")
 				return()
 		}
-		
+
 		if (is.categorical(e$xData) & is.null(e$yData)) {
 				grid.newpage()
 				grid.text("Methods do not yet exist for this type of data.")
 				print("Methods have not yet been implemented for 1D categorical data.")
 				return()
 		}
-		
+
 	}
-	
+
+        e$resetCanvas <- function() {
+            clear_actions(e)
+            e$buildCanvas()
+            e$c1$drawImage()
+        }
+
 	e
 }
