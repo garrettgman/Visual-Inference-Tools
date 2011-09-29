@@ -1,4 +1,6 @@
-# Fills in the correct details for PLOT_DATA once a variable has been loaded. You can make a certain statistical method override these details by having loadStatDetails reset PLOT_DATA for that method.
+# Fills in the correct details for PLOT_DATA once a variable has been
+# loaded. You can make a certain statistical method override these
+# details by having loadStatDetails reset PLOT_DATA for that method.
 loadPlotDetails <- function(x, y) {
 	if (is.null(y)) {
 		if (is.categorical(x)) {
@@ -18,14 +20,14 @@ loadPlotDetails <- function(x, y) {
 	}
 }
 
-# calls the load function for the selected statistic method. The load functions are stored together with the details they load in the methods file for each method
+# calls the load function for the selected statistic method. The load
+# functions are stored together with the details they load in the
+# methods file for each method
 loadStatDetails <- function(e) {
 	stat.method <- svalue(e$stat)
-	e$c1$n <- as.numeric(svalue(e$ssize))
-	enabled(e$show.ci) <- FALSE
-	list("mean" = load_bootstrapping_mean,
-		"median" = load_bootstrapping_median,
-		"confidence interval - mean" = load_CI_mean,
-		"confidence interval - median" = load_CI_median)[[stat.method]](e)
+        e$c1$n <- as.numeric(svalue(e$ssize))
+	list("mean" = load_CI_mean,
+             "median" = load_CI_median)[[stat.method]](e)
 	e$loaded <- TRUE
 }
+

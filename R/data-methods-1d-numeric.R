@@ -15,7 +15,7 @@ load_numeric_1d <- function() {
 #' PLOT_DATA method for numeric, 1d data. Also used for 2d data when one varible is numeric
 plotPointsAndBoxplot <- function(canvas) {
     canvas$y <- stackPoints(canvas$x, vp = graphPath("data"))
-    if (length(canvas$x) >= 100)
+    if (length(canvas$x) >= 1000)
         plotHist(canvas, canvas$x, graphPath("data"), "dataPlot")
     else {
         plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")

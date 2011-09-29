@@ -4,6 +4,7 @@ load_CI_mean <- function(e) {
 
 	PLOT_DATA <<- PLOT_DATA
 	PLOT_SAMPLE <<- plotSamplePointsAndBoxplot
+        SHOW_LABELS <<- ciLabels
 	CALC_STAT <<- c("normal" = calcCIWald, "percentile bootstrap" =
 		calcCIBootPercMean, "normal bootstrap" = calcCIBootSEMean,
 		"t bootstrap" = calcCIBootTSEMean)[[svalue(e$cimeth)]]
@@ -19,6 +20,7 @@ load_CI_mean <- function(e) {
 	if (!is.null(e$ci.counter)) delete(e$controls.vit, e$ci.counter)
 	e$ci.counter <- glabel()
 	add(e$controls.vit, e$ci.counter)
+        e$replace <- FALSE
 	e$results <- NULL
 }
 
@@ -32,6 +34,19 @@ plotSamplePointsAndBoxplot <- function(canvas, i) {
         plotPoints(canvas, x, y, graphPath("sample"), "samplePlot", black = TRUE)
         plotBoxplot(canvas, x, graphPath("sample"), "samplePlot")
     }
+}
+
+ciLabels <- function(canvas){
+    canvas$image <- addGrob(canvas$image, textGrob("Population", x = 0, y = 0.9,
+                                                   just = c("left", "top"),
+                                                   vp = graphPath("data")))
+    canvas$image <- addGrob(canvas$image, textGrob("Sample", x = 0, y = 0.8,
+                                                   just = c("left", "top"),
+                                                   vp = graphPath("sample")))
+    canvas$image <- addGrob(canvas$image, textGrob("CI history", x = 0, y = 0.8,
+                                                   just = c("left", "top"),
+                                                   vp = graphPath("stat")))
+    canvas$drawImage()
 }
 
 
@@ -151,6 +166,7 @@ dropPoints1d <- function(canvas, n.steps, n.slow, move = TRUE) {
     y.end <- stackPoints(x, vp = graphPath("sample")) + 1
     y.step <- (y.start - y.end)/n.steps
     n.slow <- min(n.slow, length(x))
+    ## Lighting up of sampled points.
     if (move){
         for (i in 1:length(x)){
             canvas$image <- addGrob(canvas$image,
@@ -161,11 +177,14 @@ dropPoints1d <- function(canvas, n.steps, n.slow, move = TRUE) {
             if (i <= n.slow) speed = 10 else speed = 1
             for (j in 1:speed) canvas$drawImage()
         }
+        ## Force pause before points drop.
+        for (i in 1:20) canvas$drawImage()
     }
     canvas$image <- addGrob(canvas$image,
                             pointsGrob(x, y = canvas$y[index], vp = graphPath("data"),
                                        pch = 19,
                                        name = "data.samp"))
+    ## Dropping of points.
     if (move){
         for (i in 1:n.steps){
             y.pos <- y.pos - y.step

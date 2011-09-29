@@ -26,34 +26,28 @@ vit <- function(in.window = FALSE) {
     controls.iNZight <- ggroup(horizontal = FALSE, container = g.controls,
                                expand = TRUE, label = "Load Data")
     e$controls.vit <- ggroup(horizontal = FALSE, container = g.controls,
-                             expand = TRUE, label = "Analyze Data")
+                             expand = TRUE, label = "Analyse Data")
 
 
     ## adding vit controls
     addSpace(e$controls.vit, 10, horizontal = FALSE)
     tbl <- glayout(container = e$controls.vit)
-    tbl[1,1] <- glabel("Statistic:    ", container = tbl)
-    tbl[1,2] <- (e$stat <- gcombobox(c(), editable=TRUE, container = tbl,
+    tbl[1,1] <- glabel("Quantity:    ", container = tbl)
+    tbl[1,2] <- (e$stat <- gcombobox(c(), editable = TRUE, container = tbl,
                                      handler = function(h, ...) {
-                                         if (svalue(e$stat) %in% c("confidence interval - mean",
-                                                                   "confidence interval - median")) {
-                                             enabled(e$cimeth) <- TRUE
-                                             enabled(e$cilabel) <- TRUE
-                                             if (svalue(e$stat) %in% c("confidence interval - median")) {
+                                             if (svalue(e$stat) %in% c("median")) {
                                                  e$cimeth[] <- c("percentile bootstrap", "normal bootstrap",
                                                                  "t bootstrap")
                                                  svalue(e$cimeth) <- "percentile bootstrap"
                                              } else {
                                                  e$cimeth[] <- c("normal", "percentile bootstrap",
                                                                  "normal bootstrap", "t bootstrap")
+                                                 svalue(e$cimeth) <- "normal"
                                              }
-                                         } else {
-                                             enabled(e$cimeth) <- FALSE
-                                             enabled(e$cilabel) <- FALSE
+
                                          }
-                                     }))
-    e$stat[] <- c("mean", "median", "confidence interval - mean",
-                  "confidence interval - median")
+                                     ))
+    e$stat[] <- c("mean", "median")
     svalue(e$stat) <- "mean"
 
     tbl[2,1] <- (e$cilabel <- glabel("CI Method:    ", container = tbl))
@@ -68,26 +62,28 @@ vit <- function(in.window = FALSE) {
                                                                    as.character(svalue(e$ssize)))
                                   }
                                   ))
+    tbl[4,2] <- (e$holdSample <- gcheckbox("Hold samples", container = tbl))
 
-    tbl[4,2] <- (e$replace <- gcheckbox("Sample with replacement",
-                                        container = tbl))
-
-    gbutton("Load details", container = e$controls.vit, expand = TRUE,
+    gbutton("Record my choices", container = e$controls.vit, expand = TRUE,
             handler = function(h,...) {
-                e$resetCanvas()
-                e$sample_check()
+                if (svalue(e$ssize) != e$c1$n) svalue(e$holdSample) <- FALSE
+                keep.samples <- (!(class(e$c1$samples) == "uninitializedField") &
+                                 svalue(e$holdSample))
+                if (keep.samples)
+                    e$resetCanvasKeepSample(e$c1) else e$resetCanvas()
                 loadStatDetails(e)
-                e$c1$makeSamples(svalue(e$replace))
+                e$sample_check()
+                if (!keep.samples)
+                    e$c1$makeSamples(e$replace)
                 e$c1$makeStatistics()
                 e$c1$plotDataStat() #use this to rerun PLOT_DATA for your method if necessary
+                e$c1$showLabels()
             })
 
-    svalue(e$replace) <- TRUE
     svalue(e$cimeth) <- "normal"
-    enabled(e$cimeth) <- FALSE
-    enabled(e$cilabel) <- FALSE
     addSpace(e$controls.vit, 10, horizontal = FALSE)
-    vit.bootbox <- gframe("Get bootstrapped sample(s)",
+    vit.popsamp <- glabel("Population and sample", container = e$controls.vit)
+    vit.bootbox <- gframe("Number of repititions",
                           container = e$controls.vit)
     e$redraw.radio <- gradio(c(1, 5, 20),  horizontal=FALSE)
     add(vit.bootbox, e$redraw.radio)
@@ -95,7 +91,7 @@ vit <- function(in.window = FALSE) {
     e$advance <- FALSE
 
     buttons1 <- ggroup(container = e$controls.vit)
-    get.sample <- gbutton(text = "Generate sample", expand = TRUE,
+    get.sample <- gbutton(text = "Go", expand = TRUE,
                           container = buttons1, handler = function(h, ...) {
                               loaded_check(e)
                               n <- svalue(e$redraw.radio)
@@ -111,19 +107,12 @@ vit <- function(in.window = FALSE) {
                               }
                           }
                           )
-    add.stat <- gbutton(text = "Add statistic below", expand = TRUE,
-                        container = buttons1, handler = function(h, ...) {
-                            e$c1$animateStat(10)
-                            e$c1$plotStatDist()
-                            e$c1$displayResult(e)
-                            e$c1$drawImage()
-                            e$c1$advanceWhichSample()
-                            e$advance <- FALSE
-                        }
-                        )
+
     addSpace(e$controls.vit, 20, horizontal=FALSE)
 
-    vit.diffbox <- gframe("Observe sample statistic(s)",
+    glabel("Include confidence interval history", container = e$controls.vit)
+
+    vit.diffbox <- gframe("Number of repititions",
                           container = e$controls.vit)
     e$bootstrap.radio <- gradio(c(1, 5, 20, 1000),
                                 horizontal = FALSE)
@@ -131,7 +120,7 @@ vit <- function(in.window = FALSE) {
 
 
     buttons2 <- ggroup(horizontal = FALSE, container = e$controls.vit)
-    get.dist <- gbutton(text = "Generate statistic distribution", expand = TRUE,
+    get.dist <- gbutton(text = "Go", expand = TRUE,
                         container = buttons2, handler = function(h, ...) {
                             loaded_check(e)
                             if (svalue(e$bootstrap.radio) == 1000) e$c1$handle1000(e)
@@ -156,9 +145,9 @@ vit <- function(in.window = FALSE) {
                         )
 
     ## be sure to disable this button for confidence coverage methods
-    e$show.ci <- gbutton(text = "Show Confidence Interval", expand = TRUE,
-                         container = buttons2, handler = function(h, ...) e$c1$displayResult(e))
-    addSpace(e$controls.vit, 10, horizontal = FALSE)
+    ##e$show.ci <- gbutton(text = "Show Confidence Interval", expand = TRUE,
+    ##                     container = buttons2, handler = function(h, ...) e$c1$displayResult(e))
+    ##addSpace(e$controls.vit, 10, horizontal = FALSE)
 
     ## adding iNZight controls
     ## top three buttons
@@ -180,7 +169,7 @@ vit <- function(in.window = FALSE) {
     add(iNZ.view, e$listView)
     add(controls.iNZight, iNZ.view)
 
-                                        # Table of data frame or variables
+    ## Table of data frame or variables
     e$dataGp <-  ggroup(horizontal = TRUE, expand = TRUE)
     add(controls.iNZight, e$dataGp, expand = TRUE)
 
@@ -261,7 +250,6 @@ vit <- function(in.window = FALSE) {
         e$buildCanvas()
         e$c1$drawImage()
     })
-
 }
 
 

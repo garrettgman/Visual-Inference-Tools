@@ -267,16 +267,15 @@ new.vit.env <- function() {
 
 	# Handlers and widget construction
 
-	# buildCanvas creates a canvas object from the R5 reference class canvas. This canvas object is saved in the GUI environment and handles all of the graphical displays in the vit tool. It may help to keep GUI methods (functions that begin with e$ ) separate in your mind from the canvas methods (functions that begin with e$c1$	). They behave a little differently. In general GUI methods affect the gui environment and canvas methods affect the canvas object. Handler functions that work with both are saved to the top level whenever possible.
-	e$buildCanvas <- function() {
-
-		e$c1 <- canvas$new(x = e$xData, levels = e$yData)
-		# loads the data dependent details that allow the canvas to perform
-		# its basic actions. NOTE: should actions be stored in e?
-		buildViewports(e$c1, e$xData, e$yData)
-		e$c1$buildImage()
-		pushViewport(e$c1$viewports)
-		e$c1$plotData()
+	# buildCanvas creates a canvas object from the R5 reference class canvas. This canvas object is saved in the GUI environment and handles all of the graphical displays in the vit tool. It may help to keep GUI methods (functions that begin with e$ ) separate in your mind from the canvas methods (functions that begin with e$c1$	). They behave a little differently. In general GUI methods affect the gui environment and canvas methods affect the canvas object. Handler functions that work with both are saved to the top level whenever possible. Indexes and samples can be given so that a new canvas object cointains the same samples as the previous one.
+	e$buildCanvas <- function(){
+            e$c1 <- canvas$new(x = e$xData, levels = e$yData)
+            ## loads the data dependent details that allow the canvas to perform
+            ## its basic actions. NOTE: should actions be stored in e?
+            buildViewports(e$c1, e$xData, e$yData)
+            e$c1$buildImage()
+            pushViewport(e$c1$viewports)
+            e$c1$plotData()
 	}
 
 	e$clearAllSlots = function(){
@@ -302,7 +301,7 @@ new.vit.env <- function() {
 	e$sample_check <- function() {
 		# check for potential trouble
 		if (!is.null(e$xData)){
-			if (svalue(e$replace) == FALSE & as.numeric(svalue(e$ssize)) >
+			if (e$replace == FALSE & as.numeric(svalue(e$ssize)) >
 				length(e$xData)) {
 					grid.newpage()
 					grid.text("Sample size can not exceed data size when sampling without replacement.")
@@ -361,5 +360,13 @@ new.vit.env <- function() {
             e$c1$drawImage()
         }
 
+        e$resetCanvasKeepSample <- function(old.canvas){
+            old.samples <- old.canvas$samples
+            old.indexes <- old.canvas$indexes
+            e$resetCanvas()
+            e$c1$samples <- old.samples
+            e$c1$indexes <- old.indexes
+            e$c1$which.sample <- 1
+        }
 	e
 }

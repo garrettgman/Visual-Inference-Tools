@@ -84,7 +84,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 	plotDataStat = function() {
 		'Plots the sample statistic with the sample.'
 		PLOT_DATA_STAT(.self)
-	},
+            },
 	plotSample = function(i = which.sample) {
 		'Retreives and plots the next sample.'
 		PLOT_SAMPLE(.self, i)
@@ -97,6 +97,11 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Plots the distribution of the sample statistic.'
 		PLOT_STAT_DIST(.self)
 	},
+
+        showLabels = function() {
+            'Plots labels on the three viewports.'
+            SHOW_LABELS(.self)
+        },
 
 	# Helpers
 	advanceWhichSample = function() {
