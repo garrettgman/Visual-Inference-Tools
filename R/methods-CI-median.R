@@ -5,9 +5,9 @@ load_CI_median <- function(e) {
 	PLOT_DATA <<- PLOT_DATA
 	PLOT_SAMPLE <<- plotSamplePointsAndBoxplot
         SHOW_LABELS <<- ciLabels
-	CALC_STAT <<- c("percentile bootstrap" = calcCIBootPercMedian,
-		"normal bootstrap" = calcCIBootSEMedian,
-		"t bootstrap" = calcCIBootTSEMedian)[[svalue(e$cimeth)]]
+	CALC_STAT <<- c("bootstrap: percentile" = calcCIBootPercMedian,
+		"bootstrap: +/- 2 s.e." = calcCIBootSEMedian,
+		"bootstrap: +/- t s.e." = calcCIBootTSEMedian)[[svalue(e$cimeth)]]
 
 	PLOT_DATA_STAT <<- addMedianLine
 	PLOT_SAMPLE_STAT <<- plotCI

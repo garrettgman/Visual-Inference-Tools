@@ -5,9 +5,9 @@ load_CI_mean <- function(e) {
 	PLOT_DATA <<- PLOT_DATA
 	PLOT_SAMPLE <<- plotSamplePointsAndBoxplot
         SHOW_LABELS <<- ciLabels
-	CALC_STAT <<- c("normal" = calcCIWald, "percentile bootstrap" =
-		calcCIBootPercMean, "normal bootstrap" = calcCIBootSEMean,
-		"t bootstrap" = calcCIBootTSEMean)[[svalue(e$cimeth)]]
+	CALC_STAT <<- c("normal: +/- t s.e." = calcCIWald, "bootstrap: percentile" =
+		calcCIBootPercMean, "bootstrap: +/- 2 s.e." = calcCIBootSEMean,
+		"bootstrap: +/- t s.e." = calcCIBootTSEMean)[[svalue(e$cimeth)]]
 	PLOT_DATA_STAT <<- addMeanLine
 	PLOT_SAMPLE_STAT <<- plotCI
 	PLOT_STAT_DIST <<- plotCIDistMean
@@ -93,7 +93,7 @@ calcCIBootTSEMean <- function(x){
     nboots <- 1000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
                     ncol = n)
-    means <- apply(samps, 1, mean)
+    means <- rowMeans(samps)
     se <- sd(means)
     mean(x) + c(-1, 1) * qt(0.975, n - 1) * se
 }
@@ -227,19 +227,32 @@ dropCI <- function(canvas, n.steps) {
 
 
 
-#' confidence coverage method for DISPLAY_RESULT
+##' confidence coverage method for DISPLAY_RESULT
 CIcounter <- function(canvas, env) {
-	if (is.null(env$results)) {
-		bounds <- do.call("rbind", canvas$stat.dist)
-		X <- mean(CALC_STAT(canvas$x))
-		env$results <- X >= bounds[,1] & X <= bounds[,2]
-	}
+    if (!("countertext" %in% childNames(canvas$image))){
+        xunit <- unit(0, "npc") + unit(0.5, "cm")
+        countertext1 <- textGrob("Coverage:", x = xunit, y = unit(0, "npc"),
+                                 vp = graphPath("stat"), name = "countertext1")
+        countertext2 <- textGrob("0 of 0", x = xunit, y = unit(0, "npc") - unit(1, "lines"),
+                                 vp = graphPath("stat"), name = "countertext2")
+        countertext3 <- textGrob("0%", x = xunit, y = unit(0, "npc") - unit(2, "lines"),
+                                 vp = graphPath("stat"), gp = gpar(fontface = 2),
+                                 name = "countertext3")
+        countertext <- grobTree(countertext1, countertext2, countertext3, name = "countertext")
+        canvas$image <- addGrob(canvas$image, countertext)
+    }
+    if (is.null(env$results)) {
+        bounds <- do.call("rbind", canvas$stat.dist)
+        X <- mean(CALC_STAT(canvas$x))
+        env$results <- X >= bounds[,1] & X <= bounds[,2]
+    }
 
-	total <- canvas$which.sample
-	success <- sum(env$results[1:total])
-
-	svalue(env$ci.counter) <- paste(success, "of", total, "contain true value:",
-		round(success/total*100, 1), "%")
+    total <- canvas$which.sample
+    success <- sum(env$results[1:total])
+    canvas$image <- editGrob(canvas$image, gPath("countertext2"), label = paste(success, "of", total))
+    canvas$image <- editGrob(canvas$image, gPath("countertext3"),
+                             label = paste(round(success/total*100, 1), "%"))
+    canvas$drawImage()
 
 }
 
@@ -284,7 +297,19 @@ ci1000 <- function(canvas, e){
             }
         }
     }
-    svalue(e$ci.counter) <- c("                                              ")
+    if (!("countertext" %in% childNames(canvas$image))){
+        xunit <- unit(0, "npc") + unit(0.5, "cm")
+        countertext1 <- textGrob("Coverage:", x = xunit, y = unit(0, "npc"),
+                                 vp = graphPath("stat"), name = "countertext1")
+        countertext2 <- textGrob("0 of 0", x = xunit, y = unit(0, "npc") - unit(1, "lines"),
+                                 vp = graphPath("stat"), name = "countertext2")
+        countertext3 <- textGrob("0%", x = xunit, y = unit(0, "npc") - unit(2, "lines"),
+                                 vp = graphPath("stat"), gp = gpar(fontface = 2),
+                                 name = "countertext3")
+        countertext <- grobTree(countertext1, countertext2, countertext3, name = "countertext")
+        canvas$image <- addGrob(canvas$image, countertext)
+    }
+    ##svalue(e$ci.counter) <- c("                                              ")
     ## If running out of samples, select a random starting point in first 100.
     for (j in c(seq(1 , 1000, by = 10), 1000)) {
         canvas$plotSampleStat()
@@ -292,8 +317,9 @@ ci1000 <- function(canvas, e){
         canvas$drawImage()
         canvas$advanceWhichSample()
         success <- sum(e$results[1:j])
-        svalue(e$ci.counter) <- paste(success, "of", j,
-                                      "contain true value:", round(success/j * 100, 2), "%")
+        canvas$image <- editGrob(canvas$image, gPath("countertext2"), label = paste(success, "of", j))
+        canvas$image <- editGrob(canvas$image, gPath("countertext3"),
+                               label = paste(round(success/j*100, 1), "%"))
     }
     canvas$image <- removeGrob(canvas$image, gPath("sample.stat"))
     canvas$drawImage()
