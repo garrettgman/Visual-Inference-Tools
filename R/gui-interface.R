@@ -35,14 +35,17 @@ vit <- function(in.window = FALSE) {
     tbl[1,1] <- glabel("Quantity:    ", container = tbl)
     tbl[1,2] <- (e$stat <- gcombobox(c(), editable = TRUE, container = tbl,
                                      handler = function(h, ...) {
-                                             if (svalue(e$stat) %in% c("median")) {
-                                                 e$cimeth[] <- c("percentile bootstrap", "normal bootstrap",
-                                                                 "t bootstrap")
-                                                 svalue(e$cimeth) <- "percentile bootstrap"
+                                             if (svalue(e$stat) == "median") {
+                                                 e$cimeth[] <- c("bootstrap: percentile",
+                                                                 "bootstrap: +/- 2 s.e.",
+                                                                 "bootstrap: +/- t s.e.")
+                                                 svalue(e$cimeth) <- "bootstrap: percentile"
                                              } else {
-                                                 e$cimeth[] <- c("normal", "percentile bootstrap",
-                                                                 "normal bootstrap", "t bootstrap")
-                                                 svalue(e$cimeth) <- "normal"
+                                                 e$cimeth[] <- c("bootstrap: percentile",
+                                                                 "bootstrap: +/- 2 s.e.",
+                                                                 "bootstrap: +/- t s.e.",
+                                                                 "normal: +/- t s.e.")
+                                                 svalue(e$cimeth) <- "normal: +/- t s.e."
                                              }
 
                                          }
@@ -51,8 +54,10 @@ vit <- function(in.window = FALSE) {
     svalue(e$stat) <- "mean"
 
     tbl[2,1] <- (e$cilabel <- glabel("CI Method:    ", container = tbl))
-    tbl[2,2] <- (e$cimeth <- gcombobox(c("normal", "percentile bootstrap",
-                                         "normal bootstrap", "t bootstrap"), editable = TRUE,
+    tbl[2,2] <- (e$cimeth <- gcombobox(c("bootstrap: percentile",
+                                         "bootstrap: +/- 2 s.e.",
+                                         "bootstrap: +/- t s.e.",
+                                         "normal: +/- t s.e."), editable = TRUE,
                                        container = tbl))
 
     tbl[3,1] <- (e$sizelabel <- glabel("Sample Size:  50", container = tbl))
@@ -80,7 +85,7 @@ vit <- function(in.window = FALSE) {
                 e$c1$showLabels()
             })
 
-    svalue(e$cimeth) <- "normal"
+    svalue(e$cimeth) <- "normal: +/- t s.e."
     addSpace(e$controls.vit, 10, horizontal = FALSE)
     vit.popsamp <- glabel("Population and sample", container = e$controls.vit)
     vit.bootbox <- gframe("Number of repititions",
