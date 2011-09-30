@@ -22,6 +22,7 @@ load_CI_mean <- function(e) {
 	add(e$controls.vit, e$ci.counter)
         e$replace <- FALSE
 	e$results <- NULL
+        e$sampledCIs <- NULL
 }
 
 
@@ -246,14 +247,13 @@ CIcounter <- function(canvas, env) {
         X <- mean(CALC_STAT(canvas$x))
         env$results <- X >= bounds[,1] & X <= bounds[,2]
     }
-
-    total <- canvas$which.sample
-    success <- sum(env$results[1:total])
-    canvas$image <- editGrob(canvas$image, gPath("countertext2"), label = paste(success, "of", total))
+    env$sampledCIs <- c(env$sampledCIs, canvas$which.sample)
+    total <- length(env$sampledCIs)
+    success <- sum(env$results[env$sampledCIs])
+    canvas$image <- editGrob(canvas$image, gPath("countertext2"),
+                             label = paste(success, "of", total))
     canvas$image <- editGrob(canvas$image, gPath("countertext3"),
                              label = paste(round(success/total*100, 1), "%"))
-    canvas$drawImage()
-
 }
 
 
@@ -269,6 +269,7 @@ ci1000 <- function(canvas, e){
     bounds <- do.call("rbind", canvas$stat.dist)
     X <- mean(CALC_STAT(canvas$x))
     e$results <- X >= bounds[,1] & X <= bounds[,2]
+    e$sampledCIs <- NULL
     ## Overall coverage percentage
     totperc <- mean(!e$results)
     ## Required 'red' CIs for final display of 40 CIs.
@@ -309,7 +310,6 @@ ci1000 <- function(canvas, e){
         countertext <- grobTree(countertext1, countertext2, countertext3, name = "countertext")
         canvas$image <- addGrob(canvas$image, countertext)
     }
-    ##svalue(e$ci.counter) <- c("                                              ")
     ## If running out of samples, select a random starting point in first 100.
     for (j in c(seq(1 , 1000, by = 10), 1000)) {
         canvas$plotSampleStat()
@@ -323,6 +323,9 @@ ci1000 <- function(canvas, e){
     }
     canvas$image <- removeGrob(canvas$image, gPath("sample.stat"))
     canvas$drawImage()
+    ## Move 1000 CI's next time something is plotted to avoid further CI's getting plotted on top.
+    canvas$image <- removeGrob(canvas$image, gPath("stat.dist"))
+    canvas$image <- removeGrob(canvas$image, gPath("countertext"))
 }
 
 
