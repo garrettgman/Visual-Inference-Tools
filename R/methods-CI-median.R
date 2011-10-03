@@ -3,7 +3,7 @@ load_CI_median <- function(e) {
 	confidence_check(e)
 
 	PLOT_DATA <<- PLOT_DATA
-	PLOT_SAMPLE <<- plotSamplePointsAndBoxplot
+	PLOT_SAMPLE <<- plotSamplePointsAndBoxplotMedian
         SHOW_LABELS <<- ciLabels
 	CALC_STAT <<- c("bootstrap: percentile" = calcCIBootPercMedian,
 		"bootstrap: +/- 2 s.e." = calcCIBootSEMedian,
@@ -23,6 +23,17 @@ load_CI_median <- function(e) {
 	add(e$controls.vit, e$ci.counter)
         e$replace <- FALSE
 	e$results <- NULL
+}
+
+plotSamplePointsAndBoxplotMedian <- function(canvas, i) {
+    x <- canvas$samples[[i]]
+    if (length(x) >= 100)
+        plotHist(canvas, x, graphPath("data"), "dataPlot")
+    else {
+        y <- stackPoints(x, vp = graphPath("sample"))
+        plotPoints(canvas, x, y, graphPath("sample"), "samplePlot", black = TRUE)
+        plotBoxplot(canvas, x, stat = median, graphPath("sample"), "samplePlot")
+    }
 }
 
 calcCIBootPercMedian <- function(x){

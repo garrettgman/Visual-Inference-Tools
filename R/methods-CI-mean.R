@@ -3,7 +3,7 @@ load_CI_mean <- function(e) {
 	confidence_check(e)
 
 	PLOT_DATA <<- PLOT_DATA
-	PLOT_SAMPLE <<- plotSamplePointsAndBoxplot
+	PLOT_SAMPLE <<- plotSamplePointsAndBoxplotMean
         SHOW_LABELS <<- ciLabels
 	CALC_STAT <<- c("normal: +/- t s.e." = calcCIWald, "bootstrap: percentile" =
 		calcCIBootPercMean, "bootstrap: +/- 2 s.e." = calcCIBootSEMean,
@@ -26,14 +26,14 @@ load_CI_mean <- function(e) {
 }
 
 
-plotSamplePointsAndBoxplot <- function(canvas, i) {
+plotSamplePointsAndBoxplotMean <- function(canvas, i) {
     x <- canvas$samples[[i]]
     if (length(x) >= 100)
         plotHist(canvas, x, graphPath("data"), "dataPlot")
     else {
         y <- stackPoints(x, vp = graphPath("sample"))
         plotPoints(canvas, x, y, graphPath("sample"), "samplePlot", black = TRUE)
-        plotBoxplot(canvas, x, graphPath("sample"), "samplePlot")
+        plotBoxplot(canvas, x, stat = mean, graphPath("sample"), "samplePlot")
     }
 }
 
@@ -312,6 +312,7 @@ ci1000 <- function(canvas, e){
     }
     ## If running out of samples, select a random starting point in first 100.
     for (j in c(seq(1 , 1000, by = 10), 1000)) {
+        canvas$plotSample()
         canvas$plotSampleStat()
         canvas$plotStatDist()
         canvas$drawImage()

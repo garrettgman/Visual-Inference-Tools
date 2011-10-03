@@ -13,13 +13,13 @@ load_numeric_1d <- function() {
 #' @param canvas a canvasClass object made with the generator object canvas
 # NOTE: should plotPoints be replaced with a points GROB that calculates stacking in drawDetails? So stacking changes as the plot is resized? ANSWER: Because we would have to repeat all of these calculations for every step of the animations, which would really slow things down.
 #' PLOT_DATA method for numeric, 1d data. Also used for 2d data when one varible is numeric
-plotPointsAndBoxplot <- function(canvas) {
+plotPointsAndBoxplot <- function(canvas, stat = NULL) {
     canvas$y <- stackPoints(canvas$x, vp = graphPath("data"))
     if (length(canvas$x) >= 1000)
         plotHist(canvas, canvas$x, graphPath("data"), "dataPlot")
     else {
         plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")
-        plotBoxplot(canvas, canvas$x, graphPath("data"), "dataPlot")
+        plotBoxplot(canvas, canvas$x, stat = stat, graphPath("data"), "dataPlot")
     }
 }
 
@@ -40,9 +40,9 @@ plotPoints <- function(canvas, x, y, vp, name, black = FALSE) {
 }
 
 #' helper function for plotting numeric data
-plotBoxplot <- function(canvas, x, vp, name) {
+plotBoxplot <- function(canvas, x, stat, vp, name) {
 	bp.name <- paste(name, "boxplot", vpNumber(vp), sep = ".")
-	box.plot <- boxplotGrob(data = x, name = bp.name, vp = vp)
+	box.plot <- boxplotGrob(data = x, stat = stat, name = bp.name, vp = vp)
 	canvas$image <- addGrob(canvas$image, box.plot)
 }
 
