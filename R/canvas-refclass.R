@@ -57,9 +57,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 	},
 
 	# ACTIONS
-	animateSample = function(n.steps, n.slow, move) {
+	animateSample = function(n.steps, n.slow, keep.plot, move) {
 		'Animates the selection of the sampel from the data.'
-		ANIMATE_SAMPLE(.self, n.steps, n.slow, move)
+		ANIMATE_SAMPLE(.self, n.steps, n.slow, keep.plot, move)
 	},
 	animateStat = function(n.steps) {
 		'Animates the creation of the distribution of the statistic from the samples.'
@@ -123,6 +123,13 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		grid.newpage()
 		grid.draw(image)
 	},
+        pauseImage = function(pause = 1) {
+            'Same as drawImage but pauses animation'
+            for (i in 1:pause){
+                grid.newpage()
+                grid.draw(image)
+            }
+        },
 	getSample = function(i = which.sample) {
 		'Returns ith sample of data. Defaults to current sample.'
 		samples[[i]]
@@ -158,5 +165,4 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		stat.dist <<- plyr::llply(samples, CALC_STAT, .progress = "text")
 
 	}
-
 ))
