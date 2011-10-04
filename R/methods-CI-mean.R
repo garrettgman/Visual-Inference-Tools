@@ -5,9 +5,10 @@ load_CI_mean <- function(e) {
 	PLOT_DATA <<- PLOT_DATA
 	PLOT_SAMPLE <<- plotSamplePointsAndBoxplotMean
         SHOW_LABELS <<- ciLabels
-	CALC_STAT <<- c("normal: +/- t s.e." = calcCIWald, "bootstrap: percentile" =
-		calcCIBootPercMean, "bootstrap: +/- 2 s.e." = calcCIBootSEMean,
-		"bootstrap: +/- t s.e." = calcCIBootTSEMean)[[svalue(e$cimeth)]]
+	CALC_STAT <<- c("normal: +/- t s.e." = calcCITWald, "normal: +/- 2 s.e." = calcCI2Wald,
+                        "bootstrap: percentile" = calcCIBootPercMean,
+                        "bootstrap: +/- 2 s.e." = calcCIBootSEMean,
+                        "bootstrap: +/- t s.e." = calcCIBootTSEMean)[[svalue(e$cimeth)]]
 	PLOT_DATA_STAT <<- addMeanLine
 	PLOT_SAMPLE_STAT <<- plotCI
 	PLOT_STAT_DIST <<- plotCIDistMean
@@ -25,11 +26,10 @@ load_CI_mean <- function(e) {
         e$sampledCIs <- NULL
 }
 
-
 plotSamplePointsAndBoxplotMean <- function(canvas, i) {
     x <- canvas$samples[[i]]
-    if (length(x) >= 100)
-        plotHist(canvas, x, graphPath("data"), "dataPlot")
+    if (length(x) >= 1000)
+        plotHist(canvas, x, graphPath("sample"), "samplePlot")
     else {
         y <- stackPoints(x, vp = graphPath("sample"))
         plotPoints(canvas, x, y, graphPath("sample"), "samplePlot", black = TRUE)
@@ -64,10 +64,16 @@ ciLabels <- function(canvas){
 # apply(samps, 1, median)
 #    user  system elapsed
 #129.160   3.507 133.886
-calcCIWald <- function(x){
+calcCITWald <- function(x){
     n <- length(x)
     se <- sd(x)/sqrt(n)
     mean(x) + c(-1, 1)*qt(0.975, n - 1)*se
+}
+
+calcCI2Wald <- function(x){
+    n <- length(x)
+    se <- sd(x)/sqrt(n)
+    mean(x) + c(-2, 2)*se
 }
 
 calcCIBootPercMean <- function(x){
@@ -100,10 +106,20 @@ calcCIBootTSEMean <- function(x){
 }
 
 addMeanLine <- function(canvas) {
-	x <- mean(canvas$x)
-	canvas$image <- addGrob(canvas$image, segmentsGrob(x0 = x, x1 = x, y0 = 0,
-		y1 = 3, default.units = "native", gp = gpar(col = "grey60"),
-		vp = vpPath("canvas.frame", "animation.field"), name = "hline"))
+    x <- mean(canvas$x)
+    canvas$image <- addGrob(canvas$image,
+                            segmentsGrob(x0 = x, x1 = x, y0 = 0,
+                                         y1 = 3, default.units = "native",
+                                         gp = gpar(col = "grey60"),
+                                         vp = vpPath("canvas.frame", "animation.field"),
+                                         name = "hline"))
+    canvas$y <- stackPoints(canvas$x, vp = graphPath("data"))
+    if (length(canvas$x) >= 1000)
+        plotHist(canvas, canvas$x, graphPath("data"), "dataPlot")
+    else {
+        plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")
+        plotBoxplot(canvas, canvas$x, stat = mean, graphPath("data"), "dataPlot")
+    }
 }
 
 plotCI <- function(canvas, i) {
@@ -156,11 +172,19 @@ plotCIDistMean <- function(canvas) {
 }
 
 #' Animates a sample of points dropping down from the collection of points in the data window. The ANIMATE_SAMPLE method for numeric, one dimensional data.
-dropPoints1d <- function(canvas, n.steps, n.slow, move = TRUE) {
+dropPoints1d <- function(canvas, n.steps, n.slow, keep.plot, move = TRUE) {
     if ("samplePlot.points.1" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
     if ("samplePlot.points" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.points")))
+    if (!keep.plot){
+        if ("samplePlot.boxplot.1" %in% childNames(canvas$image))
+            canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.boxplot.1")))
+        if ("samplePlot.boxplot" %in% childNames(canvas$image))
+            canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.boxplot")))
+        if ("sample.stat" %in% childNames(canvas$image))
+            canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
+    }
     index <- canvas$indexes[[canvas$which.sample]]
     x <- canvas$x[index]
     y.start <- y.pos <- canvas$y[index] + 2 # to place in data vp
@@ -202,26 +226,31 @@ dropPoints1d <- function(canvas, n.steps, n.slow, move = TRUE) {
 
 #' confidence coverage method for ANIMATE_STAT
 dropCI <- function(canvas, n.steps) {
-	stat.grob <- getGrob(canvas$image, gPath(c("sample.stat")))
-	grob.width <- stat.grob$width
-	grob.x <- stat.grob$x
-	canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
+    canvas$drawImage()
+    stat.grob <- getGrob(canvas$image, gPath(c("sample.stat")))
+    grob.width <- stat.grob$width
+    grob.x <- stat.grob$x
+    canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
 
-	y.start <- 1.2
-	y.end <- .02 * min(canvas$which.sample - 1, 41)
+    y.start <- 1.2
+    y.end <- .02 * min(canvas$which.sample - 1, 41)
 
-	step <- (y.start - y.end)/n.steps
+    step <- (y.start - y.end)/n.steps
 
-	for (i in 1:n.steps) {
-		canvas$image <- addGrob(canvas$image, rectGrob(x = grob.x,
-			y = unit(y.start - i * step, "native"), width = grob.width,
-			height = unit(0.015, "native"), gp = gpar(col = "blue",
-			fill = "blue"), vp = vpPath("canvas.frame", "animation.field"),
-			name = "sample.stat"))
+    for (i in 1:n.steps) {
+        canvas$image <- addGrob(canvas$image,
+                                rectGrob(x = grob.x,
+                                         y = unit(y.start - i * step, "native"),
+                                         width = grob.width,
+                                         height = unit(0.015, "native"),
+                                         gp = gpar(col = "blue",
+                                         fill = "blue"),
+                                         vp = vpPath("canvas.frame", "animation.field"),
+                                         name = "sample.stat"))
 
-		canvas$drawImage()
-	}
-	canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
+        canvas$drawImage()
+    }
+    canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
 }
 
 
