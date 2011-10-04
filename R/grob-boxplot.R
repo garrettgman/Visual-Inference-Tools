@@ -67,9 +67,9 @@ setBoxplotGrob <- function(bpgt){
 								gp = gpar(col = median.color),
 								name = "median.line")
         if (!is.null(stat)){
-            stat.line <- segmentsGrob(x0 = unit(stat(data), "native"), y0 = at - pad,
-                                      x1 = unit(stat(data), "native"), y1 = at + pad,
-                                      gp = gpar(col = "blue", lwd = 2), name = "stat.line")
+            stat.line <- segmentsGrob(x0 = unit(stat(data), "native"), y0 = at - 0.5*pad,
+                                      x1 = unit(stat(data), "native"), y1 = unit(0.5, "npc"),
+                                      gp = gpar(col = "blue", lwd = 3), name = "stat.line")
         } else stat.line <- median.line
 
   	bpgt <- setChildren(bpgt,
