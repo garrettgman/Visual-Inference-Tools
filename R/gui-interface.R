@@ -44,7 +44,8 @@ vit <- function(in.window = FALSE) {
                                                  e$cimeth[] <- c("bootstrap: percentile",
                                                                  "bootstrap: +/- 2 s.e.",
                                                                  "bootstrap: +/- t s.e.",
-                                                                 "normal: +/- t s.e.")
+                                                                 "normal: +/- t s.e.",
+                                                                 "normal: +/- 2 s.e.")
                                                  svalue(e$cimeth) <- "normal: +/- t s.e."
                                              }
 
@@ -57,7 +58,8 @@ vit <- function(in.window = FALSE) {
     tbl[2,2] <- (e$cimeth <- gcombobox(c("bootstrap: percentile",
                                          "bootstrap: +/- 2 s.e.",
                                          "bootstrap: +/- t s.e.",
-                                         "normal: +/- t s.e."), editable = TRUE,
+                                         "normal: +/- t s.e.",
+                                         "normal +/- 2 s.e."), editable = TRUE,
                                        container = tbl))
 
     tbl[3,1] <- (e$sizelabel <- glabel("Sample Size:  50", container = tbl))
@@ -102,12 +104,15 @@ vit <- function(in.window = FALSE) {
                               n <- svalue(e$redraw.radio)
                               for (i in 1:n) {
                                   if (e$advance) e$c1$advanceWhichSample()
-                                  if (svalue(e$redraw.radio) == 1) e$c1$animateSample(15, 5, TRUE)
-                                  if (svalue(e$redraw.radio) == 5) e$c1$animateSample(15, 0, TRUE)
-                                  if (svalue(e$redraw.radio) == 20) e$c1$animateSample(15, 0, FALSE)
+                                  if (n == 1)
+                                      e$c1$animateSample(15, 5, TRUE, TRUE)
+                                  if (n == 5)
+                                      e$c1$animateSample(15, 0, TRUE, TRUE)
+                                  if (n == 20)
+                                      e$c1$animateSample(15, 0, TRUE, FALSE)
                                   e$c1$plotSample()
                                   e$c1$plotSampleStat()
-                                  e$c1$drawImage()
+                                  if (n == 5) e$c1$pauseImage(15) else e$c1$drawImage()
                                   e$advance <- TRUE
                               }
                           }
@@ -130,21 +135,22 @@ vit <- function(in.window = FALSE) {
                             loaded_check(e)
                             if (svalue(e$bootstrap.radio) == 1000) e$c1$handle1000(e)
                             else {
-				n <- svalue(e$bootstrap.radio)
-				for (i in 1:n) {
-                                    if (svalue(e$bootstrap.radio) != 20)
-                                        e$c1$animateSample(15, 0, TRUE) else{
-                                            e$c1$animateSample(15, 0, FALSE)
+                                n <- svalue(e$bootstrap.radio)
+                                for (i in 1:n) {
+                                    if (n != 20)
+                                        e$c1$animateSample(15, 0, FALSE, TRUE) else{
+                                            e$c1$animateSample(15, 0, FALSE, FALSE)
                                         }
                                     e$c1$plotSample()
                                     e$c1$plotSampleStat()
+                                    if (n != 20) e$c1$pauseImage(15)
                                     if (svalue(e$bootstrap.radio) != 20) e$c1$animateStat(10)
                                     e$c1$plotStatDist()
                                     e$c1$displayResult(e)
                                     e$c1$drawImage()
                                     e$c1$advanceWhichSample()
-				}
-				e$advance <- FALSE
+                                }
+                                e$advance <- FALSE
                             }
                         }
                         )
