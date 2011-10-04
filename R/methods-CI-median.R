@@ -66,10 +66,20 @@ calcCIBootTSEMedian <- function(x){
 }
 
 addMedianLine <- function(canvas) {
-	x <- median(canvas$x)
-	canvas$image <- addGrob(canvas$image, segmentsGrob(x0 = x, x1 = x, y0 = 0,
-		y1 = 3, default.units = "native", gp = gpar(col = "grey60"),
-		vp = vpPath("canvas.frame", "animation.field"), name = "hline"))
+    x <- median(canvas$x)
+    canvas$image <- addGrob(canvas$image,
+                            segmentsGrob(x0 = x, x1 = x, y0 = 0,
+                                         y1 = 3, default.units = "native",
+                                         gp = gpar(col = "grey60"),
+                                         vp = vpPath("canvas.frame", "animation.field"),
+                                         name = "hline"))
+        canvas$y <- stackPoints(canvas$x, vp = graphPath("data"))
+    if (length(canvas$x) >= 1000)
+        plotHist(canvas, canvas$x, graphPath("data"), "dataPlot")
+    else {
+        plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")
+        plotBoxplot(canvas, canvas$x, stat = median, graphPath("data"), "dataPlot")
+    }
 }
 
 plotCIDistMedian <- function(canvas) {
