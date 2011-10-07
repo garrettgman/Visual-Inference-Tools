@@ -19,7 +19,7 @@ plotPointsAndBoxplot <- function(canvas) {
         plotHist(canvas, canvas$x, graphPath("data"), "dataPlot")
     else {
         plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")
-        plotBoxplot(canvas, canvas$x, stat = NULL, graphPath("data"), "dataPlot")
+        plotBoxplot(canvas, canvas$x, stat = NULL, stat.color = NULL, graphPath("data"), "dataPlot")
     }
 }
 
@@ -31,7 +31,7 @@ plotPoints <- function(canvas, x, y, vp, name, black = FALSE) {
         col = "black"
     } else {
         pch = 1
-        col = "grey50"
+        col = "grey60"
     }
     points.name <- paste(name, "points", vpNumber(vp), sep = ".")
     canvas$image <- addGrob(canvas$image,
@@ -40,9 +40,9 @@ plotPoints <- function(canvas, x, y, vp, name, black = FALSE) {
 }
 
 #' helper function for plotting numeric data
-plotBoxplot <- function(canvas, x, stat, vp, name) {
+plotBoxplot <- function(canvas, x, stat, stat.color, vp, name) {
 	bp.name <- paste(name, "boxplot", vpNumber(vp), sep = ".")
-	box.plot <- boxplotGrob(data = x, stat = stat, name = bp.name, vp = vp)
+	box.plot <- boxplotGrob(data = x, stat = stat, stat.color = stat.color, name = bp.name, vp = vp)
 	canvas$image <- addGrob(canvas$image, box.plot)
 }
 
@@ -51,5 +51,5 @@ plotHist <- function(canvas, x, vp, name) {
 	boxes <- length(hist(x, plot = FALSE)$mids)
 	canvas$image <- addGrob(canvas$image, histGrob(x, breaks = seq(min(x),
 		max(x), length.out = boxes), freq = 0.8, name = paste(name, "hist",
-		sep = "."), vp = vp))
+                                                         sep = "."), vp = vp))
 }

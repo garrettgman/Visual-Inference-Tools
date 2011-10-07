@@ -24,10 +24,10 @@ loadPlotDetails <- function(x, y) {
 # functions are stored together with the details they load in the
 # methods file for each method
 loadStatDetails <- function(e) {
-	stat.method <- svalue(e$stat)
-        e$c1$n <- as.numeric(svalue(e$ssize))
-	list("mean" = load_CI_mean,
-             "median" = load_CI_median)[[stat.method]](e)
+	stat.method <- paste(e$method, svalue(e$stat), sep = ".")
+	list("ci.mean" = load_CI_mean, "ci.median" = load_CI_median,
+             "bootstrap.mean" = load_bootstrap,
+             "bootstrap.median" = load_bootstrap)[[stat.method]](e)
 	e$loaded <- TRUE
 }
 

@@ -16,38 +16,46 @@ load_CI_mean <- function(e) {
 	ANIMATE_STAT <<- dropCI
 	DISPLAY_RESULT <<- CIcounter
 	HANDLE_1000 <<- ci1000
-
-	# getting things ready for a confidence interval counter
-	if (!is.null(e$ci.counter)) delete(e$controls.vit, e$ci.counter)
-	e$ci.counter <- glabel()
-	add(e$controls.vit, e$ci.counter)
         e$replace <- FALSE
 	e$results <- NULL
-        e$sampledCIs <- NULL
 }
 
-plotSamplePointsAndBoxplotMean <- function(canvas, i) {
+plotSamplePointsAndBoxplotMean <- function(canvas, e, i) {
+    bluecol <- "blue"
+    if (e$cb) bluecol <- dichromat(bluecol)
     x <- canvas$samples[[i]]
     if (length(x) >= 1000)
         plotHist(canvas, x, graphPath("sample"), "samplePlot")
     else {
         y <- stackPoints(x, vp = graphPath("sample"))
         plotPoints(canvas, x, y, graphPath("sample"), "samplePlot", black = TRUE)
-        plotBoxplot(canvas, x, stat = mean, graphPath("sample"), "samplePlot")
+        plotBoxplot(canvas, x, stat = mean, stat.color = bluecol, graphPath("sample"),
+                    "samplePlot")
     }
 }
 
 ciLabels <- function(canvas){
-    canvas$image <- addGrob(canvas$image, textGrob("Population", x = 0, y = 0.9,
-                                                   just = c("left", "top"),
-                                                   vp = graphPath("data")))
-    canvas$image <- addGrob(canvas$image, textGrob("Sample", x = 0, y = 0.8,
-                                                   just = c("left", "top"),
-                                                   vp = graphPath("sample")))
-    canvas$image <- addGrob(canvas$image, textGrob("CI history", x = 0, y = 0.8,
-                                                   just = c("left", "top"),
-                                                   vp = graphPath("stat")))
-    canvas$drawImage()
+
+    poplabel <- textGrob("Population",
+                         x = unit(0, "npc") - unit(1, "cm"),
+                         y = unit(0.9, "npc"),
+                         just = c("left", "top"),
+                         vp = graphPath("data"),
+                         gp = gpar(fontface = 2))
+    samplabel <- textGrob("Sample",
+                          x = unit(0, "npc") - unit(1, "cm"),
+                          y = unit(0.8, "npc"),
+                          just = c("left", "top"),
+                          vp = graphPath("sample"),
+                          gp = gpar(fontface = 2))
+    statlabel <- textGrob("CI history",
+                          x = unit(0, "npc") - unit(1, "cm"),
+                          y = unit(0.8, "npc"),
+                          just = c("left", "top"),
+                          vp = graphPath("stat"),
+                          gp = gpar(fontface = 2))
+    cilabels <- grobTree(poplabel, samplabel, statlabel, name = "cilabels")
+    canvas$image <- addGrob(canvas$image, cilabels)
 }
 
 
@@ -105,7 +113,9 @@ calcCIBootTSEMean <- function(x){
     mean(x) + c(-1, 1) * qt(0.975, n - 1) * se
 }
 
-addMeanLine <- function(canvas) {
+addMeanLine <- function(canvas, e) {
+    purplecol <- "purple3"
+    if (e$cb) purplecol <- dichromat(purplecol)
     x <- mean(canvas$x)
     canvas$image <- addGrob(canvas$image,
                             segmentsGrob(x0 = x, x1 = x, y0 = 0,
@@ -118,57 +128,69 @@ addMeanLine <- function(canvas) {
         plotHist(canvas, canvas$x, graphPath("data"), "dataPlot")
     else {
         plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")
-        plotBoxplot(canvas, canvas$x, stat = mean, graphPath("data"), "dataPlot")
+        plotBoxplot(canvas, canvas$x, stat = mean, stat.color = purplecol, graphPath("data"),
+                    "dataPlot")
     }
 }
 
-plotCI <- function(canvas, i) {
-	bounds <- canvas$stat.dist[[i]]
-	x <- mean(bounds)
-	canvas$image <- addGrob(canvas$image, rectGrob(x = unit(x, "native"),
-		y = unit(0.2, "native"), width = unit(diff(bounds), "native"),
-		height = unit(0.015, "native"), gp = gpar(col = "blue",
-		fill = "blue"), vp = graphPath("sample"), name = "sample.stat"))
+plotCI <- function(canvas, e, i) {
+    orangecol <- "#FF7F00"
+    if (e$cb) orangecol <- dichromat(orangecol)
+    bounds <- canvas$stat.dist[[i]]
+    x <- mean(bounds)
+    canvas$image <- addGrob(canvas$image,
+                            rectGrob(x = unit(x, "native"), y = unit(0.2, "native"),
+                                     width = unit(diff(bounds), "native"),
+                                     height = unit(0.015, "native"),
+                                     gp = gpar(col = orangecol,
+                                     fill = orangecol), vp = graphPath("sample"),
+                                     name = "sample.stat"))
 }
 
-plotCIDistMean <- function(canvas) {
-	i <- canvas$which.sample
-	bounds <- canvas$getStat(i)
-	x <- mean(bounds)
-	X <- mean(canvas$x)
-	if (X >= bounds[1] & X <= bounds[2]) color <- "green"
-	else color <- "red"
-	current <- data.frame(x = x, width = diff(c(bounds)), color = color)
+plotCIDistMean <- function(canvas, e) {
+    redcol <- "red"
+    greencol <- "green"
+    if (e$cb){
+        redcol <- dichromat(redcol)
+        greencol <- dichromat(greencol)
+    }
+    i <- canvas$which.sample
+    bounds <- canvas$getStat(i)
+    x <- mean(bounds)
+    X <- mean(canvas$x)
+    if (X >= bounds[1] & X <= bounds[2]) color <- greencol
+    else color <- redcol
+    current <- data.frame(x = x, width = diff(c(bounds)), color = color)
 
-	if ("stat.dist" %in% childNames(canvas$image)) {
-		dist.grob <- getGrob(canvas$image, gPath(c("stat.dist")))
-		dist.df <- dist.grob$data
-		if (nrow(dist.df) >= 40) dist.df <- dist.df[-1,]
-		dist.df <- rbind(dist.df[, -4], current)
-	} else dist.df <- current
+    if ("stat.dist" %in% childNames(canvas$image)) {
+        dist.grob <- getGrob(canvas$image, gPath(c("stat.dist")))
+        dist.df <- dist.grob$data
+        if (nrow(dist.df) >= 40) dist.df <- dist.df[-1,]
+        dist.df <- rbind(dist.df[, -4], current)
+    } else dist.df <- current
 
-	dist.df$y <- 0.02 * 1:nrow(dist.df)
-	green <- dist.df[dist.df$color == "green",]
-	red <- dist.df[dist.df$color == "red",]
+    dist.df$y <- 0.02 * 1:nrow(dist.df)
+    green <- dist.df[dist.df$color == greencol,]
+    red <- dist.df[dist.df$color == redcol,]
 
-	if (nrow(green) > 0) {
-		greenRects <- rectGrob(x = unit(green$x, "native"),
-			y = unit(green$y, "native"), width = unit(green$width, "native"),
-			height = unit(0.015, "native"), vp = graphPath("stat"),
-			gp = gpar(col = NA, fill = "green"))
-	} else greenRects <- NULL
+    if (nrow(green) > 0) {
+        greenRects <- rectGrob(x = unit(green$x, "native"),
+                               y = unit(green$y, "native"), width = unit(green$width, "native"),
+                               height = unit(0.015, "native"), vp = graphPath("stat"),
+                               gp = gpar(col = NA, fill = greencol))
+    } else greenRects <- NULL
 
-	if (nrow(red) > 0) {
-		redRects <- rectGrob(x = unit(red$x, "native"),
-			y = unit(red$y, "native"), width = unit(red$width, "native"),
-			height = unit(0.015, "native"), vp = graphPath("stat"),
-			gp = gpar(col = NA, fill = "red"))
-	} else redRects <- NULL
+    if (nrow(red) > 0) {
+        redRects <- rectGrob(x = unit(red$x, "native"),
+                             y = unit(red$y, "native"), width = unit(red$width, "native"),
+                             height = unit(0.015, "native"), vp = graphPath("stat"),
+                             gp = gpar(col = NA, fill = redcol))
+    } else redRects <- NULL
 
-	new.dist <- gTree(data = dist.df, name = "stat.dist",
-		childrenvp = canvas$viewports, children = gList(greenRects, redRects))
+    new.dist <- gTree(data = dist.df, name = "stat.dist",
+                      childrenvp = canvas$viewports, children = gList(greenRects, redRects))
 
-	canvas$image <- addGrob(canvas$image, new.dist)
+    canvas$image <- addGrob(canvas$image, new.dist)
 }
 
 #' Animates a sample of points dropping down from the collection of points in the data window. The ANIMATE_SAMPLE method for numeric, one dimensional data.
@@ -225,15 +247,17 @@ dropPoints1d <- function(canvas, n.steps, n.slow, keep.plot, move = TRUE) {
 
 
 #' confidence coverage method for ANIMATE_STAT
-dropCI <- function(canvas, n.steps) {
+dropCI <- function(canvas, e, n.steps) {
+    orangecol <- "#FF7F00"
+    if (e$cb) orangecol <- dichromat(orangecol)
     canvas$drawImage()
     stat.grob <- getGrob(canvas$image, gPath(c("sample.stat")))
     grob.width <- stat.grob$width
     grob.x <- stat.grob$x
-    canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
+    #canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
 
     y.start <- 1.2
-    y.end <- .02 * min(canvas$which.sample - 1, 41)
+    y.end <- .02 * min(length(canvas$sampledCIs) + 1, 41)
 
     step <- (y.start - y.end)/n.steps
 
@@ -243,14 +267,15 @@ dropCI <- function(canvas, n.steps) {
                                          y = unit(y.start - i * step, "native"),
                                          width = grob.width,
                                          height = unit(0.015, "native"),
-                                         gp = gpar(col = "blue",
-                                         fill = "blue"),
+                                         gp = gpar(col = orangecol,
+                                         fill = orangecol),
                                          vp = vpPath("canvas.frame", "animation.field"),
-                                         name = "sample.stat"))
+                                         name = "moving.stat"))
 
         canvas$drawImage()
     }
-    canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
+    canvas$pauseImage(10)
+    canvas$image <- removeGrob(canvas$image, gPath(c("moving.stat")))
 }
 
 
@@ -259,30 +284,34 @@ dropCI <- function(canvas, n.steps) {
 
 ##' confidence coverage method for DISPLAY_RESULT
 CIcounter <- function(canvas, env) {
-    if (!("countertext" %in% childNames(canvas$image))){
-        xunit <- unit(0, "npc") + unit(0.5, "cm")
-        countertext1 <- textGrob("Coverage:", x = xunit, y = unit(0, "npc"),
-                                 vp = graphPath("stat"), name = "countertext1")
-        countertext2 <- textGrob("0 of 0", x = xunit, y = unit(0, "npc") - unit(1, "lines"),
-                                 vp = graphPath("stat"), name = "countertext2")
-        countertext3 <- textGrob("0%", x = xunit, y = unit(0, "npc") - unit(2, "lines"),
-                                 vp = graphPath("stat"), gp = gpar(fontface = 2),
-                                 name = "countertext3")
-        countertext <- grobTree(countertext1, countertext2, countertext3, name = "countertext")
-        canvas$image <- addGrob(canvas$image, countertext)
-    }
     if (is.null(env$results)) {
         bounds <- do.call("rbind", canvas$stat.dist)
         X <- mean(CALC_STAT(canvas$x))
         env$results <- X >= bounds[,1] & X <= bounds[,2]
     }
-    env$sampledCIs <- c(env$sampledCIs, canvas$which.sample)
-    total <- length(env$sampledCIs)
-    success <- sum(env$results[env$sampledCIs])
-    canvas$image <- editGrob(canvas$image, gPath("countertext2"),
-                             label = paste(success, "of", total))
-    canvas$image <- editGrob(canvas$image, gPath("countertext3"),
-                             label = paste(round(success/total*100, 1), "%"))
+    canvas$sampledCIs <- c(canvas$sampledCIs, canvas$which.sample)
+    total <- length(canvas$sampledCIs)
+    success <- sum(env$results[canvas$sampledCIs])
+    xunit <- unit(0, "npc") + unit(1, "mm")
+    countertext1 <- textGrob("Coverage:", x = xunit, y = unit(0.5, "npc"),
+                             vp = graphPath("stat"), gp = gpar(fontface = 2),
+                             name = "countertext1")
+    countertext2 <- textGrob(paste(success, "of", total), x = xunit,
+                             y = unit(0.5, "npc") - unit(1, "lines"),
+                             vp = graphPath("stat"), name = "countertext2")
+    countertext3 <- textGrob(paste(round(success/total*100, 1), "%"),
+                             x = xunit, y = unit(0.5, "npc") - unit(2/1.3, "lines"),
+                             vp = graphPath("stat"), gp = gpar(fontface = 2, cex = 1.3),
+                             name = "countertext3")
+    counterborder <- rectGrob(x = xunit, y = unit(0.5, "npc") + unit(0.5, "lines"),
+                              width = stringWidth("1000 of 1000"),
+                              height = unit(2, "mm") + unit(3, "lines"),
+                              gp = gpar(fill = "white"),
+                              just = c("centre", "top"), vp = graphPath("stat"),
+                              name = "counterborder")
+    countertext <- grobTree(counterborder, countertext1, countertext2, countertext3,
+                            name = "countertext")
+    canvas$image <- addGrob(canvas$image, countertext)
 }
 
 
@@ -327,35 +356,42 @@ ci1000 <- function(canvas, e){
             }
         }
     }
-    if (!("countertext" %in% childNames(canvas$image))){
-        xunit <- unit(0, "npc") + unit(0.5, "cm")
-        countertext1 <- textGrob("Coverage:", x = xunit, y = unit(0, "npc"),
-                                 vp = graphPath("stat"), name = "countertext1")
-        countertext2 <- textGrob("0 of 0", x = xunit, y = unit(0, "npc") - unit(1, "lines"),
-                                 vp = graphPath("stat"), name = "countertext2")
-        countertext3 <- textGrob("0%", x = xunit, y = unit(0, "npc") - unit(2, "lines"),
-                                 vp = graphPath("stat"), gp = gpar(fontface = 2),
-                                 name = "countertext3")
-        countertext <- grobTree(countertext1, countertext2, countertext3, name = "countertext")
-        canvas$image <- addGrob(canvas$image, countertext)
-    }
     ## If running out of samples, select a random starting point in first 100.
     for (j in c(seq(1 , 1000, by = 10), 1000)) {
-        canvas$plotSample()
-        canvas$plotSampleStat()
-        canvas$plotStatDist()
-        canvas$drawImage()
+        canvas$plotSample(e)
+        canvas$plotSampleStat(e)
+        canvas$plotStatDist(e)
         canvas$advanceWhichSample()
         success <- sum(e$results[1:j])
-        canvas$image <- editGrob(canvas$image, gPath("countertext2"), label = paste(success, "of", j))
-        canvas$image <- editGrob(canvas$image, gPath("countertext3"),
-                               label = paste(round(success/j*100, 1), "%"))
+        xunit <- unit(0, "npc") + unit(1, "mm")
+        countertext1 <- textGrob("Coverage:", x = xunit, y = unit(0.5, "npc"),
+                                 vp = graphPath("stat"), gp = gpar(fontface = 2),
+                                 name = "countertext1")
+        countertext2 <- textGrob(paste(success, "of", j), x = xunit,
+                                 y = unit(0.5, "npc") - unit(1, "lines"),
+                                 vp = graphPath("stat"), name = "countertext2")
+        countertext3 <- textGrob(paste(round(success/j*100, 1), "%"),
+                                 x = xunit, y = unit(0.5, "npc") - unit(2/1.3, "lines"),
+                                 vp = graphPath("stat"), gp = gpar(fontface = 2, cex = 1.3),
+                                 name = "countertext3")
+        counterborder <- rectGrob(x = xunit, y = unit(0.5, "npc") + unit(0.5, "lines"),
+                                  width = stringWidth("1000 of 1000"),
+                                  height = unit(2, "mm") + unit(3, "lines"),
+                                  gp = gpar(fill = "white"),
+                                  just = c("centre", "top"), vp = graphPath("stat"),
+                                  name = "counterborder")
+        countertext <- grobTree(counterborder, countertext1, countertext2, countertext3,
+                                name = "countertext")
+        canvas$image <- addGrob(canvas$image, countertext)
+        canvas$showLabels()
+        canvas$drawImage()
     }
-    canvas$image <- removeGrob(canvas$image, gPath("sample.stat"))
-    canvas$drawImage()
     ## Move 1000 CI's next time something is plotted to avoid further CI's getting plotted on top.
+    #canvas$image <- removeGrob(canvas$image, gPath("sample.stat"))
     canvas$image <- removeGrob(canvas$image, gPath("stat.dist"))
     canvas$image <- removeGrob(canvas$image, gPath("countertext"))
+    ## Reset CI counter
+    canvas$sampledCIs <- NULL
 }
 
 

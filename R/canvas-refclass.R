@@ -43,7 +43,7 @@
 #' information to keep track of. The reference class approach is an attempt at
 #' object oriented programming.
 canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
-	"samples", "indexes", "which.sample", "stat.dist", "viewports", "image"),
+	"samples", "sampledCIs", "indexes", "which.sample", "stat.dist", "viewports", "image"),
 	methods = list(
 	initialize = function(x = NULL, y = NULL, levels = NULL, ...){
 		require(grid)
@@ -53,6 +53,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		n <<- length(x)
 		which.sample <<- 0
 		stat.dist <<- NULL
+                sampledCIs <<- NULL
 		invisible(.self)
 	},
 
@@ -61,9 +62,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Animates the selection of the sampel from the data.'
 		ANIMATE_SAMPLE(.self, n.steps, n.slow, keep.plot, move)
 	},
-	animateStat = function(n.steps) {
+	animateStat = function(env, n.steps) {
 		'Animates the creation of the distribution of the statistic from the samples.'
-		ANIMATE_STAT(.self, n.steps)
+		ANIMATE_STAT(.self, env, n.steps)
 	},
 	calcStat = function(i = which.sample) {
 		'Calculates the sample statistic for a group of data.'
@@ -81,21 +82,21 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Plots a vector or dataframe of data points.'
 		PLOT_DATA(.self)
 	},
-	plotDataStat = function() {
+	plotDataStat = function(env) {
 		'Plots the sample statistic with the sample.'
-		PLOT_DATA_STAT(.self)
+		PLOT_DATA_STAT(.self, env)
             },
-	plotSample = function(i = which.sample) {
+	plotSample = function(env, i = which.sample) {
 		'Retreives and plots the next sample.'
-		PLOT_SAMPLE(.self, i)
+		PLOT_SAMPLE(.self, env, i)
 	},
-	plotSampleStat = function(i = which.sample) {
+	plotSampleStat = function(env, i = which.sample) {
 		'Plots the sample statistic with the sample.'
-		PLOT_SAMPLE_STAT(.self, i)
+		PLOT_SAMPLE_STAT(.self, env, i)
 	},
-	plotStatDist = function() {
+	plotStatDist = function(env) {
 		'Plots the distribution of the sample statistic.'
-		PLOT_STAT_DIST(.self)
+		PLOT_STAT_DIST(.self, env)
 	},
 
         showLabels = function() {

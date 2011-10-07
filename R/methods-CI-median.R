@@ -16,23 +16,21 @@ load_CI_median <- function(e) {
 	ANIMATE_STAT <<- dropCI
 	DISPLAY_RESULT <<- CIcounter
 	HANDLE_1000 <<- ci1000
-
-	# getting things ready for a confidence interval counter
-	if (!is.null(e$ci.counter)) delete(e$controls.vit, e$ci.counter)
-	e$ci.counter <- glabel()
-	add(e$controls.vit, e$ci.counter)
         e$replace <- FALSE
 	e$results <- NULL
 }
 
-plotSamplePointsAndBoxplotMedian <- function(canvas, i) {
+plotSamplePointsAndBoxplotMedian <- function(canvas, e, i) {
+    bluecol <- "blue"
+    if (e$cb) bluecol <- dichromat(bluecol)
     x <- canvas$samples[[i]]
     if (length(x) >= 100)
         plotHist(canvas, x, graphPath("data"), "dataPlot")
     else {
         y <- stackPoints(x, vp = graphPath("sample"))
         plotPoints(canvas, x, y, graphPath("sample"), "samplePlot", black = TRUE)
-        plotBoxplot(canvas, x, stat = median, graphPath("sample"), "samplePlot")
+        plotBoxplot(canvas, x, stat = median, stat.color = bluecol, graphPath("sample"),
+                    "samplePlot")
     }
 }
 
@@ -65,7 +63,9 @@ calcCIBootTSEMedian <- function(x){
     median(x) + c(-1, 1) * qt(0.975, n - 1) * se
 }
 
-addMedianLine <- function(canvas) {
+addMedianLine <- function(canvas, e) {
+    purplecol <- "purple3"
+    if (e$cb) purplecol <- dichromat(purplecol)
     x <- median(canvas$x)
     canvas$image <- addGrob(canvas$image,
                             segmentsGrob(x0 = x, x1 = x, y0 = 0,
@@ -75,51 +75,57 @@ addMedianLine <- function(canvas) {
                                          name = "hline"))
         canvas$y <- stackPoints(canvas$x, vp = graphPath("data"))
     if (length(canvas$x) >= 1000)
-        plotHist(canvas, canvas$x, graphPath("data"), "dataPlot")
-    else {
+        plotHist(canvas, canvas$x, graphPath("data"), "dataPlot") else {
         plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")
-        plotBoxplot(canvas, canvas$x, stat = median, graphPath("data"), "dataPlot")
+        plotBoxplot(canvas, canvas$x, stat = median, stat.color = purplecol,
+                    graphPath("data"), "dataPlot")
     }
 }
 
-plotCIDistMedian <- function(canvas) {
-	i <- canvas$which.sample
-	bounds <- canvas$getStat(i)
-	x <- mean(bounds)
-	X <- median(canvas$x)
-	if (X >= bounds[1] & X <= bounds[2]) color <- "green"
-	else color <- "red"
-	current <- data.frame(x = x, width = diff(c(bounds)), color = color)
+plotCIDistMedian <- function(canvas, e) {
+    greencol <- "green"
+    redcol <- "red"
+    if (e$cb){
+        greencol <- dichromat(greencol)
+        redcol <- dichromat(redcol)
+    }
+    i <- canvas$which.sample
+    bounds <- canvas$getStat(i)
+    x <- mean(bounds)
+    X <- median(canvas$x)
+    if (X >= bounds[1] & X <= bounds[2]) color <- greencol
+    else color <- redcol
+    current <- data.frame(x = x, width = diff(c(bounds)), color = color)
 
-	if ("stat.dist" %in% childNames(canvas$image)) {
-		dist.grob <- getGrob(canvas$image, gPath(c("stat.dist")))
-		dist.df <- dist.grob$data
-		if (nrow(dist.df) >= 40) dist.df <- dist.df[-1,]
-		dist.df <- rbind(dist.df[, -4], current)
-	} else dist.df <- current
+    if ("stat.dist" %in% childNames(canvas$image)) {
+        dist.grob <- getGrob(canvas$image, gPath(c("stat.dist")))
+        dist.df <- dist.grob$data
+        if (nrow(dist.df) >= 40) dist.df <- dist.df[-1,]
+        dist.df <- rbind(dist.df[, -4], current)
+    } else dist.df <- current
 
-	dist.df$y <- 0.02 * 1:nrow(dist.df)
-	green <- dist.df[dist.df$color == "green",]
-	red <- dist.df[dist.df$color == "red",]
+    dist.df$y <- 0.02 * 1:nrow(dist.df)
+    green <- dist.df[dist.df$color == greencol,]
+    red <- dist.df[dist.df$color == redcol,]
 
-	if (nrow(green) > 0) {
-		greenRects <- rectGrob(x = unit(green$x, "native"),
-			y = unit(green$y, "native"), width = unit(green$width, "native"),
-			height = unit(0.015, "native"), vp = graphPath("stat"),
-			gp = gpar(col = NA, fill = "green"))
-	} else greenRects <- NULL
+    if (nrow(green) > 0) {
+        greenRects <- rectGrob(x = unit(green$x, "native"),
+                               y = unit(green$y, "native"), width = unit(green$width, "native"),
+                               height = unit(0.015, "native"), vp = graphPath("stat"),
+                               gp = gpar(col = NA, fill = greencol))
+    } else greenRects <- NULL
 
-	if (nrow(red) > 0) {
-		redRects <- rectGrob(x = unit(red$x, "native"),
-			y = unit(red$y, "native"), width = unit(red$width, "native"),
-			height = unit(0.015, "native"), vp = graphPath("stat"),
-			gp = gpar(col = NA, fill = "red"))
-	} else redRects <- NULL
+    if (nrow(red) > 0) {
+        redRects <- rectGrob(x = unit(red$x, "native"),
+                             y = unit(red$y, "native"), width = unit(red$width, "native"),
+                             height = unit(0.015, "native"), vp = graphPath("stat"),
+                             gp = gpar(col = NA, fill = redcol))
+    } else redRects <- NULL
 
-	new.dist <- gTree(data = dist.df, name = "stat.dist",
-		childrenvp = canvas$viewports, children = gList(greenRects, redRects))
+    new.dist <- gTree(data = dist.df, name = "stat.dist",
+                      childrenvp = canvas$viewports, children = gList(greenRects, redRects))
 
-	canvas$image <- addGrob(canvas$image, new.dist)
+    canvas$image <- addGrob(canvas$image, new.dist)
 }
 
 

@@ -278,7 +278,7 @@ new.vit.env <- function() {
             e$c1$plotData()
 	}
 
-	e$clearAllSlots = function(){
+	e$clearAllSlots <- function(){
 		svalue(e$xVar) <- "Drop name here"
 		e$e$xData <- NULL
 		tag(e$obj,"e$xVarData") <- NULL
@@ -319,39 +319,40 @@ new.vit.env <- function() {
 	}
 
 	e$variable_check <- function() {
-		if (is.null(e$xData)) {
-			grid.newpage()
-			grid.text("Please select Variable 1")
-			return()
+            e$data.loaded <- FALSE
+            if (is.null(e$xData)) {
+                grid.newpage()
+                grid.text("Please select Variable 1")
+                return()
+            }
+
+            if (is.categorical(e$xData) & !is.categorical(e$yData) &
+                !is.null(e$yData)) {
+                e$reverseVariables()
 		}
 
-		if (is.categorical(e$xData) & !is.categorical(e$yData) &
-			 !is.null(e$yData)) {
-				e$reverseVariables()
-		}
+            if (is.categorical(e$xData) & is.categorical(e$yData)) {
+                grid.newpage()
+                grid.text("Methods do not yet exist for this type of data.")
+                print("Methods have not yet been implemented for 2D categorical data.")
+                return()
+            }
 
-		if (is.categorical(e$xData) & is.categorical(e$yData)) {
-			grid.newpage()
-			grid.text("Methods do not yet exist for this type of data.")
-			print("Methods have not yet been implemented for 2D categorical data.")
-			return()
-		}
+            if (!is.categorical(e$xData) & !is.categorical(e$yData) &
+                !is.null(e$yData)) {
+                grid.newpage()
+                grid.text("Methods do not yet exist for this type of data.")
+                print("Methods have not yet been implemented for 2D numerical data.")
+                return()
+            }
 
-		if (!is.categorical(e$xData) & !is.categorical(e$yData) &
-			!is.null(e$yData)) {
-				grid.newpage()
-				grid.text("Methods do not yet exist for this type of data.")
-				print("Methods have not yet been implemented for 2D numerical data.")
-				return()
-		}
-
-		if (is.categorical(e$xData) & is.null(e$yData)) {
-				grid.newpage()
-				grid.text("Methods do not yet exist for this type of data.")
-				print("Methods have not yet been implemented for 1D categorical data.")
-				return()
-		}
-
+            if (is.categorical(e$xData) & is.null(e$yData)) {
+                grid.newpage()
+                grid.text("Methods do not yet exist for this type of data.")
+                print("Methods have not yet been implemented for 1D categorical data.")
+                return()
+            }
+            e$data.loaded <- TRUE
 	}
 
         e$resetCanvas <- function() {

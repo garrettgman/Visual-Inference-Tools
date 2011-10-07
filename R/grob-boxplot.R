@@ -21,12 +21,12 @@ grid.boxplot <- function(...){
 #' @param vp A default viewport to be used when drawing the grob
 boxplotGrob <- function(data, at = unit(0.15, "native"),
                         height = unit(0.2, "native"), box.color = "lightgrey",
-                        median.color = "lightgrey", stat = NULL, show.w = TRUE,
+                        median.color = "lightgrey", stat = NULL, stat.color = "blue", show.w = TRUE,
                         name = NULL, gp = gpar(lwd = 2), vp = NULL){
 
     bpgt <- gTree(data = data, at = at, height = height,
                   box.color = box.color, median.color = median.color, stat = stat,
-                  show.w = show.w,
+                  stat.color = stat.color, show.w = show.w,
                   name = name, gp = gp, vp = vp, cl="boxplot")
     bpgt
 }
@@ -39,6 +39,7 @@ setBoxplotGrob <- function(bpgt){
 	box.color    <- bpgt$box.color
 	median.color <- bpgt$median.color
         stat         <- bpgt$stat
+        stat.color   <- bpgt$stat.color
 	show.w       <- bpgt$show.w
 
 	whisker.low <- whisker.high <- boxes <- medians <- NULL
@@ -69,7 +70,7 @@ setBoxplotGrob <- function(bpgt){
         if (!is.null(stat)){
             stat.line <- segmentsGrob(x0 = unit(stat(data), "native"), y0 = at - 0.5*pad,
                                       x1 = unit(stat(data), "native"), y1 = unit(0.5, "npc"),
-                                      gp = gpar(col = "blue", lwd = 3), name = "stat.line")
+                                      gp = gpar(col = stat.color, lwd = 3), name = "stat.line")
         } else stat.line <- median.line
 
   	bpgt <- setChildren(bpgt,
