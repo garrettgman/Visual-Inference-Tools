@@ -43,7 +43,7 @@
 #' information to keep track of. The reference class approach is an attempt at
 #' object oriented programming.
 canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
-	"samples", "sampledCIs", "indexes", "which.sample", "stat.dist", "viewports", "image"),
+	"samples", "sampled.stats", "indexes", "which.sample", "stat.dist", "viewports", "image"),
 	methods = list(
 	initialize = function(x = NULL, y = NULL, levels = NULL, ...){
 		require(grid)
@@ -53,7 +53,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		n <<- length(x)
 		which.sample <<- 0
 		stat.dist <<- NULL
-                sampledCIs <<- NULL
+                sampled.stats <<- NULL
 		invisible(.self)
 	},
 
@@ -74,6 +74,10 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Displays the final result of the VIT simulation.'
 		DISPLAY_RESULT(.self, env)
 	},
+        displayResult2 = function(env) {
+            'Displays second round of results of the VIT simulation if required.'
+            DISPLAY_RESULT_2(.self, env)
+        },
 	handle1000 = function(env) {
 		'Runs simulation that uses all 1000 pre-calculated samples.'
 		HANDLE_1000(.self, env)
