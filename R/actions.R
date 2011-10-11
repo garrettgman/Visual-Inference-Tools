@@ -8,6 +8,7 @@ PLOT_DATA <- function(canvas)
 PLOT_SAMPLE <- function(canvas)
 	warning("PLOT_SAMPLE details must be set by loadDetails()")
 
+#' Puts titles for each of the plots on the canvas
 SHOW_LABELS <- function(canvas)
     warning("SHOW_LABELS details must be set by loadDetails()")
 
@@ -38,6 +39,10 @@ ANIMATE_STAT <- function(canvas)
 #' Displays any final conlusions or information required by the method whenever a statistic is added to the statistic distribution
 DISPLAY_RESULT <- function(canvas)
 	warning("DISPLAY_RESULT details must be set by loadDetails()")
+
+#' Displays a second round of conclusions if required by the method
+DISPLAY_RESULT_2 <- function(canvas)
+    warning("DISPLAY_RESULT_2 details must be set by loadDetails()")
 
 #' Manages the methods' performance of 1000 complete runs. At the moment this has its own method because running 1000 methods the usual way would be time prohibitive.
 HANDLE_1000 <- function(e)
@@ -74,6 +79,9 @@ clear_actions <- function(e) {
 
 	DISPLAY_RESULT <<- function(canvas)
 		warning("DISPLAY_RESULT details must be set by loadDetails()")
+
+        DISPLAY_RESULT_2 <<- function(canvas)
+            warning("DISPLAY_RESULT_2 details must be set by loadDetails()")
 
 	HANDLE_1000 <<- function(e)
 		warning("HANDLE_1000 details must be set by loadDetails()")
