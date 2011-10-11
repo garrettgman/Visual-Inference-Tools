@@ -3,9 +3,9 @@
 #' @param p25 The 25th percentile of the data to draw a ghost boxplot for
 #' @param p50 The 50th percentile of the data to draw a ghost boxplot for
 #' @param p75 The 75th percentile of the data to draw a ghost boxplot for
-ghostsGrob <- function(p25, p50, p75, at = unit(0.25, "native"),
-height = unit(0.375, "native"), box.color = "red", median.color = "blue",
-alpha = 0.5, name = NULL, gp = gpar(lwd = 2), vp = NULL){
+ghostsGrob <- function(p25, p50, p75, at = unit(0.15, "native"),
+height = unit(0.2, "native"), box.color = "red", median.color = "blue",
+alpha = 0.25, name = NULL, gp = gpar(lwd = 2), vp = NULL){
 
 grob(p25 = p25, p50 = p50, p75 = p75, at = at, height = height,
 box.color = box.color, median.color = median.color, alpha = alpha,
@@ -23,13 +23,17 @@ drawDetails.ghosts <- function(x, recording){
 pad <- convertHeight(unit(as.numeric(x$height)/2, attr(x$height, "unit")),
 "native")
 
-  grid.rect(x = unit(x$p25, "native"), y = x$at,
-  width = unit(x$p75 - x$p25, "native"), height = x$height,
-just = "left", gp = gpar(col = x$box.color, alpha = x$alpha))
+grid.rect(x = unit(x$p25, "native"), y = x$at,
+          width = unit(x$p75 - x$p25, "native"), height = x$height,
+          just = "left", gp = gpar(col = x$box.color, alpha = x$alpha))
 
-grid.segments(x0 = unit(x$p50, "native"), y0 = x$at - pad,
-x1 = unit(x$p50, "native"), y1 = x$at + pad,
-gp = gpar(col = x$median.color, alpha = x$alpha))
+## Plotting segments with alpha != 1 seems to be unstable.
+#grid.segments(x0 = unit(x$p50, "native"), y0 = x$at - pad,
+#x1 = unit(x$p50, "native"), y1 = x$at + pad,
+#gp = gpar(col = x$median.color, alpha = x$alpha))
+
+grid.rect(x = unit(x$p50, "native"), y = x$at, width = 0, height = x$height,
+          gp = gpar(col = x$median.color, alpha = x$alpha))
 }
 
 editDetails.ghosts <- function(x, spec){
