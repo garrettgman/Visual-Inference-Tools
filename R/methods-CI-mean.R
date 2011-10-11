@@ -257,7 +257,7 @@ dropCI <- function(canvas, e, n.steps) {
     #canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
 
     y.start <- 1.2
-    y.end <- .02 * min(length(canvas$sampledCIs) + 1, 41)
+    y.end <- .02 * min(length(canvas$sampled.stats) + 1, 41)
 
     step <- (y.start - y.end)/n.steps
 
@@ -289,9 +289,9 @@ CIcounter <- function(canvas, env) {
         X <- mean(CALC_STAT(canvas$x))
         env$results <- X >= bounds[,1] & X <= bounds[,2]
     }
-    canvas$sampledCIs <- c(canvas$sampledCIs, canvas$which.sample)
-    total <- length(canvas$sampledCIs)
-    success <- sum(env$results[canvas$sampledCIs])
+    canvas$sampled.stats <- c(canvas$sampled.stats, canvas$which.sample)
+    total <- length(canvas$sampled.stats)
+    success <- sum(env$results[canvas$sampled.stats])
     xunit <- unit(0, "npc") + unit(1, "mm")
     countertext1 <- textGrob("Coverage:", x = xunit, y = unit(0.5, "npc"),
                              vp = graphPath("stat"), gp = gpar(fontface = 2),
@@ -327,7 +327,6 @@ ci1000 <- function(canvas, e){
     bounds <- do.call("rbind", canvas$stat.dist)
     X <- mean(CALC_STAT(canvas$x))
     e$results <- X >= bounds[,1] & X <= bounds[,2]
-    e$sampledCIs <- NULL
     ## Overall coverage percentage
     totperc <- mean(!e$results)
     ## Required 'red' CIs for final display of 40 CIs.
@@ -386,12 +385,12 @@ ci1000 <- function(canvas, e){
         canvas$showLabels()
         canvas$drawImage()
     }
-    ## Move 1000 CI's next time something is plotted to avoid further CI's getting plotted on top.
+    ## Move 1000 CIs next time something is plotted to avoid further CIs getting plotted on top.
     #canvas$image <- removeGrob(canvas$image, gPath("sample.stat"))
     canvas$image <- removeGrob(canvas$image, gPath("stat.dist"))
     canvas$image <- removeGrob(canvas$image, gPath("countertext"))
     ## Reset CI counter
-    canvas$sampledCIs <- NULL
+    canvas$sampled.stats <- NULL
 }
 
 

@@ -85,7 +85,7 @@ CIGUIHandler <- function(e){
                                       e$c1$animateSample(15, 0, TRUE, FALSE)
                                   e$c1$plotSample(e)
                                   e$c1$plotSampleStat(e)
-                                  e$c1$showLabels
+                                  e$c1$showLabels()
                                   if (n == 5) e$c1$pauseImage(15) else e$c1$drawImage()
                                   e$advance <- TRUE
                               }
@@ -97,7 +97,7 @@ CIGUIHandler <- function(e){
 
     glabel("Include confidence interval history", container = e$lower)
 
-    vit.diffbox <- gframe("Number of repititions",
+    vit.diffbox <- gframe("Number of repetitions",
                           container = e$lower)
     e$bootstrap.radio <- gradio(c(1, 5, 20, 1000),
                                 horizontal = FALSE)
