@@ -1,5 +1,5 @@
 Package: vit
-Imports: grid, gWidgets, RGtk2, gWidgetsRGtk2, plyr, dichromat
+Imports: grid, gWidgets, RGtk2, gWidgetsRGtk2, plyr, dichromat, cairoDevice
 Maintainer: Garrett Grolemund <grolemund@rice.edu>
 License: GPL
 Title: Visual Inference Tools
