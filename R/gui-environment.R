@@ -354,13 +354,14 @@ new.vit.env <- function() {
             }
             e$data.loaded <- TRUE
 	}
-
+        ## Clears bottom two panels of canvas.
         e$resetCanvas <- function() {
             clear_actions(e)
             e$buildCanvas()
             e$c1$drawImage()
         }
 
+        ## Clears bottom two panels of canvas but holds onto current sample.
         e$resetCanvasKeepSample <- function(old.canvas){
             old.samples <- old.canvas$samples
             old.indexes <- old.canvas$indexes
@@ -368,6 +369,14 @@ new.vit.env <- function() {
             e$c1$samples <- old.samples
             e$c1$indexes <- old.indexes
             e$c1$which.sample <- 1
+        }
+
+        ## Clears bottom panel of canvas
+        e$clearStatPanel <- function(){
+            grobs <- childNames(e$c1$image)
+            grobs.to.clear <- grobs[substr(grobs, 1, 8) == "statPlot"]
+            for (i in grobs.to.clear)
+                e$c1$image <- removeGrob(e$c1$image, i)
         }
 	e
 }
