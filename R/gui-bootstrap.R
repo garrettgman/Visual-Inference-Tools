@@ -20,23 +20,25 @@ bootstrapGUIHandler <- function(e){
     e$redraw.radio <- gradio(c(1, 5, 20), horizontal=FALSE)
     add(vit.bootbox, e$redraw.radio)
 
-    e$advance <- FALSE
-
     buttons1 <- ggroup(container = e$lower)
-
+    e$clear.stat = FALSE
     get.sample <- gbutton("Go", container = e$lower, expand = TRUE,
                           handler = function(h, ...){
+                              enabled(e$lower) <- FALSE
+                              enabled(e$lowest) <- FALSE
+                              if (e$clear.stat){
+                                  e$clearStatPanel()
+                                  e$clear.stat <- FALSE
+                              }
                               n <- svalue(e$redraw.radio)
                               for (i in 1:n){
-                                  enabled(e$lower) <- FALSE
-                                  enabled(e$lowest) <- FALSE
                                   ##e$c1$animateSample(15, 5, TRUE, TRUE)
                                   e$c1$plotSample(e)
                                   e$c1$drawImage()
                                   enabled(e$lower) <- TRUE
-                                  e$advance <- TRUE
                                   e$c1$advanceWhichSample()
-                          }
+                              }
+                              enabled(e$lower) <- TRUE
                           })
 
     addSpace(e$lower, 20, horizontal=FALSE)
@@ -54,11 +56,16 @@ bootstrapGUIHandler <- function(e){
                         container = buttons2, handler = function(h, ...) {
                             enabled(e$lower) <- FALSE
                             enabled(e$lowest) <- FALSE
+                            if (e$clear.stat){
+                                e$clearStatPanel()
+                                e$clear.stat <- FALSE
+                            }
                             if (svalue(e$bootstrap.radio) == 1000){
                                 e$c1$handle1000(e)
                                 enabled(e$lowest) <- TRUE
                                 enabled(show.ci) <- TRUE
-                                enabled(show.summary) <- TRUE} else{
+                                enabled(show.summary) <- TRUE
+                                e$clear.stat <- TRUE} else{
                                     n <- svalue(e$bootstrap.radio)
                                     for (i in 1:n){
                                         e$c1$plotSample(e)
