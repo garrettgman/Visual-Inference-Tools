@@ -76,10 +76,16 @@ boot1000 <- function(canvas, e){
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.boxplot.1"))
     if ("samplePlot.ghosts.1" %in% childNames(e$c1$image))
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.ghosts.1"))
+    allx <- c(canvas$stat.dist, recursive = TRUE)
+    allinfo <- sapply(canvas$samples, function(x) fivenum(x)[2:4])
     for (i in 50*(1:20)){
-        x <- c(canvas$stat.dist, recursive = TRUE)[1:i]
+        x <- allx[1:i]
         y <- stackPoints(x, vp = graphPath("stat"), y.min = 0, y.max = 0.9)
         plotPoints(canvas, x, y, graphPath("stat"), "statPlot", black = FALSE, alpha = 0.7)
+        canvas$image <- addGrob(canvas$image, ghostsGrob(allinfo[1, 1:i], allinfo[2, 1:i],
+                                                         allinfo[3, 1:i], vp = graphPath("sample"),
+                                                         name = "samplePlot.ghosts.1"))
+
         canvas$drawImage()
     }
     ## Remove 1000 statistics next time something is plotted to avoid
