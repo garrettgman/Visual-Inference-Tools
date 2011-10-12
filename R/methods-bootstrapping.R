@@ -90,6 +90,8 @@ boot1000 <- function(canvas, e){
 }
 
 showCI <- function(canvas, e){
+    if ("dataPlot.rect.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.rect.1"))
     x <- c(canvas$stat.dist, recursive = TRUE)
     y <- stackPoints(x, vp = graphPath("stat"), y.min = 0, y.max = 0.9)
     ci <- round(quantile(x, prob = c(0.025, 0.975)), 1)
@@ -113,13 +115,33 @@ showCI <- function(canvas, e){
     text2 <- textGrob(label = format(ci[2], nsmall = 1), x = unit(ci[2], "native"),
                       y = unit(0.6, "npc"), gp = gpar(fontface = 2), just = "left",
                       vp = graphPath("stat"), name = "statPlot.text2.1")
-    ciGrob <- grobTree(lines, text1, text2, name = "statPlot.ci.1")
+    permCI <- rectGrob(x = unit(ci[1], "native"), y = unit(0.1, "npc"),
+                       height = unit(0.01, "npc"), width = unit(diff(ci), "native"),
+                       just = c("left", "centre"), vp = graphPath("stat"),
+                       gp = gpar(col = "blue", fill = "blue"), name = "statPlot.rect.1")
+    ciGrob <- grobTree(permCI, lines, text1, text2, name = "statPlot.ci.1")
     canvas$image <- addGrob(canvas$image, ciGrob)
     canvas$drawImage()
-    ##canvas$image <- removeGrob(canvas$image, gPath("statPlot.points.1"))
-    ##canvas$image <- removeGrob(canvas$image, gPath("statPlot.text1.1"))
-    ##canvas$image <- removeGrob(canvas$image, gPath("statPlot.text2.1"))
-    ##canvas$image <- removeGrob(canvas$image, gPath("statPlot.lines.1"))
+    for (i in 1:10){
+        canvas$image <- addGrob(canvas$image, rectGrob(x = unit(ci[1], "native"),
+                                                       y = unit(0.1 + i*0.2, "native"),
+                                                       height = unit(0.01, "native"),
+                                                       width = unit(diff(ci), "native"),
+                                                       just = c("left", "centre"), vp =
+                                                       vpPath("canvas.frame", "animation.field"),
+                                                       gp = gpar(col = "blue", fill = "blue"),
+                                                       name = "temp"))
+        canvas$drawImage()
+    }
+    canvas$image <- addGrob(canvas$image, rectGrob(x = unit(ci[1], "native"),
+                                                    y = unit(0.1, "npc"),
+                                                    height = unit(0.01, "npc"),
+                                                    width = unit(diff(ci), "native"),
+                                                    just = c("left", "centre"), vp =
+                                                    graphPath("data"),
+                                                    gp = gpar(col = "blue", fill = "blue"),
+                                                    name = "dataPlot.rect.1"))
+    canvas$image <- removeGrob(canvas$image, gPath("temp"))
 }
 
 showSummaryStats <- function(canvas, e){
