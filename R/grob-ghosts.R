@@ -25,7 +25,7 @@ pad <- convertHeight(unit(as.numeric(x$height)/2, attr(x$height, "unit")),
 
 grid.rect(x = unit(x$p25, "native"), y = x$at,
           width = unit(x$p75 - x$p25, "native"), height = x$height,
-          just = "left", gp = gpar(col = x$box.color, alpha = x$alpha))
+          just = "left", gp = gpar(col = x$box.color, alpha = x$alpha/5))
 
 ## Plotting segments with alpha != 1 seems to be unstable.
 #grid.segments(x0 = unit(x$p50, "native"), y0 = x$at - pad,
