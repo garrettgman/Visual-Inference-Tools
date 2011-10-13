@@ -7,11 +7,10 @@ load_bootstrap_mean <- function(e){
     PLOT_SAMPLE_STAT <<- notYetImplemented
     PLOT_STAT_DIST <<- plotBootDist
     ANIMATE_SAMPLE <<- dropPoints1d
-    ANIMATE_STAT <<- notYetImplemented
+    ANIMATE_STAT <<- dropStat
     DISPLAY_RESULT <<- showCI
     DISPLAY_RESULT_2 <<- showSummaryStats
     HANDLE_1000 <<- boot1000mean
-    e$samples.plotted <- NULL
 }
 bootLabels <- function(canvas){
     samplabel <- textGrob("Sample",
@@ -56,6 +55,7 @@ plotSamplePointsAndBoxplotGhostMean <- function(canvas, e, i){
                              vp = graphPath("sample"), name = "samplePlot.ghosts.1"))
     canvas$image <- addGrob(canvas$image, boxplotGrob(x, box.color = "black",
                                                       median.color = "black",
+                                                      stat = mean, stat.color = "red",
                                                       show.w = FALSE,
                                                       name = "samplePlot.boxplot.1",
                                                       vp = graphPath("sample")))
@@ -63,11 +63,32 @@ plotSamplePointsAndBoxplotGhostMean <- function(canvas, e, i){
 }
 
 plotBootDist <- function(canvas, e){
-    e$samples.plotted <- c(e$samples.plotted, canvas$which.sample)
-    x <- c(canvas$stat.dist, recursive = TRUE)[e$samples.plotted]
-    y <- stackPoints(x, vp = graphPath("stat"), y.min = 0)
+    canvas$plotted.stats <- c(canvas$plotted.stats, canvas$which.sample)
+    x <- c(canvas$stat.dist, recursive = TRUE)[canvas$plotted.stats]
+    y <- stackPoints(x, vp = graphPath("stat"), y.min = 0, y.max = 0.9)
     plotPoints(canvas, x, y, graphPath("stat"), "statPlot", black = FALSE)
 }
+
+dropStat <- function(canvas, e, n.steps){
+    xs <- c(canvas$stat.dist, recursive = TRUE)[c(canvas$plotted.stats,
+                              canvas$which.sample)]
+    x <- xs[length(xs)]
+    ys <- stackPoints(xs, vp = graphPath("stat"), y.min = 0, y.max = 0.9)
+    y.start <- 1
+    y.end <- ys[length(ys)]
+    y.step <- (y.start - y.end)/n.steps
+    for (i in 0:n.steps){
+        canvas$image <- addGrob(canvas$image, pointsGrob
+                                (x = unit(x, "native"),
+                                 y = unit(y.start - i*y.step, "native"),
+                                 gp = gpar(lwd = 2), pch = 19,
+                                 vp = vpPath("canvas.frame", "animation.field"),
+                                 name = "temp"))
+        canvas$drawImage()
+    }
+    canvas$image <- removeGrob(canvas$image, gPath("temp"))
+}
+
 
 boot1000mean <- function(canvas, e){
     if ("samplePlot.points.1" %in% childNames(canvas$image))
@@ -95,6 +116,7 @@ boot1000mean <- function(canvas, e){
     #canvas$image <- removeGrob(canvas$image, gPath("statPlot.points.1"))
     ## Reset CI counter
     canvas$sampled.stats <- NULL
+    canvas$plotted.stats <- NULL
 }
 
 showCI <- function(canvas, e){

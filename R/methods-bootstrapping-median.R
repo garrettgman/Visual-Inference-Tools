@@ -7,7 +7,7 @@ load_bootstrap_median <- function(e){
     PLOT_SAMPLE_STAT <<- notYetImplemented
     PLOT_STAT_DIST <<- plotBootDist
     ANIMATE_SAMPLE <<- dropPoints1d
-    ANIMATE_STAT <<- notYetImplemented
+    ANIMATE_STAT <<- dropStat
     DISPLAY_RESULT <<- showCI
     DISPLAY_RESULT_2 <<- showSummaryStats
     HANDLE_1000 <<- boot1000median

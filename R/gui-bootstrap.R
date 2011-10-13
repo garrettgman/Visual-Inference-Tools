@@ -69,6 +69,7 @@ bootstrapGUIHandler <- function(e){
                                     n <- svalue(e$bootstrap.radio)
                                     for (i in 1:n){
                                         e$c1$plotSample(e)
+                                        if (n != 20) e$c1$animateStat(e, 10)
                                         e$c1$plotStatDist(e)
                                         e$c1$advanceWhichSample()
                                         e$c1$drawImage()
