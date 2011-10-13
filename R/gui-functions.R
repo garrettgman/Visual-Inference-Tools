@@ -146,4 +146,11 @@ dataGUI <- function(e){
         enabled(e$upper) <- TRUE
         enabled(e$lower) <- FALSE
     })
+
+    home.button <- gbutton("Home", container = iNZ.view, expand = TRUE,
+                           handler =
+                           function(h, ...){
+                               dispose(e$win)
+                               vit()
+                           })
 }

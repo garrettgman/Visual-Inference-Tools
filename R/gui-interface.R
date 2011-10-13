@@ -49,4 +49,5 @@ vit <- function(in.window = FALSE, cb = FALSE) {
                                   permGUIHandler(e)
                                   dataGUI(e)
                               })
+    enabled(home.permutation) <- FALSE
 }
