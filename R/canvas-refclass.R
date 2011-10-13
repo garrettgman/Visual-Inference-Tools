@@ -43,7 +43,7 @@
 #' information to keep track of. The reference class approach is an attempt at
 #' object oriented programming.
 canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
-	"samples", "sampled.stats", "indexes", "which.sample", "stat.dist", "viewports", "image"),
+	"samples", "sampled.stats", "plotted.stats", "indexes", "which.sample", "stat.dist", "viewports", "image"),
 	methods = list(
 	initialize = function(x = NULL, y = NULL, levels = NULL, ...){
 		require(grid)
@@ -54,6 +54,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		which.sample <<- 0
 		stat.dist <<- NULL
                 sampled.stats <<- NULL
+                plotted.stats <<- NULL
 		invisible(.self)
 	},
 
