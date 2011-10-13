@@ -79,10 +79,14 @@ bootstrapGUIHandler <- function(e){
 
     addSpace(e$lower, 10, horizontal = FALSE)
 
-    e$lowest <- ggroup(horizontal = FALSE, container = e$controls.vit, expand = TRUE)
+    e$lowest <- ggroup(horizontal = FALSE, container = e$lower, expand = TRUE)
     show.ci <- gbutton(text = "Show confidence interval", expand = TRUE,
                          container = e$lowest, handler = function(h, ...){
+                             enabled(e$lower) <- FALSE
+                             enabled(e$lowest) <- FALSE
                              e$c1$displayResult()
+                             enabled(e$lower) <- TRUE
+                             enabled(e$lowest) <- TRUE
                              enabled(show.ci) <- FALSE
                              })
     show.summary <- gbutton(text = "Show summary statistics", expand = TRUE,
