@@ -11,6 +11,7 @@
 vit <- function(in.window = FALSE, cb = FALSE) {
     home <- gwindow("Visual Inference Tools", visible = TRUE)
     home.buttons <- ggroup(horizontal = FALSE, container = home)
+    title <- glabel("Visual Inference Tools", container = home.buttons)
     ## Generates home page
     home.confint <- gbutton("Confidence interval coverage", container = home.buttons, expand = TRUE,
                        handler =
