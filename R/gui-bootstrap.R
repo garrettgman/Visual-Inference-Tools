@@ -85,14 +85,14 @@ bootstrapGUIHandler <- function(e){
                          container = e$lowest, handler = function(h, ...){
                              enabled(e$lower) <- FALSE
                              enabled(e$lowest) <- FALSE
-                             e$c1$displayResult()
+                             e$c1$displayResult(e, ci = TRUE)
                              enabled(e$lower) <- TRUE
                              enabled(e$lowest) <- TRUE
                              enabled(show.ci) <- FALSE
                              })
     show.summary <- gbutton(text = "Show summary statistics", expand = TRUE,
                             container = e$lowest, handler = function(h, ...){
-                                e$c1$displayResult2()
+                                e$c1$displayResult(e, ci = FALSE)
                                 enabled(show.summary) <- FALSE
                                 })
     enabled(e$lowest) <- FALSE

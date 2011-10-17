@@ -71,14 +71,10 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Calculates the sample statistic for a group of data.'
 		CALC_STAT(samples[[i]])
 	},
-	displayResult = function(env) {
+	displayResult = function(env, ...) {
 		'Displays the final result of the VIT simulation.'
-		DISPLAY_RESULT(.self, env)
+		DISPLAY_RESULT(.self, env, ...)
 	},
-        displayResult2 = function(env) {
-            'Displays second round of results of the VIT simulation if required.'
-            DISPLAY_RESULT_2(.self, env)
-        },
 	handle1000 = function(env) {
 		'Runs simulation that uses all 1000 pre-calculated samples.'
 		HANDLE_1000(.self, env)
