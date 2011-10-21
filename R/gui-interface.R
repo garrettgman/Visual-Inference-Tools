@@ -17,7 +17,8 @@ vit <- function(in.window = FALSE, cb = FALSE) {
                        handler =
                        function(h, ...){
                            dispose(home)
-                           plot.new()
+                           graphics.off()
+                           dev.new(height = 50, width = 50)
                            e <- new.vit.env()
                            e$cb <- cb
                            e$in.window <- in.window
@@ -29,6 +30,8 @@ vit <- function(in.window = FALSE, cb = FALSE) {
                          handler =
                          function(h, ...){
                              dispose(home)
+                             graphics.off()
+                             dev.new(height = 50, width = 75)
                              plot.new()
                              e <- new.vit.env()
                              e$cb <- cb

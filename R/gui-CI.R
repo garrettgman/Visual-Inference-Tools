@@ -1,5 +1,6 @@
 CIGUIHandler <- function(e){
     e$method <- "ci"
+    e$data.boxes <- FALSE
     tbl <- glayout(container = e$upper)
     tbl[1,1] <- glabel("Quantity: ", container = tbl)
     tbl[1,2] <- (e$stat <- gcombobox(c(), editable = TRUE, container = tbl,

@@ -272,8 +272,8 @@ new.vit.env <- function() {
             e$c1 <- canvas$new(x = e$xData, levels = e$yData)
             ## loads the data dependent details that allow the canvas to perform
             ## its basic actions. NOTE: should actions be stored in e?
-            buildViewports(e$c1, e$xData, e$yData)
-            e$c1$buildImage()
+            buildViewports(e$c1, e$xData, e$yData, e$data.boxes)
+            e$c1$buildImage(e$data.boxes)
             pushViewport(e$c1$viewports)
             e$c1$plotData()
 	}
@@ -358,6 +358,7 @@ new.vit.env <- function() {
         e$resetCanvas <- function() {
             clear_actions(e)
             e$buildCanvas()
+            if (e$data.boxes) e$c1$buildBoxes()
             e$c1$drawImage()
         }
 
@@ -378,5 +379,9 @@ new.vit.env <- function() {
             for (i in grobs.to.clear)
                 e$c1$image <- removeGrob(e$c1$image, i)
         }
-	e
+
+        e$graphPath <- function(plot.name = "sample", number = "1", boxes = e$data.boxes)
+            graphPath(plot.name = plot.name, number = number, boxes = boxes)
+
+        e
 }

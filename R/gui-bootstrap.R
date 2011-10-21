@@ -1,5 +1,6 @@
 bootstrapGUIHandler <- function(e){
     e$method <- "bootstrap"
+    e$data.boxes <- TRUE
     tbl <- glayout(container = e$upper)
     tbl[1, 1] <- glabel("Quantity: ", container = tbl)
     tbl[1, 2] <- (e$stat <- gcombobox(c("mean", "median"), editable = FALSE, container = tbl))
@@ -69,7 +70,7 @@ bootstrapGUIHandler <- function(e){
                                     n <- svalue(e$bootstrap.radio)
                                     for (i in 1:n){
                                         e$c1$plotSample(e)
-                                        if (n != 20) e$c1$animateStat(e, 10)
+                                        if (n != 20) e$c1$animateStat(e, 15)
                                         e$c1$plotStatDist(e)
                                         e$c1$advanceWhichSample()
                                         e$c1$drawImage()

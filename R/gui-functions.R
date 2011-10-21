@@ -126,8 +126,9 @@ dataGUI <- function(e){
         if (is.integer(e$xData)) e$xData <- as.numeric(e$xData)
         e$variable_check()
         clear_actions(e)
-        loadPlotDetails(e$xData, e$yData)
+        loadPlotDetails(e, e$c1)
         e$buildCanvas()
+        if (e$data.boxes) e$c1$buildBoxes()
         e$c1$drawImage()
         enabled(e$upper) <- TRUE
         enabled(e$lower) <- FALSE
@@ -140,7 +141,7 @@ dataGUI <- function(e){
         if (is.integer(e$yData)) e$yData <- as.numeric(e$yData)
         e$variable_check()
         clear_actions(e)
-        loadPlotDetails(e$xData, e$yData)
+        loadPlotDetails(e, e$c1)
         e$buildCanvas()
         e$c1$drawImage()
         enabled(e$upper) <- TRUE

@@ -48,6 +48,9 @@ DISPLAY_RESULT_2 <- function(canvas)
 HANDLE_1000 <- function(e)
 	warning("HANDLE_1000 details must be set by loadDetails()")
 
+GRAPHPATH <- function(plot.name, number)
+    warning("GRAPHPATH details must be set by loadPlotDetalis()")
+
 test_function <- function(canvas)
 	warning("test_function details must be set by loadDetails()")
 

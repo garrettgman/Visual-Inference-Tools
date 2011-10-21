@@ -105,25 +105,59 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
             SHOW_LABELS(.self)
         },
 
+        graphPath = function(plot.name = "sample", number = "1") {
+            'Different graphpath methods required depending on whether or not data boxes are plotted'
+            GRAPHPATH(plot.name, number)
+        },
+
 	# Helpers
 	advanceWhichSample = function() {
 		'Advances which.sample.'
 		if (which.sample >= 1000) which.sample <<- 0
 		which.sample <<- which.sample + 1
 	},
-	buildImage = function() {
-		'builds an initial image for a canvas object. The initial image is just the background, with nothing added.'
-		dataAxis <- xaxisGrob(name = "dataAxis", vp = graphPath("data"))
-		sampleAxis <- xaxisGrob(name = "sampleAxis", vp = graphPath("sample"))
-		statAxis <- xaxisGrob(name = "statAxis", vp = graphPath("stat"))
-
-		image <<- gTree(name = "image", childrenvp = viewports,
-			children = gList(dataAxis, sampleAxis, statAxis))
-	},
-	drawImage = function() {
-		'Draws current image in device.'
-		grid.newpage()
-		grid.draw(image)
+        buildBoxes = function(){
+            databox1 <- roundrectGrob(name = "databox1",
+                                      x = unit(1, "mm"), y = unit(1, "mm"),
+                                      width = unit(1, "npc") - unit(2, "mm"),
+                                      height = unit(1, "npc") - unit(2, "mm"),
+                                      just = c("left", "bottom"),
+                                      gp = gpar(col = "gray40", fill = "gray95", lwd = 2),
+                                      vp = graphPath("databox", 1))
+            databox2 <- roundrectGrob(name = "databox2",
+                                      x = unit(1, "mm"), y = unit(1, "mm"),
+                                      width = unit(1, "npc") - unit(2, "mm"),
+                                      height = unit(1, "npc") - unit(2, "mm"),
+                                      just = c("left", "bottom"),
+                                      gp = gpar(col = "gray40", fill = "gray95", lwd = 2),
+                                      vp = graphPath("databox", 2))
+            if (n <= 30){
+                ntext <- n
+                xlabs <- c("Xvar", format(round(x[1:n], 1), nsmall = 1))
+            } else {
+                ntext <- 30
+                xlabs <- c("Xvar", format(round(x[1:29], 1), nsmall = 1), "...")
+            }
+            npcs <- (ntext:0)/ntext
+            yunit <- unit(npcs, "npc") - unit(4*(npcs - 0.5), "mm") + unit(1 - npcs, "lines")
+            x.data <- textGrob(label = xlabs, y = yunit, just = "top",
+                               vp = graphPath("databox", 1), name = "x.data")
+            image <<- addGrob(image, databox1)
+            image <<- addGrob(image, databox2)
+            image <<- addGrob(image, x.data)
+        },
+        buildImage = function(data.boxes = FALSE) {
+            'builds an initial image for a canvas object. The initial image is just the background, with nothing added.'
+            dataAxis <- xaxisGrob(name = "dataAxis", vp = graphPath("data"))
+            sampleAxis <- xaxisGrob(name = "sampleAxis", vp = graphPath("sample"))
+            statAxis <- xaxisGrob(name = "statAxis", vp = graphPath("stat"))
+            image <<- gTree(name = "image", childrenvp = viewports,
+                            children = gList(dataAxis, sampleAxis, statAxis))
+        },
+        drawImage = function() {
+            'Draws current image in device.'
+            grid.newpage()
+            grid.draw(image)
 	},
         pauseImage = function(pause = 1) {
             'Same as drawImage but pauses animation'
