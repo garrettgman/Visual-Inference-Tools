@@ -25,11 +25,11 @@ plotSamplePointsAndBoxplotMedian <- function(canvas, e, i) {
     if (e$cb) bluecol <- dichromat(bluecol)
     x <- canvas$samples[[i]]
     if (length(x) >= 100)
-        plotHist(canvas, x, graphPath("data"), "dataPlot")
+        plotHist(canvas, x, canvas$graphPath("data"), "dataPlot")
     else {
-        y <- stackPoints(x, vp = graphPath("sample"))
-        plotPoints(canvas, x, y, graphPath("sample"), "samplePlot", black = TRUE)
-        plotBoxplot(canvas, x, stat = median, stat.color = bluecol, graphPath("sample"),
+        y <- stackPoints(x, vp = canvas$graphPath("sample"))
+        plotPoints(canvas, x, y, canvas$graphPath("sample"), "samplePlot", black = TRUE)
+        plotBoxplot(canvas, x, stat = median, stat.color = bluecol, canvas$graphPath("sample"),
                     "samplePlot")
     }
 }
@@ -73,12 +73,12 @@ addMedianLine <- function(canvas, e) {
                                          gp = gpar(col = "grey60"),
                                          vp = vpPath("canvas.frame", "animation.field"),
                                          name = "hline"))
-        canvas$y <- stackPoints(canvas$x, vp = graphPath("data"))
+        canvas$y <- stackPoints(canvas$x, vp = canvas$graphPath("data"))
     if (length(canvas$x) >= 1000)
-        plotHist(canvas, canvas$x, graphPath("data"), "dataPlot") else {
-        plotPoints(canvas, canvas$x, canvas$y, graphPath("data"), "dataPlot")
+        plotHist(canvas, canvas$x, canvas$graphPath("data"), "dataPlot") else {
+        plotPoints(canvas, canvas$x, canvas$y, canvas$graphPath("data"), "dataPlot")
         plotBoxplot(canvas, canvas$x, stat = median, stat.color = purplecol,
-                    graphPath("data"), "dataPlot")
+                    canvas$graphPath("data"), "dataPlot")
     }
 }
 
@@ -111,14 +111,14 @@ plotCIDistMedian <- function(canvas, e) {
     if (nrow(green) > 0) {
         greenRects <- rectGrob(x = unit(green$x, "native"),
                                y = unit(green$y, "native"), width = unit(green$width, "native"),
-                               height = unit(0.015, "native"), vp = graphPath("stat"),
+                               height = unit(0.015, "native"), vp = canvas$graphPath("stat"),
                                gp = gpar(col = NA, fill = greencol))
     } else greenRects <- NULL
 
     if (nrow(red) > 0) {
         redRects <- rectGrob(x = unit(red$x, "native"),
                              y = unit(red$y, "native"), width = unit(red$width, "native"),
-                             height = unit(0.015, "native"), vp = graphPath("stat"),
+                             height = unit(0.015, "native"), vp = canvas$graphPath("stat"),
                              gp = gpar(col = NA, fill = redcol))
     } else redRects <- NULL
 

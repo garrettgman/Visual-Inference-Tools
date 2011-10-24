@@ -23,20 +23,20 @@ plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
     alpha = 0.25
     canvas$sampled.stats <- c(canvas$sampled.stats, canvas$which.sample)
     x <- canvas$samples[[i]]
-    y <- stackPoints(x, vp = graphPath("sample"))
-    plotPoints(canvas, x, y, graphPath("sample"), "samplePlot", black = FALSE)
+    y <- stackPoints(x, vp = canvas$graphPath("sample"))
+    plotPoints(canvas, x, y, canvas$graphPath("sample"), "samplePlot", black = FALSE)
     allinfo <- sapply(canvas$samples[canvas$sampled.stats], function(x) fivenum(x)[2:4])
     canvas$image <- addGrob(canvas$image, ghostsGrob(allinfo[1,],
                                                      allinfo[2,],
                                                      allinfo[3,],
                                                      alpha = alpha,
-                                                     vp = graphPath("sample"),
+                                                     vp = canvas$graphPath("sample"),
                                                      name = "samplePlot.ghosts.1"))
     canvas$image <- addGrob(canvas$image, boxplotGrob(x, box.color = "black",
                                                       median.color = "black",
                                                       show.w = FALSE,
                                                       name = "samplePlot.boxplot.1",
-                                                      vp = graphPath("sample")))
+                                                      vp = canvas$graphPath("sample")))
 }
 
 boot1000median <- function(canvas, e){
@@ -50,11 +50,11 @@ boot1000median <- function(canvas, e){
     allinfo <- sapply(canvas$samples, function(x) fivenum(x)[2:4])
     for (i in 50*(1:20)){
         x <- allx[1:i]
-        y <- stackPoints(x, vp = graphPath("stat"), y.min = 0, y.max = 0.9)
-        plotPoints(canvas, x, y, graphPath("stat"), "statPlot", black = FALSE, alpha = 0.7)
+        y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
+        plotPoints(canvas, x, y, canvas$graphPath("stat"), "statPlot", black = FALSE, alpha = 0.7)
         canvas$image <- addGrob(canvas$image, ghostsGrob(allinfo[1, 1:i], allinfo[2, 1:i],
                                                          allinfo[3, 1:i], alpha = 0.05,
-                                                         vp = graphPath("sample"),
+                                                         vp = canvas$graphPath("sample"),
                                                          name = "samplePlot.ghosts.1"))
 
         canvas$drawImage()
