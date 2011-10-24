@@ -236,18 +236,18 @@ new.vit.env <- function() {
 		e$inDataView <- FALSE
 	}
 
-    e$viewData <- function(h, ...){
-    	if(is.null(tag(e$obj, "dataSet"))) {
-			gmessage("Please load a new data set (with named columns)",
-				parent = e$win)
-		} else if ((names(tag(e$obj, "dataSet"))[1] == "empty")) {
-			gmessage("Please load a new data set", parent = e$win)
-		} else {
-			enabled(h$obj) = FALSE
-			e$updateData()
-			enabled(e$listView) = TRUE
-			e$inDataView = TRUE
-		}
+        e$viewData <- function(h, ...){
+            if(is.null(tag(e$obj, "dataSet"))) {
+                gmessage("Please load a new data set (with named columns)",
+                         parent = e$win)
+            } else if ((names(tag(e$obj, "dataSet"))[1] == "empty")) {
+                gmessage("Please load a new data set", parent = e$win)
+            } else {
+                enabled(h$obj) = FALSE
+                e$updateData()
+                enabled(e$listView) = TRUE
+                e$inDataView = TRUE
+            }
 	}
 
 	e$viewList <- function(h, ...){
