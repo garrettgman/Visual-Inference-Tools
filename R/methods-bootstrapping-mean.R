@@ -98,7 +98,7 @@ dropStat <- function(canvas, e, n.steps){
 }
 
 
-boot1000mean <- function(canvas, e){
+boot1000mean <- function(canvas, e, points = FALSE){
     if ("samplePlot.points.1" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
     if ("samplePlot.boxplot.1" %in% childNames(canvas$image))
@@ -116,7 +116,9 @@ boot1000mean <- function(canvas, e){
     for (i in 50*(1:20)){
         x <- allx[1:i]
         y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
-        plotPoints(canvas, x, y, canvas$graphPath("stat"), "statPlot", black = FALSE, alpha = 0.7)
+        if (points)
+            plotPoints(canvas, x, y, canvas$graphPath("stat"),
+                       "statPlot", black = FALSE, alpha = 0.7)
         canvas$image <- addGrob(canvas$image, rectGrob
                                 (x = unit(allinfo[1:i], "native"),
                                  y = unit(0.15, "npc"), height = unit(0.2, "npc"),
@@ -133,42 +135,47 @@ boot1000mean <- function(canvas, e){
     canvas$plotted.stats <- NULL
 }
 
-showCIandStats <- function(canvas, e, ci = TRUE){
+showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
+    if (points) vp <- canvas$graphPath("stat") else vp <- canvas$graphPath("sample")
     if (ci){
         ## CI code.
         if ("dataPlot.rect.1" %in% childNames(canvas$image))
             canvas$image <- removeGrob(canvas$image, gPath("dataPlot.rect.1"))
         x <- c(canvas$stat.dist, recursive = TRUE)
-        y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
         ci <- round(quantile(x, prob = c(0.025, 0.975)), 1)
-        x.in <- x[x >= ci[1] & x <= ci[2]]
-        x.out <- x[x < ci[1] | x > ci[2]]
-        y.in <- y[x >= ci[1] & x <= ci[2]]
-        y.out <- y[x < ci[1] | x > ci[2]]
-        points.in <- pointsGrob(x = x.in, y = y.in, gp = gpar(col = "grey60", lwd = 2, alpha = 0.7),
-                                vp = canvas$graphPath("stat"))
-        points.out <- pointsGrob(x = x.out, y = y.out, gp = gpar(col = "lightgrey", lwd = 2, alpha = 1),
-                                 vp = canvas$graphPath("stat"))
-        points.all <- grobTree(points.out, points.in, name = "statPlot.points.1")
-        canvas$image <- addGrob(canvas$image, points.all)
+        start <- 5
+        if (points){
+            start <- 1
+            y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
+            x.in <- x[x >= ci[1] & x <= ci[2]]
+            x.out <- x[x < ci[1] | x > ci[2]]
+            y.in <- y[x >= ci[1] & x <= ci[2]]
+            y.out <- y[x < ci[1] | x > ci[2]]
+            points.in <- pointsGrob(x = x.in, y = y.in, gp = gpar(col = "grey60", lwd = 2, alpha = 0.7),
+                                    vp = canvas$graphPath("stat"))
+            points.out <- pointsGrob(x = x.out, y = y.out, gp = gpar(col = "lightgrey", lwd = 2, alpha = 1),
+                                     vp = canvas$graphPath("stat"))
+            points.all <- grobTree(points.out, points.in, name = "statPlot.points.1")
+            canvas$image <- addGrob(canvas$image, points.all)
+        }
         lines <- segmentsGrob(x0 = unit(ci, "native"), x1 = unit(ci, "native"),
                               y0 = unit(0.1, "npc"), y1 = unit(-1, "lines") - unit(1, "lines"),
                               gp = gpar(lwd = 2, col = "red"), arrow = arrow(length = unit(0.1, "inches")),
-                              vp = canvas$graphPath("stat"), name = "statPlot.lines.1")
+                              vp = vp, name = "statPlot.lines.1")
         text1 <- textGrob(label = format(ci[1], nsmall = 1), x = unit(ci[1], "native"),
                           y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top",
-                          vp = canvas$graphPath("stat"), name = "statPlot.text1.1")
+                          vp = vp, name = "statPlot.text1.1")
         text2 <- textGrob(label = format(ci[2], nsmall = 1), x = unit(ci[2], "native"),
                           y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top",
-                          vp = canvas$graphPath("stat"), name = "statPlot.text2.1")
+                          vp = vp, name = "statPlot.text2.1")
         permCI <- rectGrob(x = unit(ci[1], "native"), y = unit(0.1, "npc"),
                            height = unit(0.01, "npc"), width = unit(diff(ci), "native"),
-                           just = c("left", "centre"), vp = canvas$graphPath("stat"),
+                           just = c("left", "centre"), vp = vp,
                            gp = gpar(col = "red", fill = "red"), name = "statPlot.rect.1")
         ciGrob <- grobTree(permCI, lines, text1, text2, name = "statPlot.ci.1")
         canvas$image <- addGrob(canvas$image, ciGrob)
         canvas$drawImage()
-        for (i in 1:10){
+        for (i in start:10){
             canvas$image <- addGrob(canvas$image, rectGrob(x = unit(ci[1], "native"),
                                                            y = unit(0.1 + i*0.2, "native"),
                                                            height = unit(0.01, "native"),
@@ -211,25 +218,25 @@ showCIandStats <- function(canvas, e, ci = TRUE){
         max.width <- stringWidth(c("Mean:", mean.x, sd.x)[widths == max(widths)])
         xunit <- unit(0, "npc") + unit(1, "mm") + 0.5*max.width
         summarytext1 <- textGrob("Mean:", x = xunit, y = unit(0.6, "npc"),
-                                 vp = canvas$graphPath("stat"), gp = gpar(fontface = 2),
+                                 vp = vp, gp = gpar(fontface = 2),
                                  name = "summarytext1")
         summarytext2 <- textGrob(format(mean.x, nsmall = 2), x = xunit,
                                  y = unit(0.6, "npc") - unit(1, "lines"),
-                                 vp = canvas$graphPath("stat"), #gp = gpar(fontface = 2),
+                                 vp = vp, #gp = gpar(fontface = 2),
                                  name = "summarytext2")
         summarytext3 <- textGrob("SD:",
                                  x = xunit, y = unit(0.6, "npc") - unit(2, "lines"),
-                                 vp = canvas$graphPath("stat"), gp = gpar(fontface = 2),
+                                 vp = vp, gp = gpar(fontface = 2),
                                  name = "summarytext3")
         summarytext4 <- textGrob(format(sd.x, nsmall = 2), x = xunit,
                                  y = unit(0.6, "npc") - unit(3, "lines"),
-                                 vp = canvas$graphPath("stat"), #gp = gpar(fontface = 2),
+                                 vp = vp, #gp = gpar(fontface = 2),
                                  name = "summarytext4")
         summaryborder <- rectGrob(x = xunit, y = unit(0.6, "npc") + unit(0.5, "lines"),
                                   width = max.width + unit(2, "mm"),
                                   height = unit(2, "mm") + unit(4, "lines"),
                                   gp = gpar(fill = "white"),
-                                  just = c("centre", "top"), vp = canvas$graphPath("stat"),
+                                  just = c("centre", "top"), vp = vp,
                                   name = "summaryborder")
         summarytext <- grobTree(summaryborder, summarytext1, summarytext2, summarytext3,
                                 summarytext4, name = "statPlot.summary.1")

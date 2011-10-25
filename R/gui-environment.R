@@ -378,7 +378,7 @@ new.vit.env <- function() {
         }
 
 
-## Clears bottom two panels of canvas.
+        ## Clears bottom two panels of canvas.
         e$resetCanvas <- function() {
             clear_actions(e)
             e$buildCanvas()

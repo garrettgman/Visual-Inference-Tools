@@ -75,9 +75,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Displays the final result of the VIT simulation.'
 		DISPLAY_RESULT(.self, env, ...)
 	},
-	handle1000 = function(env) {
+	handle1000 = function(env, ...) {
 		'Runs simulation that uses all 1000 pre-calculated samples.'
-		HANDLE_1000(.self, env)
+		HANDLE_1000(.self, env, ...)
 	},
 	plotData = function() {
 		'Plots a vector or dataframe of data points.'
