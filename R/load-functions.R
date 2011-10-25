@@ -2,8 +2,8 @@
 # loaded. You can make a certain statistical method override these
 # details by having loadStatDetails reset PLOT_DATA for that method.
 loadPlotDetails <- function(e, canvas) {
-    x <- e$x
-    y <- e$y
+    x <- e$xData
+    y <- e$yData
     if (is.null(y)) {
         if (is.categorical(x)) {
             load_categorical_1d()

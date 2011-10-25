@@ -124,6 +124,7 @@ dataGUI <- function(e){
         if (e$inDataView) e$xData <- svalue(h$dropdata)
         else e$xData <- tag(e$obj, "dataSet")[,id(h$dropdata)]
         if (is.integer(e$xData)) e$xData <- as.numeric(e$xData)
+        e$na_check(TRUE)
         e$variable_check()
         clear_actions(e)
         loadPlotDetails(e, e$c1)
@@ -139,6 +140,7 @@ dataGUI <- function(e){
         if (e$inDataView) e$yData <- svalue(h$dropdata) else{
             e$yData <- tag(e$obj, "dataSet")[,id(h$dropdata)]}
         if (is.integer(e$yData)) e$yData <- as.numeric(e$yData)
+        e$na_check(FALSE)
         e$variable_check()
         clear_actions(e)
         loadPlotDetails(e, e$c1)

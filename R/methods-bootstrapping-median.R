@@ -37,6 +37,9 @@ plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
                                                       show.w = FALSE,
                                                       name = "samplePlot.boxplot.1",
                                                       vp = canvas$graphPath("sample")))
+    canvas$image <- addGrob(canvas$image, datatextGrob(data = x, title = "Resample",
+                                                       name = "text.resample",
+                                                       vp = canvas$graphPath("databox", 2)))
 }
 
 boot1000median <- function(canvas, e){
@@ -46,6 +49,8 @@ boot1000median <- function(canvas, e){
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.boxplot.1"))
     if ("samplePlot.ghosts.1" %in% childNames(e$c1$image))
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.ghosts.1"))
+    if ("text.resample" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("text.resample"))
     allx <- c(canvas$stat.dist, recursive = TRUE)
     allinfo <- sapply(canvas$samples, function(x) fivenum(x)[2:4])
     for (i in 50*(1:20)){

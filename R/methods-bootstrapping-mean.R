@@ -35,6 +35,10 @@ bootLabels <- function(canvas){
 }
 
 plotSamplePointsAndBoxplotGhostMean <- function(canvas, e, i){
+    if ("dataPlot.rect.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.rect.1"))
+    if ("samplePlot.rect.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.rect.1"))
     bluecol <- "blue"
     redcol <- "red"
     if (e$cb){
@@ -103,6 +107,10 @@ boot1000mean <- function(canvas, e){
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.ghosts.1"))
     if ("text.resample" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath("text.resample"))
+    if ("dataPlot.rect.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.rect.1"))
+    if ("samplePlot.rect.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.rect.1"))
     allx <- c(canvas$stat.dist, recursive = TRUE)
     allinfo <- c(canvas$stat.dist, recursive = TRUE)
     for (i in 50*(1:20)){
@@ -170,7 +178,17 @@ showCIandStats <- function(canvas, e, ci = TRUE){
                                                            gp = gpar(col = "red", fill = "red"),
                                                            name = "temp"))
             canvas$drawImage()
-            if (i == 5) canvas$pauseImage(10)
+            if (i == 5){
+                canvas$pauseImage(5)
+                canvas$image <- addGrob(canvas$image, rectGrob(x = unit(ci[1], "native"),
+                                                       y = unit(0.1, "npc"),
+                                                       height = unit(0.01, "npc"),
+                                                       width = unit(diff(ci), "native"),
+                                                       just = c("left", "centre"), vp =
+                                                       canvas$graphPath("sample"),
+                                                       gp = gpar(col = "red", fill = "red"),
+                                                       name = "samplePlot.rect.1"))
+            }
         }
         canvas$image <- addGrob(canvas$image, rectGrob(x = unit(ci[1], "native"),
                                                        y = unit(0.1, "npc"),

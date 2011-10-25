@@ -354,7 +354,31 @@ new.vit.env <- function() {
             }
             e$data.loaded <- TRUE
 	}
-        ## Clears bottom two panels of canvas.
+
+        e$na_check <- function(for.x = TRUE){
+            if (for.x){
+                e$xNA <- e$xData
+                if (is.null(e$yData)){
+                    e$xData <- e$xNA[!is.na(e$xNA)]
+                } else {
+                    subset <- is.na(e$xNA) | is.na(e$yNA)
+                    e$xData <- e$xNA[!subset]
+                    e$yData <- e$yNA[!subset]
+                }
+            } else {
+                e$yNA <- e$yData
+                if (is.null(e$xData)){
+                    e$yData <- e$yNA[!is.na(e$xNA)]
+                } else {
+                    subset <- is.na(e$xNA) | is.na(e$yNA)
+                    e$xData <- e$xNA[!subset]
+                    e$yData <- e$yNA[!subset]
+                }
+            }
+        }
+
+
+## Clears bottom two panels of canvas.
         e$resetCanvas <- function() {
             clear_actions(e)
             e$buildCanvas()
