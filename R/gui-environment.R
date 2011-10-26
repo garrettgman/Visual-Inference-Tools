@@ -397,9 +397,10 @@ new.vit.env <- function() {
         }
 
         ## Clears bottom panel of canvas
-        e$clearStatPanel <- function(){
+        e$clearPanel <- function(panel = "stat"){
+            clear.panel <- paste(panel, "Plot", sep = "")
             grobs <- childNames(e$c1$image)
-            grobs.to.clear <- grobs[substr(grobs, 1, 8) == "statPlot"]
+            grobs.to.clear <- grobs[substr(grobs, 1, nchar(panel) + 4) == clear.panel]
             for (i in grobs.to.clear)
                 e$c1$image <- removeGrob(e$c1$image, i)
         }

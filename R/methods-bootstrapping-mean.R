@@ -6,7 +6,7 @@ load_bootstrap_mean <- function(e){
     PLOT_DATA_STAT <<- c("mean" = addMeanLine, "median" = addMedianLine)[[svalue(e$stat)]]
     PLOT_SAMPLE_STAT <<- notYetImplemented
     PLOT_STAT_DIST <<- plotBootDist
-    ANIMATE_SAMPLE <<- dropPoints1d
+    ANIMATE_SAMPLE <<- moveDataTextAndDropPoints
     ANIMATE_STAT <<- dropStat
     DISPLAY_RESULT <<- showCIandStats
     HANDLE_1000 <<- boot1000mean
@@ -56,6 +56,10 @@ plotSamplePointsAndBoxplotGhostMean <- function(canvas, e, i){
                              y = unit(0.15, "npc"), height = unit(0.2, "npc"),
                              width = 0, gp = gpar(alpha = alpha, col = "blue", lwd = 2),
                              vp = canvas$graphPath("sample"), name = "samplePlot.ghosts.1"))
+    canvas$image <- addGrob(canvas$image, linesGrob
+                            (x = unit(canvas$stat.dist[canvas$which.sample], "native"),
+                             y = unit(c(0.05, 0.25), "npc"), gp = gpar(lwd = 4, col = "red"),
+                             vp = canvas$graphPath("sample"), name = "samplePlot.lines.1"))
     #canvas$image <- addGrob(canvas$image, boxplotGrob(x, box.color = "black",
     #                                                  median.color = "black",
     #                                                  stat = mean, stat.color = "red",
@@ -63,8 +67,8 @@ plotSamplePointsAndBoxplotGhostMean <- function(canvas, e, i){
     #                                                  name = "samplePlot.boxplot.1",
     #                                                  vp = canvas$graphPath("sample")))
     canvas$image <- addGrob(canvas$image, datatextGrob(data = x, title = "Resample",
-                                                       name = "text.resample",
-                                                       vp = canvas$graphPath("databox", 2)))
+                                                       name = "databox.text.2",
+                                                       vp = canvas$graphPath("databox", 2), gp = gpar(col = "red")))
 }
 
 plotBootDist <- function(canvas, e){
@@ -73,6 +77,92 @@ plotBootDist <- function(canvas, e){
     y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
     plotPoints(canvas, x, y, canvas$graphPath("stat"), "statPlot", black = FALSE)
 }
+
+moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10, n.slow = 5){
+    if ("databox.text.2" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("databox.text.2"))
+    if ("samplePlot.points.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
+
+    index <- canvas$indexes[[canvas$which.sample]]
+    x <- canvas$x[index]
+    y <- canvas$y[index]
+    n <- canvas$n
+    n.slow <- min(n.slow, n)
+    ## Calculating the position of text in text boxes.
+    ntext <- min(n, 30)
+    npcs <- (ntext:0)/ntext
+    yunit <- (unit(npcs, "npc") - unit(4*(npcs - 0.5), "mm") + unit(1 - npcs, "lines"))
+    x.text.start <- 0.25
+    x.text.end <- 0.75
+    x.text.step <- (x.text.end - x.text.start)/n.steps
+    y.start <- y + 2
+    y.end <- stackPoints(x, vp = canvas$graphPath("sample")) + 1
+    y.step <- (y.end - y.start)/n.steps
+    for (i in 1:n){
+        y.text.start <- yunit[min(c(30, index[i] + 1))]
+        y.text.end <- yunit[i + 1]
+        y.text.step <- convertY(y.text.end - y.text.start, "npc", valueOnly = TRUE)/n.steps
+        temp.text <- textGrob(label = format(round(x[i], 1), nsmall = 1),
+                              y = y.text.start, just = "top",
+                              gp = gpar(col = "red", fontface = 2), name = "temp.text",
+                              vp = canvas$graphPath("databox", 1))
+        canvas$image <- addGrob(canvas$image, temp.text)
+        temp.arrow <- linesGrob(x = c(0.9, 0.8),
+                                y = y.text.start - unit(0.5, "lines"),
+                                gp = gpar(lwd = 3, col = "red"),
+                                arrow = arrow(length = unit(0.1, "inches")), name = "temp.arrow",
+                                vp = canvas$graphPath("databox", 1))
+        temp.point <- pointsGrob(x = x[i], y = (canvas$y[index])[i], pch = 19,
+                                 vp = canvas$graphPath("data"), name = "temp.point")
+        canvas$image <- addGrob(canvas$image, temp.arrow)
+        canvas$image <- addGrob(canvas$image, temp.point)
+        if (i <= n.slow){
+            canvas$pauseImage(5)
+            for (j in 1:n.steps){
+                canvas$image <- addGrob(canvas$image, textGrob
+                                        (label = format(round(x[i], 1), nsmall = 1),
+                                         y = y.text.start + unit(j*y.text.step, "npc"),
+                                         x = unit(x.text.start + j*x.text.step, "npc"),
+                                         just = "top", gp = gpar(col = "red", fontface = 2),
+                                         name = "temp.text",
+                                         vp = vpPath("canvas.all", "canvas.boxes")))
+               if (drop.points){
+                    canvas$image <- addGrob(canvas$image, pointsGrob
+                                            (x = x[i], y = y.start[i] + j*y.step[i], pch = 19,
+                                             vp = vpPath("canvas.all", "canvas.plots",
+                                             "canvas.frame", "animation.field"), name = "temp"))
+               }
+                canvas$drawImage()
+                canvas$image <- removeGrob(canvas$image, gPath("temp"))
+            }
+            plotPoints(canvas, x[1:i], y.end[1:i] - 1, canvas$graphPath("sample"),
+                       "samplePlot", black = FALSE)
+            canvas$pauseImage(5)
+            canvas$image <- removeGrob(canvas$image, gPath("temp.text"))
+            resamp.text <- textGrob(label = c("Resample", format(round(x[1:i], 1), nsmall = 1)),
+                                    y = yunit[1:(i + 1)], just = "top", gp = gpar(col = "red"),
+                                    name = "databox.text.2", vp = canvas$graphPath("databox", 2))
+            canvas$image <- addGrob(canvas$image, resamp.text)
+        } else {
+            resamp.text <- textGrob(label = c("Resample", format(round(x[1:i], 1), nsmall = 1)),
+                                    y = yunit[1:(i + 1)], just = "top", gp = gpar(col = "red"),
+                                    name = "databox.text.2", vp = canvas$graphPath("databox", 2))
+            canvas$image <- addGrob(canvas$image, resamp.text)
+            plotPoints(canvas, x[1:i], y.end[1:i] - 1, canvas$graphPath("sample"),
+                       "samplePlot", black = FALSE)
+            canvas$pauseImage(5)
+        }
+    }
+    canvas$drawImage()
+    canvas$image <- removeGrob(canvas$image, gPath("temp.text"))
+    canvas$image <- removeGrob(canvas$image, gPath("temp.arrow"))
+    canvas$image <- removeGrob(canvas$image, gPath("temp.point"))
+}
+
+
+
+
 
 dropStat <- function(canvas, e, n.steps){
     xs <- c(canvas$stat.dist, recursive = TRUE)[c(canvas$plotted.stats,
@@ -99,18 +189,10 @@ dropStat <- function(canvas, e, n.steps){
 
 
 boot1000mean <- function(canvas, e, points = FALSE){
-    if ("samplePlot.points.1" %in% childNames(canvas$image))
-        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
-    if ("samplePlot.boxplot.1" %in% childNames(canvas$image))
-        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.boxplot.1"))
-    if ("samplePlot.ghosts.1" %in% childNames(canvas$image))
-        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.ghosts.1"))
-    if ("text.resample" %in% childNames(canvas$image))
-        canvas$image <- removeGrob(canvas$image, gPath("text.resample"))
+    if ("databox.text.2" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("databox.text.2"))
     if ("dataPlot.rect.1" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath("dataPlot.rect.1"))
-    if ("samplePlot.rect.1" %in% childNames(canvas$image))
-        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.rect.1"))
     allx <- c(canvas$stat.dist, recursive = TRUE)
     allinfo <- c(canvas$stat.dist, recursive = TRUE)
     for (i in 50*(1:20)){
@@ -127,10 +209,6 @@ boot1000mean <- function(canvas, e, points = FALSE){
 
         canvas$drawImage()
     }
-    ## Remove 1000 statistics next time something is plotted to avoid
-    ## further statistics being plotted on top.
-    #canvas$image <- removeGrob(canvas$image, gPath("statPlot.points.1"))
-    ## Reset CI counter
     canvas$sampled.stats <- NULL
     canvas$plotted.stats <- NULL
 }
@@ -146,6 +224,7 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
         start <- 5
         if (points){
             start <- 1
+            ## Set points outside interval to a lighter shade of grey.
             y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
             x.in <- x[x >= ci[1] & x <= ci[2]]
             x.out <- x[x < ci[1] | x > ci[2]]
@@ -158,6 +237,7 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
             points.all <- grobTree(points.out, points.in, name = "statPlot.points.1")
             canvas$image <- addGrob(canvas$image, points.all)
         }
+        ## Plot CI.
         lines <- segmentsGrob(x0 = unit(ci, "native"), x1 = unit(ci, "native"),
                               y0 = unit(0.1, "npc"), y1 = unit(-1, "lines") - unit(1, "lines"),
                               gp = gpar(lwd = 2, col = "red"), arrow = arrow(length = unit(0.1, "inches")),
@@ -175,6 +255,7 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
         ciGrob <- grobTree(permCI, lines, text1, text2, name = "statPlot.ci.1")
         canvas$image <- addGrob(canvas$image, ciGrob)
         canvas$drawImage()
+        ## Animate CI.
         for (i in start:10){
             canvas$image <- addGrob(canvas$image, rectGrob(x = unit(ci[1], "native"),
                                                            y = unit(0.1 + i*0.2, "native"),

@@ -59,9 +59,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 	},
 
 	# ACTIONS
-	animateSample = function(n.steps, n.slow, keep.plot, move) {
+	animateSample = function(...) {
 		'Animates the selection of the sampel from the data.'
-		ANIMATE_SAMPLE(.self, n.steps, n.slow, keep.plot, move)
+		ANIMATE_SAMPLE(.self, ...)
 	},
 	animateStat = function(env, n.steps) {
 		'Animates the creation of the distribution of the statistic from the samples.'

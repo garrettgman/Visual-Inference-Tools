@@ -6,7 +6,7 @@ load_bootstrap_median <- function(e){
     PLOT_DATA_STAT <<- c("mean" = addMeanLine, "median" = addMedianLine)[[svalue(e$stat)]]
     PLOT_SAMPLE_STAT <<- notYetImplemented
     PLOT_STAT_DIST <<- plotBootDist
-    ANIMATE_SAMPLE <<- dropPoints1d
+    ANIMATE_SAMPLE <<- moveDataTextAndDropPoints
     ANIMATE_STAT <<- dropStat
     DISPLAY_RESULT <<- showCIandStats
     HANDLE_1000 <<- boot1000median
@@ -29,7 +29,7 @@ plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
     canvas$image <- addGrob(canvas$image, ghostsGrob(allinfo[1,],
                                                      allinfo[2,],
                                                      allinfo[3,],
-                                                     alpha = alpha,
+                                                     alpha = alpha, box.color = "lightpink",
                                                      vp = canvas$graphPath("sample"),
                                                      name = "samplePlot.ghosts.1"))
     canvas$image <- addGrob(canvas$image, boxplotGrob(x, box.color = "black",
@@ -38,27 +38,27 @@ plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
                                                       name = "samplePlot.boxplot.1",
                                                       vp = canvas$graphPath("sample")))
     canvas$image <- addGrob(canvas$image, datatextGrob(data = x, title = "Resample",
-                                                       name = "text.resample",
+                                                       name = "databox.text.2",
+                                                       gp = gpar(col = "red"),
                                                        vp = canvas$graphPath("databox", 2)))
 }
 
-boot1000median <- function(canvas, e){
-    if ("samplePlot.points.1" %in% childNames(canvas$image))
-        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
-    if ("samplePlot.boxplot.1" %in% childNames(e$c1$image))
-        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.boxplot.1"))
-    if ("samplePlot.ghosts.1" %in% childNames(e$c1$image))
-        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.ghosts.1"))
-    if ("text.resample" %in% childNames(canvas$image))
-        canvas$image <- removeGrob(canvas$image, gPath("text.resample"))
+boot1000median <- function(canvas, e, points = FALSE){
+    if ("databox.text.2" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("databox.text.2"))
+    if ("dataPlot.rect.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.rect.1"))
     allx <- c(canvas$stat.dist, recursive = TRUE)
     allinfo <- sapply(canvas$samples, function(x) fivenum(x)[2:4])
     for (i in 50*(1:20)){
         x <- allx[1:i]
         y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
-        plotPoints(canvas, x, y, canvas$graphPath("stat"), "statPlot", black = FALSE, alpha = 0.7)
+        if (points)
+            plotPoints(canvas, x, y, canvas$graphPath("stat"), "statPlot",
+                       black = FALSE, alpha = 0.7)
         canvas$image <- addGrob(canvas$image, ghostsGrob(allinfo[1, 1:i], allinfo[2, 1:i],
                                                          allinfo[3, 1:i], alpha = 0.05,
+                                                         box.color = "lightpink",
                                                          vp = canvas$graphPath("sample"),
                                                          name = "samplePlot.ghosts.1"))
 
@@ -69,4 +69,5 @@ boot1000median <- function(canvas, e){
     #canvas$image <- removeGrob(canvas$image, gPath("statPlot.points.1"))
     ## Reset CI counter
     canvas$sampled.stats <- NULL
+    canvas$plotted.stats <- NULL
 }

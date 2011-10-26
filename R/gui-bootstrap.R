@@ -20,7 +20,7 @@ bootstrapGUIHandler <- function(e){
                           container = e$lower)
     e$redraw.radio <- gradio(c(1, 5, 20, 1000), horizontal=FALSE)
     add(vit.bootbox, e$redraw.radio)
-
+    e$animate.points <- gcheckbox("Animate points", container = e$lower)
     buttons1 <- ggroup(container = e$lower)
     e$clear.stat <- FALSE
     e$points <- FALSE
@@ -29,22 +29,30 @@ bootstrapGUIHandler <- function(e){
                               enabled(e$lower) <- FALSE
                               enabled(e$lowest) <- FALSE
                               if (svalue(e$redraw.radio) == 1000){
-                                  e$clearStatPanel()
+                                  e$clearPanel(panel = "stat")
+                                  e$clearPanel(panel = "sample")
                                   e$c1$handle1000(e, points = FALSE)
                                   enabled(e$lower) <- TRUE
                                   enabled(e$lowest) <- TRUE
                                   enabled(show.ci) <- TRUE
                                   enabled(show.summary) <- TRUE
-                                  e$points <- FALSE
                                   e$clear.stat <- TRUE
+                                  e$clear.sample <- TRUE
+                                  e$points <- FALSE
                               } else {
                                   if (e$clear.stat){
-                                      e$clearStatPanel()
+                                      e$clearPanel("stat")
+                                      e$clearPanel("sample")
                                       e$clear.stat <- FALSE
                                   }
                                   n <- svalue(e$redraw.radio)
                                   for (i in 1:n){
-                                      ##e$c1$animateSample(15, 5, TRUE, TRUE)
+                                      if (n == 1)
+                                          e$c1$animateSample(drop.points = svalue(e$animate.points),
+                                                             n.steps = 10, n.slow = 10)
+                                      if (n == 5)
+                                          e$c1$animateSample(drop.points = FALSE,
+                                                             n.steps = 10, n.slow = 0)
                                       e$c1$plotSample(e)
                                       e$c1$drawImage()
                                       enabled(e$lower) <- TRUE
@@ -69,17 +77,15 @@ bootstrapGUIHandler <- function(e){
                         container = buttons2, handler = function(h, ...) {
                             enabled(e$lower) <- FALSE
                             enabled(e$lowest) <- FALSE
-                            if (e$clear.stat){
-                                e$clearStatPanel()
-                                e$clear.stat <- FALSE
-                            }
                             if (svalue(e$bootstrap.radio) == 1000){
+                                e$clearPanel("stat")
+                                e$clearPanel("sample")
                                 e$c1$handle1000(e, points = TRUE)
                                 enabled(e$lowest) <- TRUE
                                 enabled(show.ci) <- TRUE
                                 enabled(show.summary) <- TRUE
-                                e$clear.stat <- TRUE
                                 e$points <- TRUE
+                                e$clear.stat <- TRUE
                             } else {
                                 n <- svalue(e$bootstrap.radio)
                                 for (i in 1:n){
