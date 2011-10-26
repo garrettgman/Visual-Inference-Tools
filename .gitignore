@@ -4,3 +4,4 @@
 *.log
 *.out
 *.synctex.gz
+*.R~
