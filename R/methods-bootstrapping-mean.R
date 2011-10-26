@@ -100,9 +100,11 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
     y.end <- stackPoints(x, vp = canvas$graphPath("sample")) + 1
     y.step <- (y.end - y.start)/n.steps
     for (i in 1:n){
-        y.text.start <- yunit[min(c(30, index[i] + 1))]
-        y.text.end <- yunit[i + 1]
-        y.text.step <- convertY(y.text.end - y.text.start, "npc", valueOnly = TRUE)/n.steps
+        y.text.start <- yunit[min(c(31, index[i] + 1))]
+        if (i + 1 <= length(yunit)){
+            y.text.end <- yunit[i + 1]
+            y.text.step <- convertY(y.text.end - y.text.start, "npc", valueOnly = TRUE)/n.steps
+        }
         temp.text <- textGrob(label = format(round(x[i], 1), nsmall = 1),
                               y = y.text.start, just = "top",
                               gp = gpar(col = "red", fontface = 2), name = "temp.text",
@@ -132,9 +134,9 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
                                             (x = x[i], y = y.start[i] + j*y.step[i], pch = 19,
                                              vp = vpPath("canvas.all", "canvas.plots",
                                              "canvas.frame", "animation.field"), name = "temp"))
-               }
-                canvas$drawImage()
-                canvas$image <- removeGrob(canvas$image, gPath("temp"))
+                    canvas$drawImage()
+                    canvas$image <- removeGrob(canvas$image, gPath("temp"))
+                } else  canvas$drawImage()
             }
             plotPoints(canvas, x[1:i], y.end[1:i] - 1, canvas$graphPath("sample"),
                        "samplePlot", black = FALSE)
@@ -145,9 +147,22 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
                                     name = "databox.text.2", vp = canvas$graphPath("databox", 2))
             canvas$image <- addGrob(canvas$image, resamp.text)
         } else {
-            resamp.text <- textGrob(label = c("Resample", format(round(x[1:i], 1), nsmall = 1)),
-                                    y = yunit[1:(i + 1)], just = "top", gp = gpar(col = "red"),
-                                    name = "databox.text.2", vp = canvas$graphPath("databox", 2))
+            if (n > 30 & i >= 30){
+                resamp.text <- textGrob(label = c("Resample",
+                                        format(round(x[1:29], 1), nsmall = 1), "..."),
+                                        y = yunit, just = "top", gp = gpar(col = "red"),
+                                        name = "databox.text.2",
+                                        vp = canvas$graphPath("databox", 2))
+            } else {
+                resamp.text <- textGrob(label = c("Resample",
+                                        format(round(x[1:i], 1),
+                                               nsmall = 1)),
+                                        y = yunit[1:(i + 1)],
+                                        just = "top",
+                                        gp = gpar(col = "red"),
+                                        name = "databox.text.2",
+                                        vp = canvas$graphPath("databox",
+                                        2)) }
             canvas$image <- addGrob(canvas$image, resamp.text)
             plotPoints(canvas, x[1:i], y.end[1:i] - 1, canvas$graphPath("sample"),
                        "samplePlot", black = FALSE)
