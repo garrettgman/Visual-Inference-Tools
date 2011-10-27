@@ -3,7 +3,7 @@ load_bootstrap_mean <- function(e){
     PLOT_SAMPLE <<- plotSamplePointsAndBoxplotGhostMean
     SHOW_LABELS <<- bootLabels
     CALC_STAT <<- c("mean" = mean, "median" = median)[[svalue(e$stat)]]
-    PLOT_DATA_STAT <<- lineOnBoxplot
+    PLOT_DATA_STAT <<- lineOnBoxplotMean
     PLOT_SAMPLE_STAT <<- notYetImplemented
     PLOT_STAT_DIST <<- plotBootDist
     ANIMATE_SAMPLE <<- moveDataTextAndDropPoints
@@ -34,7 +34,7 @@ bootLabels <- function(canvas){
     canvas$image <- addGrob(canvas$image, bootlabels)
 }
 
-lineOnBoxplot <- function(canvas, e){
+lineOnBoxplotMean <- function(canvas, e){
 
    plotBoxplot(canvas, canvas$x, stat = mean, stat.color = "purple3",
                canvas$graphPath("data"), "dataPlot")
@@ -272,19 +272,18 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
         ## Plot CI.
         lines <- segmentsGrob(x0 = unit(ci, "native"), x1 = unit(ci, "native"),
                               y0 = unit(0.15, "npc"), y1 = unit(-1, "lines") - unit(1, "lines"),
-                              gp = gpar(lwd = 2, col = "red"), arrow = arrow(length = unit(0.1, "inches")),
-                              vp = vp, name = "statPlot.lines.1")
+                              gp = gpar(col = "red"), arrow = arrow(length = unit(0.1, "inches")),
+                               name = "statPlot.lines.1")
         text1 <- textGrob(label = format(ci[1], nsmall = 1), x = unit(ci[1], "native"),
                           y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top",
-                          vp = vp, name = "statPlot.text1.1")
+                           name = "statPlot.text1.1")
         text2 <- textGrob(label = format(ci[2], nsmall = 1), x = unit(ci[2], "native"),
-                          y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top",
-                          vp = vp, name = "statPlot.text2.1")
+                          y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top", name = "statPlot.text2.1")
         permCI <- rectGrob(x = unit(ci[1], "native"), y = unit(0.15, "npc"),
                            height = unit(0.01, "npc"), width = unit(diff(ci), "native"),
-                           just = c("left", "centre"), vp = vp,
+                           just = c("left", "centre"),
                            gp = gpar(col = "red", fill = "red"), name = "statPlot.rect.1")
-        ciGrob <- grobTree(permCI, lines, text1, text2, name = "statPlot.ci.1")
+        ciGrob <- grobTree(permCI, lines, text1, text2, name = "statPlot.ci.1", vp = vp)
         canvas$image <- addGrob(canvas$image, ciGrob)
         canvas$drawImage()
         ## Animate CI.
@@ -319,6 +318,21 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
                                                        gp = gpar(col = "red", fill = "red"),
                                                        name = "dataPlot.rect.1"))
         canvas$image <- removeGrob(canvas$image, gPath("temp"))
+        canvas$pauseImage(5)
+        ## Fade sample and stat plots out
+        canvas$image <- addGrob(canvas$image, rectGrob
+                                (x = unit(0.5, "npc"), y = unit(2/3, "npc") - unit(1, "lines"),
+                                 width = unit(1, "npc"), height = unit(2/3, "npc") - unit(1, "lines"),
+                                 just = "top",
+                                  gp = gpar(col = "white", fill = "white", alpha = 0.75),
+                                 vp = vpPath("canvas.all", "canvas.plots"),
+                                 name = "fadebox"))
+        canvas$image <- addGrob(canvas$image, grobTree(permCI, lines, text1, text2, name = "dataPlot.ci.1",
+                                                       vp = canvas$graphPath("data")))
+        canvas$drawImage()
+        canvas$image <- removeGrob(canvas$image, gPath("fadebox"))
+        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
+
     } else {
         ## Summary stats code.
         x <- c(canvas$stat.dist, recursive = TRUE)

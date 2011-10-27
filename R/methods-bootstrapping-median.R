@@ -3,7 +3,7 @@ load_bootstrap_median <- function(e){
     PLOT_SAMPLE <<- plotSamplePointsAndBoxplotGhostMedian
     SHOW_LABELS <<- bootLabels
     CALC_STAT <<- c("mean" = mean, "median" = median)[[svalue(e$stat)]]
-    PLOT_DATA_STAT <<- c("mean" = addMeanLine, "median" = addMedianLine)[[svalue(e$stat)]]
+    PLOT_DATA_STAT <<- lineOnBoxplotMedian
     PLOT_SAMPLE_STAT <<- notYetImplemented
     PLOT_STAT_DIST <<- plotBootDist
     ANIMATE_SAMPLE <<- moveDataTextAndDropPoints
@@ -41,6 +41,11 @@ plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
                                                        name = "databox.text.2",
                                                        gp = gpar(col = "red"),
                                                        vp = canvas$graphPath("databox", 2)))
+}
+
+lineOnBoxplotMedian <- function(canvas, e){
+   plotBoxplot(canvas, canvas$x, stat = median, stat.color = "purple3",
+               canvas$graphPath("data"), "dataPlot")
 }
 
 boot1000median <- function(canvas, e, points = FALSE){
