@@ -76,15 +76,21 @@ CIGUIHandler <- function(e){
                               enabled(e$lower) <- FALSE
                               loaded_check(e)
                               n <- svalue(e$redraw.radio)
+                              pause = 0
                               for (i in 1:n) {
                                   if (e$advance) e$c1$advanceWhichSample()
-                                  if (n == 1)
+                                  if (n == 1){
                                       e$c1$animateSample(15, 5, TRUE, TRUE)
-                                  if (n == 5)
+                                      pause = 10
+                                  }
+                                  if (n == 5){
                                       e$c1$animateSample(15, 0, TRUE, TRUE)
+                                      pause = 10
+                                  }
                                   if (n == 20)
                                       e$c1$animateSample(15, 0, TRUE, FALSE)
                                   e$c1$plotSample(e)
+                                  e$c1$pauseImage(pause)
                                   e$c1$plotSampleStat(e)
                                   e$c1$showLabels()
                                   if (n == 5) e$c1$pauseImage(15) else e$c1$drawImage()

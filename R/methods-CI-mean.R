@@ -21,6 +21,8 @@ load_CI_mean <- function(e) {
 }
 
 plotSamplePointsAndBoxplotMean <- function(canvas, e, i) {
+    if ("samplePlot.stat.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.stat.1")))
     bluecol <- "blue"
     if (e$cb) bluecol <- dichromat(bluecol)
     x <- canvas$samples[[i]]
@@ -144,7 +146,7 @@ plotCI <- function(canvas, e, i) {
                                      height = unit(0.015, "native"),
                                      gp = gpar(col = orangecol,
                                      fill = orangecol), vp = canvas$graphPath("sample"),
-                                     name = "sample.stat"))
+                                     name = "samplePlot.stat.1"))
 }
 
 plotCIDistMean <- function(canvas, e) {
@@ -204,8 +206,8 @@ dropPoints1d <- function(canvas, n.steps, n.slow, keep.plot, move = TRUE) {
             canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.boxplot.1")))
         if ("samplePlot.boxplot" %in% childNames(canvas$image))
             canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.boxplot")))
-        if ("sample.stat" %in% childNames(canvas$image))
-            canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
+        if ("samplePlot.stat.1" %in% childNames(canvas$image))
+            canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.stat.1")))
     }
     index <- canvas$indexes[[canvas$which.sample]]
     x <- canvas$x[index]
@@ -251,10 +253,9 @@ dropCI <- function(canvas, e, n.steps) {
     orangecol <- "#FF7F00"
     if (e$cb) orangecol <- dichromat(orangecol)
     canvas$drawImage()
-    stat.grob <- getGrob(canvas$image, gPath(c("sample.stat")))
+    stat.grob <- getGrob(canvas$image, gPath(c("samplePlot.stat.1")))
     grob.width <- stat.grob$width
     grob.x <- stat.grob$x
-    #canvas$image <- removeGrob(canvas$image, gPath(c("sample.stat")))
 
     y.start <- 1.2
     y.end <- .02 * min(length(canvas$sampled.stats) + 1, 41)

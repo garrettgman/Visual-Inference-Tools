@@ -152,7 +152,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 	},
         pauseImage = function(pause = 1) {
             'Same as drawImage but pauses animation'
-            for (i in 1:pause){
+            for (i in rep(1, pause)){
                 grid.newpage()
                 grid.draw(image)
             }
