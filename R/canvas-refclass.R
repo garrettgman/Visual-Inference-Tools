@@ -131,7 +131,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
                                       just = c("left", "bottom"),
                                       gp = gpar(col = "gray40", fill = "gray95", lwd = 2),
                                       vp = graphPath("databox", 2))
-            text.sample <- datatextGrob(data = x, title = "Sample", name = "text.sample",
+            text.sample <- datatextGrob(data = x, title = "Sample", max = 50, name = "text.sample",
                                      vp = graphPath("databox", 1))
             image <<- addGrob(image, databox1)
             image <<- addGrob(image, databox2)

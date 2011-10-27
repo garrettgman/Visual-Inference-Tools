@@ -12,15 +12,24 @@ bootstrapGUIHandler <- function(e){
                 e$c1$makeSamples(e$replace)
                 e$c1$makeStatistics()
                 e$c1$showLabels()
+                e$c1$plotDataStat(e)
                 e$c1$drawImage()
                 enabled(e$lower) <- TRUE
             })
     vit.resamp <- glabel("Resampling", container = e$lower)
     vit.bootbox <- gframe("Number of repetitions",
                           container = e$lower)
-    e$redraw.radio <- gradio(c(1, 5, 20, 1000), horizontal=FALSE)
+    e$redraw.radio <- gradio(c(1, 5, 20, 1000), horizontal=FALSE,
+                             handler = function(h, ...){
+                                 if (svalue(e$redraw.radio) == 1){
+                                     enabled(e$animate.points) <- TRUE
+                                     } else {
+                                         svalue(e$animate.points) <- FALSE
+                                         enabled(e$animate.points) <- FALSE
+                                         }
+                                 })
     add(vit.bootbox, e$redraw.radio)
-    e$animate.points <- gcheckbox("Animate points", container = e$lower)
+    e$animate.points <- gcheckbox("Animate points and track sample", container = e$lower)
     buttons1 <- ggroup(container = e$lower)
     e$clear.stat <- FALSE
     e$points <- FALSE
@@ -77,6 +86,11 @@ bootstrapGUIHandler <- function(e){
                         container = buttons2, handler = function(h, ...) {
                             enabled(e$lower) <- FALSE
                             enabled(e$lowest) <- FALSE
+                            if (e$clear.stat){
+                                e$clearPanel("stat")
+                                e$clearPanel("sample")
+                                e$clear.stat <- FALSE
+                            }
                             if (svalue(e$bootstrap.radio) == 1000){
                                 e$clearPanel("stat")
                                 e$clearPanel("sample")

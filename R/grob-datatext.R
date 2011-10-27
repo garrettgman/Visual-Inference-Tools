@@ -15,18 +15,18 @@ grid.datatext <- function(...)
 #' @param gp graphical parameters for the text, constructed with gpar().
 #' @param vp a default viewport to be used when drawing the grob.
 
-datatextGrob <- function(data, title = NULL, name = NULL, gp = NULL, vp = NULL){
+datatextGrob <- function(data, title = NULL, max = 30, name = NULL, gp = NULL, vp = NULL){
     n <- length(data)
-    if (n <= 30){
+    if (n <= max){
         ntext <- n
         datalabs <- c(title, format(round(data, 1), nsmall = 1))
     } else {
-        ntext <- 30
-        datalabs <- c(title, format(round(data[1:29], 1), nsmall = 1), "...")
+        ntext <- max
+        datalabs <- c(title, format(round(data[1:(max - 1)], 1), nsmall = 1), "...")
     }
     npcs <- (ntext:0)/ntext
     yunit <- unit(npcs, "npc") - unit(4*(npcs - 0.5), "mm") + unit(1 - npcs, "lines")
-    grob(data = data, datalabs = datalabs, yunit = yunit,
+    grob(data = data, datalabs = datalabs, yunit = yunit, max = max,
          name = name, gp = gp, vp = vp, cl = "datatext")
 }
 
@@ -46,6 +46,8 @@ vaildDetails.datatext <- function(x){
         stop("data must be provided as a vector")
     if (length(x$title) != 1)
         stop("title should be a vector of length 1")
+    if (!is.numeric(x$max) | length(x$max) != 1 | x$max < 1)
+        stop("max should be a numeric vector of length 1")
 }
 
 grid.datatext.example <- function(data = rnorm(100), title = "X", name = "datatext.example")
