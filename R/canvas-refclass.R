@@ -75,6 +75,10 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Displays the final result of the VIT simulation.'
 		DISPLAY_RESULT(.self, env, ...)
 	},
+        fadePlots = function(env, ...) {
+            'Fades plots to emphasize those that are remaining'
+            FADE_PLOTS(.self, env, ...)
+        },
 	handle1000 = function(env, ...) {
 		'Runs simulation that uses all 1000 pre-calculated samples.'
 		HANDLE_1000(.self, env, ...)
@@ -91,9 +95,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Retreives and plots the next sample.'
 		PLOT_SAMPLE(.self, env, i)
 	},
-	plotSampleStat = function(env, i = which.sample) {
+	plotSampleStat = function(env, i = which.sample, ...) {
 		'Plots the sample statistic with the sample.'
-		PLOT_SAMPLE_STAT(.self, env, i)
+		PLOT_SAMPLE_STAT(.self, env, i, ...)
 	},
 	plotStatDist = function(env) {
 		'Plots the distribution of the sample statistic.'

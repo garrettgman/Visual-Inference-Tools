@@ -20,6 +20,10 @@ ANIMATE_SAMPLE <- function(canvas)
 CALC_STAT <- function(canvas)
 	warning("CALC_STAT details must be set by loadDetails()")
 
+#' Method used to fade plots in order emphasize those remaining
+FADE_PLOTS <- function(canvas)
+    warning("FADE_PLOTS details must be set by loadDetails()")
+
 #' Creates a plot of the data parameter
 PLOT_DATA_STAT <- function(canvas)
 	warning("PLOT_STAT details must be set by loadDetails()")
@@ -67,6 +71,9 @@ clear_actions <- function(e) {
 
 	CALC_STAT <<- function(canvas)
 		warning("CALC_STAT details must be set by loadDetails()")
+
+        FADE_PLOTS <<- function(canvas)
+            warning("FADE_PLOTS details must be set by loadDetails()")
 
 	PLOT_DATA_STAT <<- function(canvas)
 		warning("PLOT_STAT details must be set by loadDetails()")

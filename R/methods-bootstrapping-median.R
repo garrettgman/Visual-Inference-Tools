@@ -10,7 +10,7 @@ load_bootstrap_median <- function(e){
     ANIMATE_STAT <<- dropStat
     DISPLAY_RESULT <<- showCIandStats
     HANDLE_1000 <<- boot1000median
-    e$plotted <- NULL
+    FADE_PLOTS <<- fadeSampleAndStat
 }
 
 plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
