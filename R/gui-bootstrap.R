@@ -97,6 +97,7 @@ bootstrapGUIHandler <- function(e){
                                 e$c1$handle1000(e, points = TRUE)
                                 enabled(e$lowest) <- TRUE
                                 enabled(show.ci) <- TRUE
+                                enabled(fade.plots) <- FALSE
                                 enabled(show.summary) <- TRUE
                                 e$points <- TRUE
                                 e$clear.stat <- TRUE
@@ -114,22 +115,32 @@ bootstrapGUIHandler <- function(e){
                         })
 
     addSpace(e$lower, 10, horizontal = FALSE)
-
     e$lowest <- ggroup(horizontal = FALSE, container = e$lower, expand = TRUE)
-    show.ci <- gbutton(text = "Show confidence interval", expand = TRUE,
-                         container = e$lowest, handler = function(h, ...){
-                             enabled(e$lower) <- FALSE
-                             enabled(e$lowest) <- FALSE
-                             e$c1$displayResult(e, ci = TRUE, points = e$points)
-                             enabled(e$lower) <- TRUE
-                             enabled(e$lowest) <- TRUE
-                             enabled(show.ci) <- FALSE
-                             enabled(show.summary) <- FALSE
-                             })
+    ci.layout <- ggroup(horizontal = TRUE, container = e$lowest, expand = TRUE)
+    show.ci <- gbutton(text = "Show CI", expand = TRUE,
+                                          container = ci.layout, handler = function(h, ...){
+                                              enabled(e$lower) <- FALSE
+                                              enabled(e$lowest) <- FALSE
+                                              e$c1$displayResult(e, ci = TRUE, points = e$points)
+                                              enabled(e$lower) <- TRUE
+                                              enabled(e$lowest) <- TRUE
+                                              enabled(show.ci) <- FALSE
+                                              enabled(fade.plots) <- TRUE
+                                              e$fade <- TRUE
+                                              e$summary.shown <- FALSE
+                                          })
+    fade.plots <- gbutton(text = "Fade on/off", expand = TRUE, container = ci.layout,
+                                             handler = function(h, ...){
+                                                 if (e$fade) e$c1$fadePlots() else e$c1$drawImage()
+                                                 enabled(show.summary) <- FALSE
+                                                 e$fade <- !e$fade
+                                                 enabled(show.summary) <- e$fade & !e$summary.shown
+                                             })
     show.summary <- gbutton(text = "Show summary statistics", expand = TRUE,
                             container = e$lowest, handler = function(h, ...){
                                 e$c1$displayResult(e, ci = FALSE, points = e$points)
                                 enabled(show.summary) <- FALSE
+                                e$summary.shown <- TRUE
                                 })
     enabled(e$lowest) <- FALSE
 }

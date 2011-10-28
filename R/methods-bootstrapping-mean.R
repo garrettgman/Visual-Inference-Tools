@@ -10,6 +10,7 @@ load_bootstrap_mean <- function(e){
     ANIMATE_STAT <<- dropStat
     DISPLAY_RESULT <<- showCIandStats
     HANDLE_1000 <<- boot1000mean
+    FADE_PLOTS <<- fadeSampleAndStat
 }
 bootLabels <- function(canvas){
     samplabel <- textGrob("Sample",
@@ -84,7 +85,6 @@ plotBootDist <- function(canvas, e){
     plotPoints(canvas, x, y, canvas$graphPath("stat"), "statPlot", black = FALSE)
 }
 
-## Very messy function. Would pay to clean up.
 moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10, n.slow = 5, max = 50){
     if ("databox.text.2" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath("databox.text.2"))
@@ -107,76 +107,127 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
     y.start <- y + 2
     y.end <- stackPoints(x, vp = canvas$graphPath("sample")) + 1
     y.step <- (y.end - y.start)/n.steps
-    for (i in 1:n){
+
+    ## Animation of slow points.
+    for (i in seq(from = 1, by = 1, length.out = n.slow)){
         y.text.start <- yunit[min(c(max + 1, index[i] + 1))]
-        if (i + 1 <= length(yunit)){
-            y.text.end <- yunit[i + 1]
-            y.text.step <- convertY(y.text.end - y.text.start, "npc", valueOnly = TRUE)/n.steps
-        }
+        y.text.end <- yunit[i + 1]
+        y.text.step <- convertY(y.text.end - y.text.start, "npc", valueOnly = TRUE)/n.steps
         temp.text <- textGrob(label = format(round(x[i], 1), nsmall = 1),
                               y = y.text.start, just = "top",
                               gp = gpar(col = "red", fontface = 2), name = "temp.text",
                               vp = canvas$graphPath("databox", 1))
-        canvas$image <- addGrob(canvas$image, temp.text)
         temp.arrow <- linesGrob(x = c(0.9, 0.8),
                                 y = y.text.start - unit(0.5, "lines"),
                                 gp = gpar(lwd = 3, col = "red"),
                                 arrow = arrow(length = unit(0.1, "inches")), name = "temp.arrow",
                                 vp = canvas$graphPath("databox", 1))
-        temp.point <- pointsGrob(x = x[i], y = (canvas$y[index])[i], pch = 19,
-                                 vp = canvas$graphPath("data"), name = "temp.point")
-        canvas$image <- addGrob(canvas$image, temp.arrow)
-        canvas$image <- addGrob(canvas$image, temp.point)
-        if (i <= n.slow){
-            canvas$pauseImage(5)
-            for (j in 1:n.steps){
-                canvas$image <- addGrob(canvas$image, textGrob
-                                        (label = format(round(x[i], 1), nsmall = 1),
-                                         y = y.text.start + unit(j*y.text.step, "npc"),
-                                         x = unit(x.text.start + j*x.text.step, "npc"),
-                                         just = "top", gp = gpar(col = "red", fontface = 2),
-                                         name = "temp.text",
-                                         vp = vpPath("canvas.all", "canvas.boxes")))
-               if (drop.points){
-                    canvas$image <- addGrob(canvas$image, pointsGrob
-                                            (x = x[i], y = y.start[i] + j*y.step[i], pch = 19,
-                                             vp = vpPath("canvas.all", "canvas.plots",
-                                             "canvas.frame", "animation.field"), name = "temp"))
-                    canvas$drawImage()
-                    canvas$image <- removeGrob(canvas$image, gPath("temp"))
-                } else  canvas$drawImage()
-            }
-            plotPoints(canvas, x[1:i], y.end[1:i] - 1, canvas$graphPath("sample"),
-                       "samplePlot", black = FALSE)
-            canvas$pauseImage(5)
-            canvas$image <- removeGrob(canvas$image, gPath("temp.text"))
-            resamp.text <- textGrob(label = c("Resample", format(round(x[1:i], 1), nsmall = 1)),
-                                    y = yunit[1:(i + 1)], just = "top", gp = gpar(col = "red"),
-                                    name = "databox.text.2", vp = canvas$graphPath("databox", 2))
-            canvas$image <- addGrob(canvas$image, resamp.text)
-        } else {
-            if (n > max & i >= max){
-                resamp.text <- textGrob(label = c("Resample",
-                                        format(round(x[1:(max - 1)], 1), nsmall = 1), "..."),
-                                        y = yunit, just = "top", gp = gpar(col = "red"),
-                                        name = "databox.text.2",
-                                        vp = canvas$graphPath("databox", 2))
-            } else {
-                resamp.text <- textGrob(label = c("Resample",
-                                        format(round(x[1:i], 1),
-                                               nsmall = 1)),
-                                        y = yunit[1:(i + 1)],
-                                        just = "top",
-                                        gp = gpar(col = "red"),
-                                        name = "databox.text.2",
-                                        vp = canvas$graphPath("databox",
-                                        2)) }
-            canvas$image <- addGrob(canvas$image, resamp.text)
-            plotPoints(canvas, x[1:i], y.end[1:i] - 1, canvas$graphPath("sample"),
-                       "samplePlot", black = FALSE)
-            canvas$pauseImage(5)
+        ## Light up point to drop
+        if (drop.points){
+            temp.point <- pointsGrob(x = x[i], y = (canvas$y[index])[i], pch = 19,
+                                     vp = canvas$graphPath("data"), name = "temp.point")
+            canvas$image <- addGrob(canvas$image, temp.point)
         }
+        canvas$image <- addGrob(canvas$image, temp.text)
+        canvas$image <- addGrob(canvas$image, temp.arrow)
+        canvas$pauseImage(5)
+        for (j in 1:n.steps){
+            ## Move text
+            canvas$image <- addGrob(canvas$image, textGrob
+                                    (label = format(round(x[i], 1), nsmall = 1),
+                                     y = y.text.start + unit(j*y.text.step, "npc"),
+                                     x = unit(x.text.start + j*x.text.step, "npc"),
+                                     just = "top", gp = gpar(col = "red", fontface = 2),
+                                     name = "temp.text",
+                                     vp = vpPath("canvas.all", "canvas.boxes")))
+            ## Drop point
+            if (drop.points){
+                canvas$image <- addGrob(canvas$image, pointsGrob
+                                        (x = x[i], y = y.start[i] + j*y.step[i], pch = 19,
+                                         vp = vpPath("canvas.all", "canvas.plots",
+                                         "canvas.frame", "animation.field"), name = "temp"))
+            }
+            canvas$drawImage()
+            if (j == n.steps & drop.points)
+                canvas$image <- removeGrob(canvas$image, gPath("temp"))
+        }
+        ## Make points permanent if dropping
+        if (drop.points)
+            plotPoints(canvas, x[1:i], y.end[1:i] - 1, canvas$graphPath("sample"),
+                       "samplePlot", black = FALSE)
+        canvas$pauseImage(5)
+        ## Make text in resample databox permanent
+        canvas$image <- removeGrob(canvas$image, gPath("temp.text"))
+        resamp.text <- textGrob(label = c("Resample", format(round(x[1:i], 1), nsmall = 1)),
+                                y = yunit[1:(i + 1)], just = "top", gp = gpar(col = "red"),
+                                name = "databox.text.2", vp = canvas$graphPath("databox", 2))
+        canvas$image <- addGrob(canvas$image, resamp.text)
     }
+    ## Animation of fast points.
+    if (n == ntext) length.out <- ntext - n.slow else length.out <- ntext - n.slow - 1
+    for (i in seq(from = n.slow + 1, by = 1, length.out = length.out)){
+        y.text.start <- yunit[min(c(max + 1, index[i] + 1))]
+        temp.text <- textGrob(label = format(round(x[i], 1), nsmall = 1),
+                              y = y.text.start, just = "top",
+                              gp = gpar(col = "red", fontface = 2), name = "temp.text",
+                              vp = canvas$graphPath("databox", 1))
+        temp.arrow <- linesGrob(x = c(0.9, 0.8),
+                                y = y.text.start - unit(0.5, "lines"),
+                                gp = gpar(lwd = 3, col = "red"),
+                                arrow = arrow(length = unit(0.1, "inches")), name = "temp.arrow",
+                                vp = canvas$graphPath("databox", 1))
+        ## Light up point to drop.
+        if (drop.points){
+            temp.point <- pointsGrob(x = x[i], y = (canvas$y[index])[i], pch = 19,
+                                     vp = canvas$graphPath("data"), name = "temp.point")
+            canvas$image <- addGrob(canvas$image, temp.point)
+        }
+        resamp.text <- textGrob(label = c("Resample", format(round(x[1:i], 1), nsmall = 1)),
+                                y = yunit[1:(i + 1)], just = "top", gp = gpar(col = "red"),
+                                name = "databox.text.2", vp = canvas$graphPath("databox", 2))
+        canvas$image <- addGrob(canvas$image, temp.text)
+        canvas$image <- addGrob(canvas$image, temp.arrow)
+        canvas$image <- addGrob(canvas$image, resamp.text)
+        ## Plot dropped point.
+        if (drop.points)
+            plotPoints(canvas, x[1:i], y.end[1:i] - 1, canvas$graphPath("sample"),
+                       "samplePlot", black = FALSE)
+        canvas$pauseImage(5)
+    }
+    ## Animation of points outside databox.
+    for (i in seq(from = ntext, by = 1, length.out = n - ntext)){
+        y.text.start <- yunit[min(c(max + 1, index[i] + 1))]
+        temp.text <- textGrob(label = format(round(x[i], 1), nsmall = 1),
+                              y = y.text.start, just = "top",
+                              gp = gpar(col = "red", fontface = 2), name = "temp.text",
+                              vp = canvas$graphPath("databox", 1))
+        temp.arrow <- linesGrob(x = c(0.9, 0.8),
+                                y = y.text.start - unit(0.5, "lines"),
+                                gp = gpar(lwd = 3, col = "red"),
+                                arrow = arrow(length = unit(0.1, "inches")), name = "temp.arrow",
+                                vp = canvas$graphPath("databox", 1))
+        ## Light up point to drop.
+        if (drop.points){
+            temp.point <- pointsGrob(x = x[i], y = (canvas$y[index])[i], pch = 19,
+                                     vp = canvas$graphPath("data"), name = "temp.point")
+            canvas$image <- addGrob(canvas$image, temp.point)
+        }
+        resamp.text <- textGrob(label = c("Resample",
+                                format(round(x[1:(ntext - 1)], 1), nsmall = 1), "..."),
+                                y = yunit, just = "top", gp = gpar(col = "red"),
+                                name = "databox.text.2",
+                                vp = canvas$graphPath("databox", 2))
+        canvas$image <- addGrob(canvas$image, temp.text)
+        canvas$image <- addGrob(canvas$image, temp.arrow)
+        canvas$image <- addGrob(canvas$image, resamp.text)
+        ## Plot dropped point.
+        if (drop.points)
+            plotPoints(canvas, x[1:i], y.end[1:i] - 1, canvas$graphPath("sample"),
+                       "samplePlot", black = FALSE)
+        canvas$pauseImage(5)
+    }
+    plotPoints(canvas, x, y.end - 1, canvas$graphPath("sample"),
+               "samplePlot", black = FALSE)
     canvas$image <- addGrob(canvas$image, linesGrob
                             (x = unit(canvas$stat.dist[canvas$which.sample], "native"),
                              y = unit(c(0.05, 0.5), "npc"), gp = gpar(lwd = 4, col = "blue"),
@@ -184,9 +235,9 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
     canvas$pauseImage(10)
     canvas$image <- removeGrob(canvas$image, gPath("temp.text"))
     canvas$image <- removeGrob(canvas$image, gPath("temp.arrow"))
-    canvas$image <- removeGrob(canvas$image, gPath("temp.point"))
+    if (drop.points)
+        canvas$image <- removeGrob(canvas$image, gPath("temp.point"))
 }
-
 
 
 
@@ -318,19 +369,10 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
                                                        gp = gpar(col = "red", fill = "red"),
                                                        name = "dataPlot.rect.1"))
         canvas$image <- removeGrob(canvas$image, gPath("temp"))
-        canvas$pauseImage(5)
-        ## Fade sample and stat plots out
-        canvas$image <- addGrob(canvas$image, rectGrob
-                                (x = unit(0.5, "npc"), y = unit(2/3, "npc") - unit(1, "lines"),
-                                 width = unit(1, "npc"), height = unit(2/3, "npc") - unit(1, "lines"),
-                                 just = "top",
-                                  gp = gpar(col = "white", fill = "white", alpha = 0.75),
-                                 vp = vpPath("canvas.all", "canvas.plots"),
-                                 name = "fadebox"))
-        canvas$image <- addGrob(canvas$image, grobTree(permCI, lines, text1, text2, name = "dataPlot.ci.1",
+        canvas$image <- addGrob(canvas$image, grobTree(permCI, lines, text1, text2,
+                                                       name = "dataPlot.ci.1",
                                                        vp = canvas$graphPath("data")))
         canvas$drawImage()
-        canvas$image <- removeGrob(canvas$image, gPath("fadebox"))
         canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
 
     } else {
@@ -370,4 +412,17 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
         canvas$image <- addGrob(canvas$image,  summarytext)
         canvas$drawImage()
     }
+}
+
+fadeSampleAndStat <- function(canvas, e){
+        canvas$image <- addGrob(canvas$image, rectGrob
+                                (x = unit(0.5, "npc"), y = unit(2/3, "npc") - unit(1, "lines"),
+                                 width = unit(1, "npc"),
+                                 height = unit(2/3, "npc") - unit(1, "lines"),
+                                 just = "top",
+                                 gp = gpar(col = "white", fill = "white", alpha = 0.75),
+                                 vp = vpPath("canvas.all", "canvas.plots"),
+                                 name = "fadebox"))
+        canvas$drawImage()
+        canvas$image <- removeGrob(canvas$image, gPath("fadebox"))
 }
