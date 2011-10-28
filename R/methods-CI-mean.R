@@ -135,9 +135,17 @@ addMeanLine <- function(canvas, e) {
     }
 }
 
-plotCI <- function(canvas, e, i) {
+plotCI <- function(canvas, e, i, pause) {
     orangecol <- "#FF7F00"
-    if (e$cb) orangecol <- dichromat(orangecol)
+    if (pause){
+        ciCalcLabel <- textGrob("Calculating CI...", x = unit(1, "npc") - unit(1, "cm"),
+                                y = unit(0.8, "npc"), just = c("right", "top"),
+                                vp = canvas$graphPath("sample"), gp = gpar(fontface = 2),
+                                name = "ciCalcLabel")
+        canvas$image <- addGrob(canvas$image, ciCalcLabel)
+        canvas$pauseImage(10)
+        canvas$image <- removeGrob(canvas$image, gPath("ciCalcLabel"))
+    }
     bounds <- canvas$stat.dist[[i]]
     x <- mean(bounds)
     canvas$image <- addGrob(canvas$image,
