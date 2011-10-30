@@ -42,8 +42,8 @@ lineOnBoxplotMean <- function(canvas, e){
 }
 
 plotSamplePointsAndBoxplotGhostMean <- function(canvas, e, i){
-    if ("dataPlot.rect.1" %in% childNames(canvas$image))
-        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.rect.1"))
+    if ("dataPlot.ci.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
     if ("samplePlot.rect.1" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath("samplePlot.rect.1"))
     bluecol <- "blue"
@@ -86,6 +86,8 @@ plotBootDist <- function(canvas, e){
 }
 
 moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10, n.slow = 5, max = 50){
+    if ("dataPlot.ci.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
     if ("databox.text.2" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath("databox.text.2"))
     if ("samplePlot.points.1" %in% childNames(canvas$image))
@@ -269,8 +271,8 @@ dropStat <- function(canvas, e, n.steps){
 boot1000mean <- function(canvas, e, points = FALSE){
     if ("databox.text.2" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath("databox.text.2"))
-    if ("dataPlot.rect.1" %in% childNames(canvas$image))
-        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.rect.1"))
+    if ("dataPlot.ci.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
     allx <- c(canvas$stat.dist, recursive = TRUE)
     allinfo <- c(canvas$stat.dist, recursive = TRUE)
     for (i in 20*(1:50)){
@@ -300,8 +302,8 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
     if (points) vp <- canvas$graphPath("stat") else vp <- canvas$graphPath("sample")
     if (ci){
         ## CI code.
-        if ("dataPlot.rect.1" %in% childNames(canvas$image))
-            canvas$image <- removeGrob(canvas$image, gPath("dataPlot.rect.1"))
+        if ("dataPlot.ci.1" %in% childNames(canvas$image))
+            canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
         x <- c(canvas$stat.dist, recursive = TRUE)
         ci <- round(quantile(x, prob = c(0.025, 0.975)), 1)
         start <- 5
@@ -360,14 +362,6 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
                                                        name = "samplePlot.rect.1"))
             }
         }
-        canvas$image <- addGrob(canvas$image, rectGrob(x = unit(ci[1], "native"),
-                                                       y = unit(0.15, "npc"),
-                                                       height = unit(0.01, "npc"),
-                                                       width = unit(diff(ci), "native"),
-                                                       just = c("left", "centre"), vp =
-                                                       canvas$graphPath("data"),
-                                                       gp = gpar(col = "red", fill = "red"),
-                                                       name = "dataPlot.rect.1"))
         canvas$image <- removeGrob(canvas$image, gPath("temp"))
         canvas$image <- addGrob(canvas$image, grobTree(permCI, lines, text1, text2,
                                                        name = "dataPlot.ci.1",
@@ -415,14 +409,33 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
 }
 
 fadeSampleAndStat <- function(canvas, e){
-        canvas$image <- addGrob(canvas$image, rectGrob
-                                (x = unit(0.5, "npc"), y = unit(2/3, "npc") - unit(1, "lines"),
-                                 width = unit(1, "npc"),
-                                 height = unit(2/3, "npc") - unit(1, "lines"),
-                                 just = "top",
-                                 gp = gpar(col = "white", fill = "white", alpha = 0.75),
-                                 vp = vpPath("canvas.all", "canvas.plots"),
-                                 name = "fadebox"))
-        canvas$drawImage()
-        canvas$image <- removeGrob(canvas$image, gPath("fadebox"))
+    x <- c(canvas$stat.dist, recursive = TRUE)
+    ci <- round(quantile(x, prob = c(0.025, 0.975)), 1)
+    canvas$image <- addGrob(canvas$image, rectGrob
+                            (x = unit(0.5, "npc"), y = unit(2/3, "npc") - unit(1, "lines"),
+                             width = unit(1, "npc"),
+                             height = unit(2/3, "npc") - unit(1, "lines"),
+                             just = "top",
+                             gp = gpar(col = "white", fill = "white", alpha = 0.75),
+                             vp = vpPath("canvas.all", "canvas.plots"),
+                             name = "fadebox"))
+    lines <- segmentsGrob(x0 = unit(ci, "native"), x1 = unit(ci, "native"),
+                          y0 = unit(0.15, "npc"), y1 = unit(-1, "lines") - unit(1, "lines"),
+                          gp = gpar(col = "red"), arrow = arrow(length = unit(0.1, "inches")),
+                          name = "statPlot.lines.1")
+    text1 <- textGrob(label = format(ci[1], nsmall = 1), x = unit(ci[1], "native"),
+                      y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top",
+                      name = "statPlot.text1.1")
+    text2 <- textGrob(label = format(ci[2], nsmall = 1), x = unit(ci[2], "native"),
+                      y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top",
+                      name = "statPlot.text2.1")
+    permCI <- rectGrob(x = unit(ci[1], "native"), y = unit(0.15, "npc"),
+                       height = unit(0.01, "npc"), width = unit(diff(ci), "native"),
+                       just = c("left", "centre"),
+                       gp = gpar(col = "red", fill = "red"), name = "statPlot.rect.1")
+    canvas$image <- addGrob(canvas$image, grobTree(permCI, lines, text1, text2,
+                                                   name = "dataPlot.ci.1",
+                                                   vp = canvas$graphPath("data")))
+    canvas$drawImage()
+    canvas$image <- removeGrob(canvas$image, gPath("fadebox"))
 }

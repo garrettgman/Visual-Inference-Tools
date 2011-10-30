@@ -135,7 +135,7 @@ addMeanLine <- function(canvas, e) {
     }
 }
 
-plotCI <- function(canvas, e, i, pause) {
+plotCI <- function(canvas, e, i, pause = FALSE) {
     orangecol <- "#FF7F00"
     if (pause){
         ciCalcLabel <- textGrob("Calculating CI...", x = unit(1, "npc") - unit(1, "cm"),

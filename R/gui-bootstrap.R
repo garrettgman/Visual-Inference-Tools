@@ -101,6 +101,7 @@ bootstrapGUIHandler <- function(e){
                                 enabled(show.summary) <- TRUE
                                 e$points <- TRUE
                                 e$clear.stat <- TRUE
+                                e$summary.shown <- FALSE
                             } else {
                                 n <- svalue(e$bootstrap.radio)
                                 for (i in 1:n){
@@ -127,7 +128,6 @@ bootstrapGUIHandler <- function(e){
                                               enabled(show.ci) <- FALSE
                                               enabled(fade.plots) <- TRUE
                                               e$fade <- TRUE
-                                              e$summary.shown <- FALSE
                                           })
     fade.plots <- gbutton(text = "Fade on/off", expand = TRUE, container = ci.layout,
                                              handler = function(h, ...){

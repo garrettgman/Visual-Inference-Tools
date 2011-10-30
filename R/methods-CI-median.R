@@ -21,6 +21,8 @@ load_CI_median <- function(e) {
 }
 
 plotSamplePointsAndBoxplotMedian <- function(canvas, e, i) {
+    if ("samplePlot.stat.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath(c("samplePlot.stat.1")))
     bluecol <- "blue"
     if (e$cb) bluecol <- dichromat(bluecol)
     x <- canvas$samples[[i]]

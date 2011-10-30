@@ -123,7 +123,7 @@ CIGUIHandler <- function(e){
                                             e$c1$animateSample(15, 0, FALSE, FALSE)
                                         }
                                     e$c1$plotSample(e)
-                                    e$c1$plotSampleStat(e)
+                                    e$c1$plotSampleStat(e, pause = FALSE)
                                     if (n != 20) e$c1$pauseImage(15)
                                     if (svalue(e$bootstrap.radio) != 20) e$c1$animateStat(e, 10)
                                     e$c1$plotStatDist(e)

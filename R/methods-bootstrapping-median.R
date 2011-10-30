@@ -14,6 +14,10 @@ load_bootstrap_median <- function(e){
 }
 
 plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
+    if ("dataPlot.ci.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
+    if ("samplePlot.rect.1" %in% childNames(canvas$image))
+        canvas$image <- removeGrob(canvas$image, gPath("samplePlot.rect.1"))
     bluecol <- "blue"
     redcol <- "red"
     if (e$cb){
@@ -41,6 +45,10 @@ plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
                                                        name = "databox.text.2",
                                                        gp = gpar(col = "red"),
                                                        vp = canvas$graphPath("databox", 2)))
+    canvas$image <- addGrob(canvas$image, linesGrob
+                            (x = unit(canvas$stat.dist[i], "native"),
+                             y = unit(c(0.05, 0.5), "npc"), gp = gpar(lwd = 4, col = "blue"),
+                             vp = canvas$graphPath("sample"), name = "samplePlot.lines.1"))
 }
 
 lineOnBoxplotMedian <- function(canvas, e){
