@@ -98,6 +98,7 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
     x <- canvas$x[index]
     y <- canvas$y[index]
     n <- canvas$n
+    if (n < 100){
     n.slow <- min(n.slow, n)
     ## Calculating the position of text in text boxes.
     ntext <- min(n, max)
@@ -240,7 +241,7 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
     if (drop.points)
         canvas$image <- removeGrob(canvas$image, gPath("temp.point"))
 }
-
+}
 
 
 
@@ -278,7 +279,7 @@ boot1000mean <- function(canvas, e, points = FALSE){
     for (i in 20*(1:50)){
         canvas$plotSample(e, i)
         x <- allx[1:i]
-        y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
+        y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9*i/1000)
         if (points)
             plotPoints(canvas, x, y, canvas$graphPath("stat"),
                        "statPlot", black = FALSE, alpha = 0.7)
@@ -323,21 +324,9 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
             canvas$image <- addGrob(canvas$image, points.all)
         }
         ## Plot CI.
-        lines <- segmentsGrob(x0 = unit(ci, "native"), x1 = unit(ci, "native"),
-                              y0 = unit(0.15, "npc"), y1 = unit(-1, "lines") - unit(1, "lines"),
-                              gp = gpar(col = "red"), arrow = arrow(length = unit(0.1, "inches")),
-                               name = "statPlot.lines.1")
-        text1 <- textGrob(label = format(ci[1], nsmall = 1), x = unit(ci[1], "native"),
-                          y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top",
-                           name = "statPlot.text1.1")
-        text2 <- textGrob(label = format(ci[2], nsmall = 1), x = unit(ci[2], "native"),
-                          y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top", name = "statPlot.text2.1")
-        permCI <- rectGrob(x = unit(ci[1], "native"), y = unit(0.15, "npc"),
-                           height = unit(0.01, "npc"), width = unit(diff(ci), "native"),
-                           just = c("left", "centre"),
-                           gp = gpar(col = "red", fill = "red"), name = "statPlot.rect.1")
-        ciGrob <- grobTree(permCI, lines, text1, text2, name = "statPlot.ci.1", vp = vp)
-        canvas$image <- addGrob(canvas$image, ciGrob)
+        canvas$image <- addGrob(canvas$image, confintGrob(ci = ci,
+                                                          name = "statPlot.ci.1",
+                                                          vp = canvas$graphPath("stat")))
         canvas$drawImage()
         ## Animate CI.
         for (i in start:10){
@@ -363,9 +352,9 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
             }
         }
         canvas$image <- removeGrob(canvas$image, gPath("temp"))
-        canvas$image <- addGrob(canvas$image, grobTree(permCI, lines, text1, text2,
-                                                       name = "dataPlot.ci.1",
-                                                       vp = canvas$graphPath("data")))
+        canvas$image <- addGrob(canvas$image, confintGrob(ci = ci,
+                                                          name = "dataPlot.ci.1",
+                                                          vp = canvas$graphPath("data")))
         canvas$drawImage()
         canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
 
@@ -419,23 +408,10 @@ fadeSampleAndStat <- function(canvas, e){
                              gp = gpar(col = "white", fill = "white", alpha = 0.75),
                              vp = vpPath("canvas.all", "canvas.plots"),
                              name = "fadebox"))
-    lines <- segmentsGrob(x0 = unit(ci, "native"), x1 = unit(ci, "native"),
-                          y0 = unit(0.15, "npc"), y1 = unit(-1, "lines") - unit(1, "lines"),
-                          gp = gpar(col = "red"), arrow = arrow(length = unit(0.1, "inches")),
-                          name = "statPlot.lines.1")
-    text1 <- textGrob(label = format(ci[1], nsmall = 1), x = unit(ci[1], "native"),
-                      y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top",
-                      name = "statPlot.text1.1")
-    text2 <- textGrob(label = format(ci[2], nsmall = 1), x = unit(ci[2], "native"),
-                      y = unit(-2, "lines"), gp = gpar(fontface = 2, col = "red"), just = "top",
-                      name = "statPlot.text2.1")
-    permCI <- rectGrob(x = unit(ci[1], "native"), y = unit(0.15, "npc"),
-                       height = unit(0.01, "npc"), width = unit(diff(ci), "native"),
-                       just = c("left", "centre"),
-                       gp = gpar(col = "red", fill = "red"), name = "statPlot.rect.1")
-    canvas$image <- addGrob(canvas$image, grobTree(permCI, lines, text1, text2,
-                                                   name = "dataPlot.ci.1",
-                                                   vp = canvas$graphPath("data")))
+
+    canvas$image <- addGrob(canvas$image, confintGrob(ci = ci,
+                                                 name = "dataPlot.ci.1",
+                                                 vp = canvas$graphPath("data")))
     canvas$drawImage()
     canvas$image <- removeGrob(canvas$image, gPath("fadebox"))
 }

@@ -44,9 +44,11 @@ bootstrapGUIHandler <- function(e){
                                   enabled(e$lower) <- TRUE
                                   enabled(e$lowest) <- TRUE
                                   enabled(show.ci) <- TRUE
+                                  enabled(fade.plots) <- FALSE
                                   enabled(show.summary) <- TRUE
                                   e$clear.stat <- TRUE
                                   e$clear.sample <- TRUE
+                                  e$summary.shown <- FALSE
                                   e$points <- FALSE
                               } else {
                                   if (e$clear.stat){
@@ -99,9 +101,9 @@ bootstrapGUIHandler <- function(e){
                                 enabled(show.ci) <- TRUE
                                 enabled(fade.plots) <- FALSE
                                 enabled(show.summary) <- TRUE
-                                e$points <- TRUE
                                 e$clear.stat <- TRUE
                                 e$summary.shown <- FALSE
+                                e$points <- TRUE
                             } else {
                                 n <- svalue(e$bootstrap.radio)
                                 for (i in 1:n){
