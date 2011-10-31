@@ -28,6 +28,7 @@ Collate:
 	'data-methods-2d-mixed.R'
 	'error-checks.R'
 	'grob-boxplot.R'
+	'grob-ci.R'
 	'grob-datatext.R'
 	'grob-ghosts.R'
 	'grob-hist.R'
