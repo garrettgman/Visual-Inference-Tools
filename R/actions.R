@@ -16,6 +16,10 @@ SHOW_LABELS <- function(canvas)
 ANIMATE_SAMPLE <- function(canvas)
 	warning("ANIMATE_SAMPLE details must be set by loadDetails()")
 
+#' Animated the tracking of a sample (or resample)
+TRACK_SAMPLE <- function(canvas)
+    warning("TRACK_SAMPLE details must be set by loadDetails()")
+
 #' Method used to calculate a single statistic from a single group of observsations
 CALC_STAT <- function(canvas)
 	warning("CALC_STAT details must be set by loadDetails()")
@@ -60,45 +64,48 @@ test_function <- function(canvas)
 
 #' returns all actions to their original empty values, with the exception of PLOT_DETAILS. Since clear_actions() is only called when a new variable is added,  it will be followed by e$build_canvas, which will change PLOT_DATA if necessary
 clear_actions <- function(e) {
-	PLOT_SAMPLE <<- function(canvas)
-		warning("PLOT_SAMPLE details must be set by loadDetails()")
+    PLOT_SAMPLE <<- function(canvas)
+        warning("PLOT_SAMPLE details must be set by loadDetails()")
 
-        SHOW_LABELS <<- function(canvas)
-            warning("SHOW_LABELS details must be set by loadDetails()")
+    SHOW_LABELS <<- function(canvas)
+        warning("SHOW_LABELS details must be set by loadDetails()")
 
-	ANIMATE_SAMPLE <<- function(canvas)
-		warning("ANIMATE_SAMPLE details must be set by loadDetails()")
+    ANIMATE_SAMPLE <<- function(canvas)
+        warning("ANIMATE_SAMPLE details must be set by loadDetails()")
 
-	CALC_STAT <<- function(canvas)
-		warning("CALC_STAT details must be set by loadDetails()")
+    TRACK_SAMPLE <<- function(canvas)
+        warning("TRACK_SAMPLE details must be set by loadDetails()")
 
-        FADE_PLOTS <<- function(canvas)
-            warning("FADE_PLOTS details must be set by loadDetails()")
+    CALC_STAT <<- function(canvas)
+        warning("CALC_STAT details must be set by loadDetails()")
 
-	PLOT_DATA_STAT <<- function(canvas)
-		warning("PLOT_STAT details must be set by loadDetails()")
+    FADE_PLOTS <<- function(canvas)
+        warning("FADE_PLOTS details must be set by loadDetails()")
 
-	PLOT_SAMPLE_STAT <<- function(canvas)
-		warning("PLOT_STAT details must be set by loadDetails()")
+    PLOT_DATA_STAT <<- function(canvas)
+        warning("PLOT_STAT details must be set by loadDetails()")
 
-	PLOT_STAT_DIST <<- function(canvas)
-		warning("PLOT_STAT_DIST details must be set by loadDetails()")
+    PLOT_SAMPLE_STAT <<- function(canvas)
+        warning("PLOT_STAT details must be set by loadDetails()")
 
-	ANIMATE_STAT <<- function(canvas)
-		warning("ANIMATE_STAT details must be set by loadDetails()")
+    PLOT_STAT_DIST <<- function(canvas)
+        warning("PLOT_STAT_DIST details must be set by loadDetails()")
 
-	DISPLAY_RESULT <<- function(canvas)
-		warning("DISPLAY_RESULT details must be set by loadDetails()")
+    ANIMATE_STAT <<- function(canvas)
+        warning("ANIMATE_STAT details must be set by loadDetails()")
 
-        DISPLAY_RESULT_2 <<- function(canvas)
-            warning("DISPLAY_RESULT_2 details must be set by loadDetails()")
+    DISPLAY_RESULT <<- function(canvas)
+        warning("DISPLAY_RESULT details must be set by loadDetails()")
 
-	HANDLE_1000 <<- function(e)
-		warning("HANDLE_1000 details must be set by loadDetails()")
+    DISPLAY_RESULT_2 <<- function(canvas)
+        warning("DISPLAY_RESULT_2 details must be set by loadDetails()")
 
-	MISCELLANEOUS <<- function(env)
-		warning("MISCELLANEOUS details must be set by loadDetails()")
+    HANDLE_1000 <<- function(e)
+        warning("HANDLE_1000 details must be set by loadDetails()")
 
-	e$loaded <- FALSE
+    MISCELLANEOUS <<- function(env)
+        warning("MISCELLANEOUS details must be set by loadDetails()")
+
+    e$loaded <- FALSE
 }
 
