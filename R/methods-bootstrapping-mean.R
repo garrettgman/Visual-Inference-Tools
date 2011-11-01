@@ -260,7 +260,8 @@ trackBootstrap <- function(canvas){
                              name = "databox.text.2", vp = canvas$graphPath("databox", 2)))
     max.width <- max(convertX(stringWidth(format(round(sample, 1), nsmall = 1)), "cm", valueOnly = TRUE))
     max.width <- unit(max.width, "cm")
-    for (i in 1:ntext){
+    if (n <= 50) finalobs <- n else finalobs <- 49
+    for (i in 1:finalobs){
         value <- sample[i]
         canvas$image <- addGrob(canvas$image, textGrob
                                 (label = format(round(value, 1), nsmall = 1),
@@ -270,22 +271,24 @@ trackBootstrap <- function(canvas){
         canvas$image <- addGrob(canvas$image, pointsGrob
                                 (x = sample[i], y = sample.y[i], pch = 19, gp = gpar(col = "red"),
                                  name = "temp.point", vp = canvas$graphPath("data")))
-        resamp.ys <- yunit[c(FALSE, index == i)]
-        if (length(resamp.ys) > 0){
+        resamp.ys <- c(FALSE, index == i)
+        if (any(resamp.ys)){
+            subset.resamp <- c(resamp.ys[1:(ntext + 1)])
+            if (n != ntext) subset.resamp <- c(resamp.ys[1:ntext], any(resamp.ys[(ntext + 1):(n + 1)]))
             canvas$image <- addGrob(canvas$image, textGrob
                                     (label = format(round(value, 1), nsmall = 1),
-                                     y = yunit[c(FALSE, index == i)], just = "top",
+                                     y = yunit[subset.resamp], just = "top",
                                      gp = gpar(col = "red", fontface = 2), name = "temp.resamp",
                                      vp = canvas$graphPath("databox", 2)))
             canvas$image <- addGrob(canvas$image, segmentsGrob
                                     (x0 = unit(0.25, "npc") + max.width*0.5 + unit(1, "mm"),
                                      x1 = unit(0.75, "npc") - max.width*0.5 - unit(1, "mm"),
                                      y0 = yunit[i + 1] - unit(0.5, "lines"),
-                                     y1 = yunit[c(FALSE, index == i)] - unit(0.5, "lines"),
+                                     y1 = yunit[subset.resamp] - unit(0.5, "lines"),
                                      name = "temp.segments", gp = gpar(lwd = 2, col = "red"),
                                      vp = vpPath("canvas.all", "canvas.boxes")))
             canvas$image <- addGrob(canvas$image, pointsGrob
-                                    (x = rep(value, length(resamp.ys)), y = resample.y[index == i],
+                                    (x = rep(value, sum(resamp.ys)), y = resample.y[index == i],
                                      pch = 19,
                                      gp = gpar(col = "red"), name = "temp.resamplepoints",
                                      vp = canvas$graphPath("sample")))
