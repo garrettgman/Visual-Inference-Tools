@@ -38,7 +38,7 @@ plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
                                                      name = "samplePlot.ghosts.1"))
     canvas$image <- addGrob(canvas$image, boxplotGrob(x, box.color = "black",
                                                       median.color = "black",
-                                                      show.w = FALSE, gp = gpar(lwd = 5),
+                                                      show.w = FALSE, gp = gpar(lwd = 3),
                                                       name = "samplePlot.boxplot.1",
                                                       vp = canvas$graphPath("sample")))
     canvas$image <- addGrob(canvas$image, datatextGrob(data = x, title = "Resample",
@@ -63,21 +63,40 @@ boot1000median <- function(canvas, e, points = FALSE){
         canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
     allx <- c(canvas$stat.dist, recursive = TRUE)
     allinfo <- sapply(canvas$samples, function(x) fivenum(x)[2:4])
-    for (i in 50*(1:20)){
-        canvas$plotSample(e, i)
+    for (i in 20*(1:50)){
         x <- allx[1:i]
-        y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
-        if (points)
+        xsample <- canvas$samples[[i]]
+        ysample <- stackPoints(xsample, vp = canvas$graphPath("sample"))
+        if (points){
+            y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9*i/1000)
             plotPoints(canvas, x, y, canvas$graphPath("stat"), "statPlot",
                        black = FALSE, alpha = 0.7)
+        }
+        plotPoints(canvas, xsample, ysample, canvas$graphPath("sample"), "samplePlot",
+                   black = FALSE)
         canvas$image <- addGrob(canvas$image, ghostsGrob(allinfo[1, 1:i], allinfo[2, 1:i],
                                                          allinfo[3, 1:i], alpha = 0.05,
                                                          box.color = "lightpink",
                                                          vp = canvas$graphPath("sample"),
                                                          name = "samplePlot.ghosts.1"))
+        canvas$image <- addGrob(canvas$image, boxplotGrob(data = xsample, box.color = "black",
+                                                          median.color = "black", stat = median,
+                                                          stat.color = "blue",
+                                                          show.w = FALSE, gp = gpar(lwd = 3),
+                                                          name = "samplePlot.boxplot.1",
+                                                          vp = canvas$graphPath("sample")))
+        canvas$image <- addGrob(canvas$image, datatextGrob(data = xsample, title = "Resample",
+                                                           name = "databox.text.2",
+                                                           gp = gpar(col = "red"),
+                                                           vp = canvas$graphPath("databox", 2)))
 
         canvas$drawImage()
     }
+
+    canvas$image <- removeGrob(canvas$image, gPath("samplePlot.points.1"))
+    canvas$image <- removeGrob(canvas$image, gPath("samplePlot.boxplot.1"))
+    canvas$image <- removeGrob(canvas$image, gPath("databox.text.2"))
+    canvas$drawImage()
     ## Remove 1000 statistics next time something is plotted to avoid
     ## further statistics being plotted on top.
     #canvas$image <- removeGrob(canvas$image, gPath("statPlot.points.1"))

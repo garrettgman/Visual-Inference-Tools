@@ -8,7 +8,7 @@
 # Garrett
 
 
-vit <- function(in.window = FALSE, cb = FALSE) {
+vit <- function(cb = FALSE) {
     home <- gwindow("Visual Inference Tools", visible = TRUE)
     home.buttons <- ggroup(horizontal = FALSE, container = home)
     title <- glabel("Visual Inference Tools", container = home.buttons)
@@ -21,7 +21,6 @@ vit <- function(in.window = FALSE, cb = FALSE) {
                            dev.new(height = 50, width = 50)
                            e <- new.vit.env()
                            e$cb <- cb
-                           e$in.window <- in.window
                            setupGUI(e)
                            CIGUIHandler(e)
                            dataGUI(e)
@@ -35,7 +34,6 @@ vit <- function(in.window = FALSE, cb = FALSE) {
                              plot.new()
                              e <- new.vit.env()
                              e$cb <- cb
-                             e$in.window <- in.window
                              setupGUI(e)
                              bootstrapGUIHandler(e)
                              dataGUI(e)
