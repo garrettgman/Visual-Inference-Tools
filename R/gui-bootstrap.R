@@ -58,9 +58,11 @@ bootstrapGUIHandler <- function(e){
                                   }
                                   n <- svalue(e$redraw.radio)
                                   for (i in 1:n){
-                                      if (n == 1)
+                                      if (n == 1){
                                           e$c1$animateSample(drop.points = svalue(e$animate.points),
                                                              n.steps = 10, n.slow = 10)
+                                          if (svalue(e$animate.points)) e$c1$trackSample()
+                                      }
                                       if (n == 5)
                                           e$c1$animateSample(drop.points = FALSE,
                                                              n.steps = 10, n.slow = 0)
@@ -138,7 +140,7 @@ bootstrapGUIHandler <- function(e){
                                                  e$fade <- !e$fade
                                                  enabled(show.summary) <- e$fade & !e$summary.shown
                                              })
-    show.summary <- gbutton(text = "Show summary statistics", expand = TRUE,
+    show.summary <- gbutton(text = "Bootstrap distribution summaries", expand = TRUE,
                             container = e$lowest, handler = function(h, ...){
                                 e$c1$displayResult(e, ci = FALSE, points = e$points)
                                 enabled(show.summary) <- FALSE

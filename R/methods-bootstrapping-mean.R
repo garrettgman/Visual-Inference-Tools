@@ -7,6 +7,7 @@ load_bootstrap_mean <- function(e){
     PLOT_SAMPLE_STAT <<- notYetImplemented
     PLOT_STAT_DIST <<- plotBootDist
     ANIMATE_SAMPLE <<- moveDataTextAndDropPoints
+    TRACK_SAMPLE <<- trackBootstrap
     ANIMATE_STAT <<- dropStat
     DISPLAY_RESULT <<- showCIandStats
     HANDLE_1000 <<- boot1000mean
@@ -19,13 +20,13 @@ bootLabels <- function(canvas){
                          just = c("left", "top"),
                          vp = canvas$graphPath("data"),
                          gp = gpar(fontface = 2))
-    resamplabel <- textGrob("Resample",
+    resamplabel <- textGrob("Re-sample",
                           x = unit(0, "npc") + unit(1, "mm"),
                           y = unit(0.8, "npc"),
                           just = c("left", "top"),
                           vp = canvas$graphPath("sample"),
                           gp = gpar(fontface = 2))
-    statlabel <- textGrob("Statistic distribution",
+    statlabel <- textGrob("Bootstrap distribution",
                           x = unit(0, "npc") + unit(1, "mm"),
                           y = unit(0.8, "npc"),
                           just = c("left", "top"),
@@ -81,7 +82,8 @@ plotSamplePointsAndBoxplotGhostMean <- function(canvas, e, i){
 plotBootDist <- function(canvas, e){
     canvas$plotted.stats <- c(canvas$plotted.stats, canvas$which.sample)
     x <- c(canvas$stat.dist, recursive = TRUE)[canvas$plotted.stats]
-    y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
+    y.max <- convertY(unit(1, "npc") - unit(2, "lines"), "npc", valueOnly = TRUE)
+    y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = y.max)
     plotPoints(canvas, x, y, canvas$graphPath("stat"), "statPlot", black = FALSE)
 }
 
@@ -243,13 +245,69 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
 }
 }
 
-
+trackBootstrap <- function(canvas){
+    index <- canvas$indexes[[canvas$which.sample]]
+    sample <- canvas$x
+    sample.y <- canvas$y
+    resample <- sample[index]
+    resample.y <- stackPoints(resample, vp = canvas$graphPath("sample"))
+    n <- canvas$n
+    ntext <- min(n, 50)
+    npcs <- (ntext:0)/ntext
+    yunit <- (unit(npcs, "npc") - unit(4*(npcs - 0.5), "mm") + unit(1 - npcs, "lines"))
+    canvas$image <- addGrob(canvas$image, datatextGrob
+                            (data = resample, title = "Resample", max = 50,
+                             name = "databox.text.2", vp = canvas$graphPath("databox", 2)))
+    max.width <- max(convertX(stringWidth(format(round(sample, 1), nsmall = 1)), "cm", valueOnly = TRUE))
+    max.width <- unit(max.width, "cm")
+    for (i in 1:ntext){
+        value <- sample[i]
+        canvas$image <- addGrob(canvas$image, textGrob
+                                (label = format(round(value, 1), nsmall = 1),
+                                 y = yunit[i + 1], just = "top",
+                                 gp = gpar(col = "red", fontface = 2), name = "temp.samp",
+                                 vp = canvas$graphPath("databox", 1)))
+        canvas$image <- addGrob(canvas$image, pointsGrob
+                                (x = sample[i], y = sample.y[i], pch = 19, gp = gpar(col = "red"),
+                                 name = "temp.point", vp = canvas$graphPath("data")))
+        resamp.ys <- yunit[c(FALSE, index == i)]
+        if (length(resamp.ys) > 0){
+            canvas$image <- addGrob(canvas$image, textGrob
+                                    (label = format(round(value, 1), nsmall = 1),
+                                     y = yunit[c(FALSE, index == i)], just = "top",
+                                     gp = gpar(col = "red", fontface = 2), name = "temp.resamp",
+                                     vp = canvas$graphPath("databox", 2)))
+            canvas$image <- addGrob(canvas$image, segmentsGrob
+                                    (x0 = unit(0.25, "npc") + max.width*0.5 + unit(1, "mm"),
+                                     x1 = unit(0.75, "npc") - max.width*0.5 - unit(1, "mm"),
+                                     y0 = yunit[i + 1] - unit(0.5, "lines"),
+                                     y1 = yunit[c(FALSE, index == i)] - unit(0.5, "lines"),
+                                     name = "temp.segments", gp = gpar(lwd = 2, col = "red"),
+                                     vp = vpPath("canvas.all", "canvas.boxes")))
+            canvas$image <- addGrob(canvas$image, pointsGrob
+                                    (x = rep(value, length(resamp.ys)), y = resample.y[index == i],
+                                     pch = 19,
+                                     gp = gpar(col = "red"), name = "temp.resamplepoints",
+                                     vp = canvas$graphPath("sample")))
+            canvas$pauseImage(20)
+            canvas$image <- removeGrob(canvas$image, gPath("temp.resamp"))
+            canvas$image <- removeGrob(canvas$image, gPath("temp.segments"))
+            canvas$image <- removeGrob(canvas$image, gPath("temp.resamplepoints"))
+        } else canvas$pauseImage(20)
+    }
+    canvas$image <- removeGrob(canvas$image, gPath("temp.samp"))
+    canvas$image <- removeGrob(canvas$image, gPath("temp.point"))
+    canvas$image <- addGrob(canvas$image, datatextGrob
+                            (data = resample, title = "Resample", max = 50, gp = gpar(col = "red"),
+                             name = "databox.text.2", vp = canvas$graphPath("databox", 2)))
+}
 
 dropStat <- function(canvas, e, n.steps){
     xs <- c(canvas$stat.dist, recursive = TRUE)[c(canvas$plotted.stats,
                               canvas$which.sample)]
     x <- xs[length(xs)]
-    ys <- stackPoints(xs, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
+    ys <- stackPoints(xs, vp = canvas$graphPath("stat"), y.min = 0,
+                      y.max = unit(1, "npc") - unit(2, "lines"))
     y.start <- 1
     y.end <- ys[length(ys)]
     y.step <- (y.start - y.end)/n.steps
@@ -276,10 +334,11 @@ boot1000mean <- function(canvas, e, points = FALSE){
         canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
     allx <- c(canvas$stat.dist, recursive = TRUE)
     allinfo <- c(canvas$stat.dist, recursive = TRUE)
+    y.max <- unit(1, "npc") - unit(2, "lines")
     for (i in 20*(1:50)){
         canvas$plotSample(e, i)
         x <- allx[1:i]
-        y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9*i/1000)
+        y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = y.max*i*0.001)
         if (points)
             plotPoints(canvas, x, y, canvas$graphPath("stat"),
                        "statPlot", black = FALSE, alpha = 0.7)
@@ -311,7 +370,8 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
         if (points){
             start <- 1
             ## Set points outside interval to a lighter shade of grey.
-            y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0, y.max = 0.9)
+            y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0,
+                             y.max = unit(1, "npc") - unit(2, "lines"))
             x.in <- x[x >= ci[1] & x <= ci[2]]
             x.out <- x[x < ci[1] | x > ci[2]]
             y.in <- y[x >= ci[1] & x <= ci[2]]
@@ -326,7 +386,7 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
         ## Plot CI.
         canvas$image <- addGrob(canvas$image, confintGrob(ci = ci,
                                                           name = "statPlot.ci.1",
-                                                          vp = canvas$graphPath("stat")))
+                                                          vp = vp))
         canvas$drawImage()
         ## Animate CI.
         for (i in start:10){
@@ -356,7 +416,6 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
                                                           name = "dataPlot.ci.1",
                                                           vp = canvas$graphPath("data")))
         canvas$drawImage()
-        canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
 
     } else {
         ## Summary stats code.

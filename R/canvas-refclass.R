@@ -46,7 +46,6 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 	"samples", "sampled.stats", "plotted.stats", "indexes", "which.sample", "stat.dist", "viewports", "image"),
 	methods = list(
 	initialize = function(x = NULL, y = NULL, levels = NULL, ...){
-		require(grid)
 		x <<- x
 		y <<- y
 		levels <<- levels
@@ -107,6 +106,11 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
         showLabels = function() {
             'Plots labels on the three viewports.'
             SHOW_LABELS(.self)
+        },
+
+        trackSample = function(){
+            'Tracks a sample or resample.'
+            TRACK_SAMPLE(.self)
         },
 
         graphPath = function(plot.name = "sample", number = "1") {

@@ -1,21 +1,12 @@
 ## Sets up data and analysis tabs.
 setupGUI <- function(e){
-    if (e$in.window)
-        e$win <- gwindow("Visual Inference Tools", visible = TRUE, width = 870,
-                         height = 600) else{
-                             e$win <- gwindow("Visual Inference Tools", visible = TRUE,
-                                              width = 375,
-                                              height = 600)}
+    e$win <- gwindow("Visual Inference Tools", visible = TRUE,
+                     width = 375, height = 600)
     e$loaded <- FALSE
     ## separates space into controls and plot
-    if (!e$in.window)
-        g <- ggroup(container = e$win, expand = TRUE) else{
-            g <- gpanedgroup(container = e$win, expand = TRUE)}
+    g <- ggroup(container = e$win, expand = TRUE)
     e$obj <- g
     g.controls <- gnotebook(container = g, expand = TRUE)
-    if (e$in.window)
-        g.plot <- ggraphics(container = g, expand = TRUE)
-
     ## control panel has a read data tab inspired from iNZight
     ## and a VIT tab
     e$controls.iNZight <- ggroup(horizontal = FALSE, container = g.controls,
