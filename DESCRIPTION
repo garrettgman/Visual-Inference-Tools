@@ -1,6 +1,6 @@
 Package: vit
-Imports: grid, gWidgets, RGtk2, gWidgetsRGtk2, plyr, dichromat, cairoDevice
-Maintainer: Garrett Grolemund <grolemund@rice.edu>
+Imports: grid, gWidgets, RGtk2, gWidgetsRGtk2, plyr, dichromat
+Maintainer: Ben Stevenson <bste085@aucklanduni.ac.nz>
 License: GPL
 Title: Visual Inference Tools
 LazyData: true
