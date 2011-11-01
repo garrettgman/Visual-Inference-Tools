@@ -72,7 +72,7 @@ addMedianLine <- function(canvas, e) {
     canvas$image <- addGrob(canvas$image,
                             segmentsGrob(x0 = x, x1 = x, y0 = 0,
                                          y1 = 3, default.units = "native",
-                                         gp = gpar(col = "grey60"),
+                                         gp = gpar(col = "grey60", lty = "dashed"),
                                          vp = vpPath("canvas.frame", "animation.field"),
                                          name = "hline"))
         canvas$y <- stackPoints(canvas$x, vp = canvas$graphPath("data"))

@@ -122,7 +122,7 @@ addMeanLine <- function(canvas, e) {
     canvas$image <- addGrob(canvas$image,
                             segmentsGrob(x0 = x, x1 = x, y0 = 0,
                                          y1 = 3, default.units = "native",
-                                         gp = gpar(col = "grey60"),
+                                         gp = gpar(col = "grey60", lty = "dashed"),
                                          vp = vpPath("canvas.frame", "animation.field"),
                                          name = "hline"))
     canvas$y <- stackPoints(canvas$x, vp = canvas$graphPath("data"))
@@ -144,7 +144,7 @@ plotCI <- function(canvas, e, i, pause = FALSE) {
                                 just = c("centre", "top"), vp = canvas$graphPath("sample"),
                                 gp = gpar(fontface = 2), name = "ciCalcLabel")
         canvas$image <- addGrob(canvas$image, ciCalcLabel)
-        canvas$pauseImage(10)
+        canvas$pauseImage(15)
         canvas$image <- removeGrob(canvas$image, gPath("ciCalcLabel"))
     }
     bounds <- canvas$stat.dist[[i]]
