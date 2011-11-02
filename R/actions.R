@@ -1,66 +1,67 @@
 # The high level actions performed by the VIT Canvas. The details of how these methods accomplish their goals is set by loadDetails, which chooses the appropriate method based on the type of sata and the statistic being examined
-
+#initialize_actions <- function(e){
 #' Creates the initial plot of the data
-PLOT_DATA <- function(canvas)
+    PLOT_DATA <- function(canvas)
 	warning("PLOT_DATA details must be set by loadPlotDetails()")
 
 #' Creates the initial plot of the sample
-PLOT_SAMPLE <- function(canvas)
+    PLOT_SAMPLE <- function(canvas)
 	warning("PLOT_SAMPLE details must be set by loadDetails()")
 
 #' Puts titles for each of the plots on the canvas
-SHOW_LABELS <- function(canvas)
-    warning("SHOW_LABELS details must be set by loadDetails()")
+    SHOW_LABELS <- function(canvas)
+        warning("SHOW_LABELS details must be set by loadDetails()")
 
 #' Animates the construction of the sample from the data
-ANIMATE_SAMPLE <- function(canvas)
+    ANIMATE_SAMPLE <- function(canvas)
 	warning("ANIMATE_SAMPLE details must be set by loadDetails()")
 
 #' Animated the tracking of a sample (or resample)
-TRACK_SAMPLE <- function(canvas)
-    warning("TRACK_SAMPLE details must be set by loadDetails()")
+    TRACK_SAMPLE <- function(canvas)
+        warning("TRACK_SAMPLE details must be set by loadDetails()")
 
 #' Method used to calculate a single statistic from a single group of observsations
-CALC_STAT <- function(canvas)
+    CALC_STAT <- function(canvas)
 	warning("CALC_STAT details must be set by loadDetails()")
 
 #' Method used to fade plots in order emphasize those remaining
-FADE_PLOTS <- function(canvas)
-    warning("FADE_PLOTS details must be set by loadDetails()")
+    FADE_PLOTS <- function(canvas)
+        warning("FADE_PLOTS details must be set by loadDetails()")
 
 #' Creates a plot of the data parameter
-PLOT_DATA_STAT <- function(canvas)
+    PLOT_DATA_STAT <- function(canvas)
 	warning("PLOT_STAT details must be set by loadDetails()")
 
 #' Creates a plot of the sample statistic
-PLOT_SAMPLE_STAT <- function(canvas)
+    PLOT_SAMPLE_STAT <- function(canvas)
 	warning("PLOT_STAT details must be set by loadDetails()")
 
 #' Creates a plot of the distribution of sample statistics
-PLOT_STAT_DIST <- function(canvas)
+    PLOT_STAT_DIST <- function(canvas)
 	warning("PLOT_STAT_DIST details must be set by loadDetails()")
 
 #' Animates the addition of the current sample statistic to the statistic distribution
-ANIMATE_STAT <- function(canvas)
+    ANIMATE_STAT <- function(canvas)
 	warning("ANIMATE_STAT details must be set by loadDetails()")
 
 #' Displays any final conlusions or information required by the method whenever a statistic is added to the statistic distribution
-DISPLAY_RESULT <- function(canvas)
+    DISPLAY_RESULT <- function(canvas)
 	warning("DISPLAY_RESULT details must be set by loadDetails()")
 
 #' Displays a second round of conclusions if required by the method
-DISPLAY_RESULT_2 <- function(canvas)
-    warning("DISPLAY_RESULT_2 details must be set by loadDetails()")
+    DISPLAY_RESULT_2 <- function(canvas)
+        warning("DISPLAY_RESULT_2 details must be set by loadDetails()")
 
 #' Manages the methods' performance of 1000 complete runs. At the moment this has its own method because running 1000 methods the usual way would be time prohibitive.
-HANDLE_1000 <- function(e)
+    HANDLE_1000 <- function(e)
 	warning("HANDLE_1000 details must be set by loadDetails()")
 
-GRAPHPATH <- function(plot.name, number)
-    warning("GRAPHPATH details must be set by loadPlotDetalis()")
+    GRAPHPATH <- function(plot.name, number)
+        warning("GRAPHPATH details must be set by loadPlotDetalis()")
 
-test_function <- function(canvas)
+    test_function <- function(canvas)
 	warning("test_function details must be set by loadDetails()")
+#}
 
 #' returns all actions to their original empty values, with the exception of PLOT_DETAILS. Since clear_actions() is only called when a new variable is added,  it will be followed by e$build_canvas, which will change PLOT_DATA if necessary
 clear_actions <- function(e) {

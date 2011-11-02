@@ -20,6 +20,7 @@ vit <- function(cb = FALSE) {
                            graphics.off()
                            dev.new(height = 50, width = 50)
                            e <- new.vit.env()
+                           #initialize_actions(e)
                            e$cb <- cb
                            setupGUI(e)
                            CIGUIHandler(e)
@@ -33,6 +34,7 @@ vit <- function(cb = FALSE) {
                              dev.new(height = 50, width = 75)
                              plot.new()
                              e <- new.vit.env()
+                             #initialize_actions(e)
                              e$cb <- cb
                              setupGUI(e)
                              bootstrapGUIHandler(e)
@@ -42,13 +44,14 @@ vit <- function(cb = FALSE) {
                               handler =
                               function(h, ...){
                                   dispose(home)
+                                  graphics.off()
+                                  dev.new(height = 50, width = 50)
                                   plot.new()
                                   e <- new.vit.env()
+                                  #initialize_actions(e)
                                   e$cb <- cb
-                                  e$in.window <- in.window
                                   setupGUI(e)
                                   permGUIHandler(e)
                                   dataGUI(e)
                               })
-    enabled(home.permutation) <- FALSE
 }

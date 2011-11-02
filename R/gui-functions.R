@@ -83,7 +83,7 @@ dataGUI <- function(e){
         clear_actions(e)
         ## Only try to plot something if data is loaded.
         if (e$data.loaded){
-            loadPlotDetails(e$xData, e$yData)
+            loadPlotDetails(e, e$c1)
             e$buildCanvas()
             e$c1$drawImage()
         } else enabled(e$upper) <- FALSE
@@ -96,7 +96,7 @@ dataGUI <- function(e){
         clear_actions(e)
         ## Only try to plot something if data is loaded.
         if (e$data.loaded){
-            loadPlotDetails(e$xData, e$yData)
+            loadPlotDetails(e, c$c1)
             e$buildCanvas()
             e$c1$drawImage()
         } else enabled(e$upper) <- FALSE
