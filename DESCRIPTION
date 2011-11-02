@@ -1,5 +1,5 @@
 Package: vit
-Imports: grid, gWidgets, RGtk2, gWidgetsRGtk2, plyr, dichromat
+Imports: grid, gWidgets, RGtk2, gWidgetsRGtk2, plyr, dichromat, RODBC
 Maintainer: Ben Stevenson <bste085@aucklanduni.ac.nz>
 License: GPL
 Title: Visual Inference Tools
@@ -38,6 +38,7 @@ Collate:
 	'gui-environment.R'
 	'gui-functions.R'
 	'gui-interface.R'
+	'gui-permutation.R'
 	'helpers.R'
 	'load-functions.R'
 	'methods-bootstrapping-mean.R'
