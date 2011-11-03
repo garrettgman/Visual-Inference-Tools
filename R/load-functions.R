@@ -30,7 +30,9 @@ loadStatDetails <- function(e) {
 	stat.method <- paste(e$method, svalue(e$stat), sep = ".")
 	list("ci.mean" = load_CI_mean, "ci.median" = load_CI_median,
              "bootstrap.mean" = load_bootstrap_mean,
-             "bootstrap.median" = load_bootstrap_median)[[stat.method]](e)
+             "bootstrap.median" = load_bootstrap_median,
+             "permutation.mean" = load_permutation_mean,
+             "permutation.median" = load_permutation_median)[[stat.method]](e)
 	e$loaded <- TRUE
 }
 
