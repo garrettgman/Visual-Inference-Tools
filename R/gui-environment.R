@@ -11,7 +11,6 @@ new.vit.env <- function() {
 	}
 
 	e$odbcCloseAll <- function(){
-		require(RODBC)
 		odbcCloseAll()
 	}
 

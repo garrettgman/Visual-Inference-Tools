@@ -1,10 +1,10 @@
 bootstrapGUIHandler <- function(e){
     e$method <- "bootstrap"
     e$data.boxes <- TRUE
+    e$replace <- TRUE
     tbl <- glayout(container = e$upper)
     tbl[1, 1] <- glabel("Quantity: ", container = tbl)
     tbl[1, 2] <- (e$stat <- gcombobox(c("mean", "median"), editable = FALSE, container = tbl))
-    e$replace <- TRUE
     gbutton("Record my choices", container = e$upper, expand = TRUE,
             handler = function(h, ...) {
                 e$resetCanvas()
