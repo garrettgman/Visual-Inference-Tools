@@ -74,19 +74,19 @@ ciLabels <- function(canvas){
 # apply(samps, 1, median)
 #    user  system elapsed
 #129.160   3.507 133.886
-calcCITWald <- function(x){
+calcCITWald <- function(x, y = NULL){
     n <- length(x)
     se <- sd(x)/sqrt(n)
     mean(x) + c(-1, 1)*qt(0.975, n - 1)*se
 }
 
-calcCI2Wald <- function(x){
+calcCI2Wald <- function(x, y = NULL){
     n <- length(x)
     se <- sd(x)/sqrt(n)
     mean(x) + c(-2, 2)*se
 }
 
-calcCIBootPercMean <- function(x){
+calcCIBootPercMean <- function(x, y = NULL){
     n <- length(x)
     nboots <- 999
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
@@ -95,7 +95,7 @@ calcCIBootPercMean <- function(x){
     quantile(means, prob = c(0.025, 0.975))
 }
 
-calcCIBootSEMean <- function(x){
+calcCIBootSEMean <- function(x, y = NULL){
     n <- length(x)
     nboots <- 1000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
@@ -105,7 +105,7 @@ calcCIBootSEMean <- function(x){
     mean(x) + c(-1, 1) * 2 * se
 }
 
-calcCIBootTSEMean <- function(x){
+calcCIBootTSEMean <- function(x, y = NULL){
     n <- length(x)
     nboots <- 1000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,

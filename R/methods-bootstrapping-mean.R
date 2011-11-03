@@ -2,7 +2,7 @@ load_bootstrap_mean <- function(e){
     PLOT_DATA <<- PLOT_DATA
     PLOT_SAMPLE <<- plotSamplePointsAndBoxplotGhostMean
     SHOW_LABELS <<- bootLabels
-    CALC_STAT <<- c("mean" = mean, "median" = median)[[svalue(e$stat)]]
+    CALC_STAT <<- calcMean
     PLOT_DATA_STAT <<- lineOnBoxplotMean
     PLOT_SAMPLE_STAT <<- notYetImplemented
     PLOT_STAT_DIST <<- plotBootDist
@@ -13,6 +13,10 @@ load_bootstrap_mean <- function(e){
     HANDLE_1000 <<- boot1000mean
     FADE_PLOTS <<- fadeSampleAndStat
 }
+
+calcMean <- function(x, y = NULL)
+    mean(x)
+
 bootLabels <- function(canvas){
     samplabel <- textGrob("Sample",
                          x = unit(0, "npc") + unit(1, "mm"),

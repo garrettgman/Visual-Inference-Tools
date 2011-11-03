@@ -36,7 +36,7 @@ plotSamplePointsAndBoxplotMedian <- function(canvas, e, i) {
     }
 }
 
-calcCIBootPercMedian <- function(x){
+calcCIBootPercMedian <- function(x, y = NULL){
     n <- length(x)
     nboots <- 999
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
@@ -45,7 +45,7 @@ calcCIBootPercMedian <- function(x){
     quantile(medians, prob = c(0.025, 0.975))
 }
 
-calcCIBootSEMedian <- function(x){
+calcCIBootSEMedian <- function(x, y = NULL){
     n <- length(x)
     nboots <- 1000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,
@@ -55,7 +55,7 @@ calcCIBootSEMedian <- function(x){
     median(x) + c(-1, 1) * 2 * se
 }
 
-calcCIBootTSEMedian <- function(x){
+calcCIBootTSEMedian <- function(x, y = NULL){
     n <- length(x)
     nboots <- 1000
     samps <- matrix(sample(x, size = nboots*n, replace = TRUE), nrow = nboots,

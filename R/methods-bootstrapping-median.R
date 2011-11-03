@@ -2,7 +2,7 @@ load_bootstrap_median <- function(e){
     PLOT_DATA <<- PLOT_DATA
     PLOT_SAMPLE <<- plotSamplePointsAndBoxplotGhostMedian
     SHOW_LABELS <<- bootLabels
-    CALC_STAT <<- c("mean" = mean, "median" = median)[[svalue(e$stat)]]
+    CALC_STAT <<- calcMedian
     PLOT_DATA_STAT <<- lineOnBoxplotMedian
     PLOT_SAMPLE_STAT <<- notYetImplemented
     PLOT_STAT_DIST <<- plotBootDist
@@ -12,6 +12,9 @@ load_bootstrap_median <- function(e){
     HANDLE_1000 <<- boot1000median
     FADE_PLOTS <<- fadeSampleAndStat
 }
+
+calcMedian <- function(x, y = NULL)
+    median(x)
 
 plotSamplePointsAndBoxplotGhostMedian <- function(canvas, e, i){
     if ("dataPlot.ci.1" %in% childNames(canvas$image))

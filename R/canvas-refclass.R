@@ -66,9 +66,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Animates the creation of the distribution of the statistic from the samples.'
 		ANIMATE_STAT(.self, env, n.steps)
 	},
-	calcStat = function(i = which.sample) {
+	calcStat = function(i = which.sample, y = NULL) {
 		'Calculates the sample statistic for a group of data.'
-		CALC_STAT(samples[[i]])
+		CALC_STAT(samples[[i]], y)
 	},
 	displayResult = function(env, ...) {
 		'Displays the final result of the VIT simulation.'
@@ -197,7 +197,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 	},
 	makeStatistics = function(){
 		'Calculates the statistic for all 1000 samples. Shows progress in a progress bar on the console.'
-		stat.dist <<- plyr::llply(samples, CALC_STAT, .progress = "text")
+		stat.dist <<- plyr::llply(samples, function(x) CALC_STAT(x, .self$levels), .progress = "text")
 
 	}
 ))
