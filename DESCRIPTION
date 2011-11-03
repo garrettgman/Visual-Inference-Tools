@@ -45,5 +45,7 @@ Collate:
 	'methods-bootstrapping-median.R'
 	'methods-CI-mean.R'
 	'methods-CI-median.R'
+	'methods-permutation-mean.R'
+	'methods-permutation-median.R'
 	'stackPoints.R'
 	'unimplemented-stuff.R'
