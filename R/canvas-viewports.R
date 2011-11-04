@@ -1,7 +1,6 @@
 ## Makes a viewport scheme to facilitate animation and plotting a statistic underneath the data
 
-makeVitGraphViewports <- function(x.scale, nlevels.y) {
-
+makeVitGraphViewports <- function(x.scale, nlevels.y, stat.scale) {
     canvas.frame.layout <- grid.layout(nrow = 2, heights = unit(1,
                                                  c("null", "line")))
     canvas.frame <- plotViewport(c(3, 3, 0, 1), layout = canvas.frame.layout,
@@ -16,14 +15,14 @@ makeVitGraphViewports <- function(x.scale, nlevels.y) {
                           name = "data.data")
     sample <- splitDataPane(x.scale = x.scale, n = nlevels.y,
                             layout.pos.row = 2, name = "sample.data")
-    stat <- dataViewport(xscale = x.scale, yscale = c(0, 1), layout.pos.row = 3,
+    stat <- dataViewport(xscale = stat.scale, yscale = c(0, 1), layout.pos.row = 3,
                          name = "stat.data.1")
 
     vpTree(canvas.frame, vpList(vpTree(animation.field,
                                        vpList(data, sample, stat))))
 }
 
-makeVitGraphViewportsBoxes <- function(x.scale, nlevels.y){
+makeVitGraphViewportsBoxes <- function(x.scale, nlevels.y, stat.scale){
     canvas.all.layout <- grid.layout(ncol = 2, widths = unit(1:2, "null"))
     canvas.all <- viewport(layout = canvas.all.layout, name = "canvas.all")
     canvas.boxes.layout <- grid.layout(ncol = 2)
@@ -104,11 +103,23 @@ graphPathBoxes <- function(plot.name = "sample", number = "1") {
         }
 }
 
+## If same.stat.scale is TRUE, then stat plot will have same x-axis
+## scale as the other two.  Otherwise, the scale will be centred at 0,
+## but the scale of units on the x-axis will still remain the
+## same. That is, the distance on the x-axis for 1 unit will remain
+## constant in all three plots.
+buildViewports <- function(canvas, x, y = NULL, boxes = FALSE, same.stat.scale = TRUE) {
 
-buildViewports <- function(canvas, x, y = NULL, boxes = FALSE) {
-    if (is.categorical(x)) x.scale <- c(0, length(x))
-    else x.scale <- range(x)
-
+    if (is.categorical(x)){
+        x.scale <- c(0, length(x))
+    } else {
+        x.scale <- range(x)
+    }
+    if (same.stat.scale){
+        stat.scale <- x.scale
+    } else {
+        stat.scale <- x.scale - mean(x.scale)
+    }
     if (is.null(y)) {
         n.y <- 1
         y.scale <- c(0,1)
@@ -121,8 +132,11 @@ buildViewports <- function(canvas, x, y = NULL, boxes = FALSE) {
         notYetImplemented("build viewports for 2d numeric data")
         stop("method does not exist yet.")
     }
-    if (boxes) canvas$viewports <- makeVitGraphViewportsBoxes(x.scale, n.y) else{
-        canvas$viewports <- makeVitGraphViewports(x.scale, n.y)}
+    if (boxes){
+        canvas$viewports <- makeVitGraphViewportsBoxes(x.scale, n.y, stat.scale)
+    } else {
+        canvas$viewports <- makeVitGraphViewports(x.scale, n.y, stat.scale)
+    }
 }
 
 

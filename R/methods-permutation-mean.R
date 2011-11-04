@@ -6,11 +6,11 @@ load_permutation_mean <- function(e){
     CALC_STAT <<- calcMeanDiff
     PLOT_DATA_STAT <<- dataDiffArrow
     PLOT_STAT_DIST <<- plotDiffDist
-    ANIMATE_SAMPLE <<- notYetImplemented
+    ANIMATE_SAMPLE <<- permTwoSample
     TRACK_SAMPLE <<- notYetImplemented
-    ANIMATE_STAT <<- notYetImplemented
+    ANIMATE_STAT <<- dropPermArrow
     DISPLAY_RESULT <<- notYetImplemented
-    HANDLE_1000 <<- notYetImplemented
+    HANDLE_1000 <<- perm1000
     FADE_PLOTS <<- notYetImplemented
 }
 
@@ -91,4 +91,61 @@ dataDiffArrow <- function(canvas, e){
                                                     arrow = arrow(length = unit(0.1, "inches")),
                                                     vp = canvas$graphPath("data", 2),
                                                     name = "dataPlot.stat.2"))
+    canvas$image <- addGrob(canvas$image, linesGrob(x = unit(rep(0, 2), "native"),
+                                                    y = unit(0:1, "npc"),
+                                                    gp = gpar(lty = "dashed"),
+                                                    vp = canvas$graphPath("stat"),
+                                                    name = "zeroline.1"))
+}
+
+permTwoSample <- function(canvas, e){
+e}
+
+dropPermArrow <- function(canvas, e, n.steps){
+    arrowbounds <- canvas$stat.dist[c(canvas$plotted.stats, canvas$which.sample)]
+    stats <- sapply(arrowbounds, diff)
+    curr.arrow <- arrowbounds[[length(stats)]]
+    curr.stat <- stats[length(stats)]
+    y <- stackPoints(stats, vp = canvas$graphPath("stat"), y.min = 0)
+    y.start <- 1.5
+    y.end <- y[length(stats)]
+    y.step <- (y.start - y.end)/n.steps
+    xs.start <- curr.arrow
+    xs.end <- curr.arrow - (curr.arrow[1] - mean(range(canvas$x)))
+    xs.step <- (xs.start - xs.end)/n.steps
+    for (i in 0:n.steps){
+        temp.arrow <- linesGrob(x = unit(xs.start - i*xs.step, "native"),
+                                          y = unit(rep(y.start - i*y.step, 2), "native"),
+                                          gp = gpar(lwd = 2, col = "red"),
+                                          arrow = arrow(length = unit(0.1, "inches")),
+                                          vp = vpPath("canvas.frame", "animation.field"),
+                                          name = "temp.arrow")
+        canvas$image <- addGrob(canvas$image, temp.arrow)
+        canvas$drawImage()
+    }
+    canvas$image <- removeGrob(canvas$image, gPath("temp.arrow"))
+}
+
+plotDiffDist <- function(canvas, e){
+    canvas$plotted.stats <- c(canvas$plotted.stats, canvas$which.sample)
+    stats <- sapply(canvas$stat.dist[canvas$plotted.stats], diff)
+    y <- stackPoints(stats, vp = canvas$graphPath("stat"), y.min = 0)
+    plotPoints(canvas, stats, y, vp = canvas$graphPath("stat"), name = "statPlot")
+}
+
+perm1000 <- function(canvas, e){
+    stats <- sapply(canvas$stat.dist, diff)
+    y.max <- unit(1, "npc") - unit(2, "lines")
+    for (i in 20*(1:50)){
+        canvas$plotSample(e, i)
+        x <- stats[1:i]
+        y <- stackPoints(x, vp = canvas$graphPath("stat"), y.min = 0,
+                         y.max = y.max*i*0.001)
+        plotPoints(canvas, x, y, canvas$graphPath("stat"),
+                   "statPlot", black = FALSE, alpha = 0.7)
+        canvas$drawImage()
+    }
+    canvas$plotted.stats <- NULL
+    e$clearPanel("sample")
+    canvas$drawImage()
 }

@@ -78,7 +78,7 @@ plotSamplePointsAndBoxplotGhostMean <- function(canvas, e, i){
     #                                                  show.w = FALSE,
     #                                                  name = "samplePlot.boxplot.1",
     #                                                  vp = canvas$graphPath("sample")))
-    canvas$image <- addGrob(canvas$image, datatextGrob(data = x, title = "Resample",
+    canvas$image <- addGrob(canvas$image, datatextGrob(data = x, title = "Re-sample",
                                                        max = 50, name = "databox.text.2",
                                                        vp = canvas$graphPath("databox", 2), gp = gpar(col = "red")))
 }
@@ -167,7 +167,7 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
         canvas$pauseImage(5)
         ## Make text in resample databox permanent
         canvas$image <- removeGrob(canvas$image, gPath("temp.text"))
-        resamp.text <- textGrob(label = c("Resample", format(round(x[1:i], 1), nsmall = 1)),
+        resamp.text <- textGrob(label = c("Re-sample", format(round(x[1:i], 1), nsmall = 1)),
                                 y = yunit[1:(i + 1)], just = "top", gp = gpar(col = "red"),
                                 name = "databox.text.2", vp = canvas$graphPath("databox", 2))
         canvas$image <- addGrob(canvas$image, resamp.text)
@@ -191,7 +191,7 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
                                      vp = canvas$graphPath("data"), name = "temp.point")
             canvas$image <- addGrob(canvas$image, temp.point)
         }
-        resamp.text <- textGrob(label = c("Resample", format(round(x[1:i], 1), nsmall = 1)),
+        resamp.text <- textGrob(label = c("Re-sample", format(round(x[1:i], 1), nsmall = 1)),
                                 y = yunit[1:(i + 1)], just = "top", gp = gpar(col = "red"),
                                 name = "databox.text.2", vp = canvas$graphPath("databox", 2))
         canvas$image <- addGrob(canvas$image, temp.text)
@@ -221,7 +221,7 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
                                      vp = canvas$graphPath("data"), name = "temp.point")
             canvas$image <- addGrob(canvas$image, temp.point)
         }
-        resamp.text <- textGrob(label = c("Resample",
+        resamp.text <- textGrob(label = c("Re-sample",
                                 format(round(x[1:(ntext - 1)], 1), nsmall = 1), "..."),
                                 y = yunit, just = "top", gp = gpar(col = "red"),
                                 name = "databox.text.2",
@@ -260,7 +260,7 @@ trackBootstrap <- function(canvas){
     npcs <- (ntext:0)/ntext
     yunit <- (unit(npcs, "npc") - unit(4*(npcs - 0.5), "mm") + unit(1 - npcs, "lines"))
     canvas$image <- addGrob(canvas$image, datatextGrob
-                            (data = resample, title = "Resample", max = 50,
+                            (data = resample, title = "Re-sample", max = 50,
                              name = "databox.text.2", vp = canvas$graphPath("databox", 2)))
     max.width <- max(convertX(stringWidth(format(round(sample, 1), nsmall = 1)), "cm", valueOnly = TRUE))
     max.width <- unit(max.width, "cm")
@@ -305,7 +305,7 @@ trackBootstrap <- function(canvas){
     canvas$image <- removeGrob(canvas$image, gPath("temp.samp"))
     canvas$image <- removeGrob(canvas$image, gPath("temp.point"))
     canvas$image <- addGrob(canvas$image, datatextGrob
-                            (data = resample, title = "Resample", max = 50, gp = gpar(col = "red"),
+                            (data = resample, title = "Re-sample", max = 50, gp = gpar(col = "red"),
                              name = "databox.text.2", vp = canvas$graphPath("databox", 2)))
 }
 
@@ -340,7 +340,6 @@ boot1000mean <- function(canvas, e, points = FALSE){
     if ("dataPlot.ci.1" %in% childNames(canvas$image))
         canvas$image <- removeGrob(canvas$image, gPath("dataPlot.ci.1"))
     allx <- c(canvas$stat.dist, recursive = TRUE)
-    allinfo <- c(canvas$stat.dist, recursive = TRUE)
     y.max <- unit(1, "npc") - unit(2, "lines")
     for (i in 20*(1:50)){
         canvas$plotSample(e, i)
@@ -350,7 +349,7 @@ boot1000mean <- function(canvas, e, points = FALSE){
             plotPoints(canvas, x, y, canvas$graphPath("stat"),
                        "statPlot", black = FALSE, alpha = 0.7)
         canvas$image <- addGrob(canvas$image, rectGrob
-                                (x = unit(allinfo[1:i], "native"),
+                                (x = unit(x, "native"),
                                  y = unit(0.15, "npc"), height = unit(0.2, "npc"),
                                  width = 0, gp = gpar(alpha = 0.05, col = "blue", lwd = 2),
                                  vp = canvas$graphPath("sample"), name = "samplePlot.ghosts.1"))

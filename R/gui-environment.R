@@ -271,7 +271,7 @@ new.vit.env <- function() {
             e$c1 <- canvas$new(x = e$xData, levels = e$yData)
             ## loads the data dependent details that allow the canvas to perform
             ## its basic actions. NOTE: should actions be stored in e?
-            buildViewports(e$c1, e$xData, e$yData, e$data.boxes)
+            buildViewports(e$c1, e$xData, e$yData, e$data.boxes, e$same.stat.scale)
             e$c1$buildImage(e$data.boxes)
             pushViewport(e$c1$viewports)
             e$c1$plotData()
