@@ -2,6 +2,7 @@ bootstrapGUIHandler <- function(e){
     e$method <- "bootstrap"
     e$data.boxes <- TRUE
     e$replace <- TRUE
+    e$same.stat.scale <- TRUE
     tbl <- glayout(container = e$upper)
     tbl[1, 1] <- glabel("Quantity: ", container = tbl)
     tbl[1, 2] <- (e$stat <- gcombobox(c("mean", "median"), editable = FALSE, container = tbl))
@@ -16,7 +17,7 @@ bootstrapGUIHandler <- function(e){
                 e$c1$drawImage()
                 enabled(e$lower) <- TRUE
             })
-    vit.resamp <- glabel("Resampling", container = e$lower)
+    vit.resamp <- glabel("Re-sampling", container = e$lower)
     vit.bootbox <- gframe("Number of repetitions",
                           container = e$lower)
     e$redraw.radio <- gradio(c(1, 5, 20, 1000), horizontal=FALSE,
