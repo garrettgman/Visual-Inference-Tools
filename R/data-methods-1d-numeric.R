@@ -25,13 +25,13 @@ plotPointsAndBoxplot <- function(canvas) {
 
 
 #' helper function for plotting numeric data
-plotPoints <- function(canvas, x, y, vp, name, black = FALSE, alpha = 1) {
+plotPoints <- function(canvas, x, y, vp, name, black = FALSE, alpha = 1, col = "grey60") {
     if (black){
         pch = 19
         col = "black"
     } else {
         pch = 1
-        col = "grey60"
+        col = col
     }
     points.name <- paste(name, "points", vpNumber(vp), sep = ".")
     canvas$image <- addGrob(canvas$image,

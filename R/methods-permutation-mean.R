@@ -98,8 +98,25 @@ dataDiffArrow <- function(canvas, e){
                                                     name = "zeroline.1"))
 }
 
-permTwoSample <- function(canvas, e){
-e}
+permTwoSample <- function(canvas, e, n.steps){
+    ## Drop samples down to middle plot.
+    x <- canvas$x
+    levels <- canvas$levels
+    y <- stackPoints(x, levels, vp = canvas$graphPath("data"))
+    y.start <- y + 2
+    y.end <- y + 1
+    y.step <- (y.start - y.end)/n.steps
+    for (i in 1:n.steps){
+        for (j in unique(levels)) {
+        plotPoints(canvas, x[levels == j],
+                   y.start[levels == j] - i*y.step[levels == j],
+                   vp = vpPath("canvas.frame", "animation.field"),
+                   name = "temp")
+    }
+        canvas$drawImage()
+    }
+
+}
 
 dropPermArrow <- function(canvas, e, n.steps){
     arrowbounds <- canvas$stat.dist[c(canvas$plotted.stats, canvas$which.sample)]

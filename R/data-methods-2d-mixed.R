@@ -4,7 +4,7 @@ load_mixed_2d <- function()
 
 # plotPoints and plotBoxplot are defined in the data-methods-numeric-1d.R file
 plotPointGroups <- function(canvas) {
-	canvas$y <- stackPoints(canvas$x, canvas$levels, vp = canvas$graphPath("data"), y.min = 0, y.max = 0.5)
+	canvas$y <- stackPoints(canvas$x, canvas$levels, vp = canvas$graphPath("data"), y.min = 0.3, y.max = 1)
 	n <- 1
 	for (i in unique(canvas$levels)) {
 		plotPoints(canvas, canvas$x[canvas$levels == i],

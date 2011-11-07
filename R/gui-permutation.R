@@ -33,6 +33,7 @@ permGUIHandler <- function(e){
                               }
                               n <- svalue(e$redraw.radio)
                               for (i in 1:n){
+                                  #e$c1$animateSample(e, n.steps = 10)
                                   e$c1$plotSample(e)
                                   e$c1$drawImage()
                                   e$c1$advanceWhichSample()
