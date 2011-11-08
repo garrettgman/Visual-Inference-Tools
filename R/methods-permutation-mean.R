@@ -16,24 +16,37 @@ load_permutation_mean <- function(e){
 
 plotSampleGroupPoints <- function(canvas, e, i){
     x <- canvas$samples[[i]]
-    y <- stackPoints(x, canvas$levels, vp = canvas$graphPath("sample"))
+    levels <- canvas$levels
+    ylevels <- unique(levels)
+    y <- stackPoints(x, levels, vp = canvas$graphPath("sample"))
     n <- 1
-    for (j in unique(canvas$levels)) {
-        plotPoints(canvas, x[canvas$levels == j],
-                   y[canvas$levels == j],
+    for (j in ylevels) {
+        plotPoints(canvas, x[levels == j],
+                   y[levels == j], col = c("darkseagreen", "tan4")[n],
                    vp = canvas$graphPath("sample", as.character(n)),
                    name = "samplePlot")
-        plotBoxplot(canvas, x[canvas$levels == j],
+        plotBoxplot(canvas, x[levels == j],
                     stat = mean, stat.color = "blue", vp = canvas$graphPath("sample", as.character(n)),
                     name = "samplePlot")
         n <- n + 1
     }
     canvas$image <- addGrob(canvas$image, linesGrob(x = unit(canvas$stat.dist[[i]], "native"),
-                                                    y = unit(0, "npc"),
+                                                    y = unit(0.8, "npc"),
                                                     gp = gpar(lwd = 2, col = "red"),
                                                     arrow = arrow(length = unit(0.1, "inches")),
-                                                    vp = canvas$graphPath("sample", 2),
+                                                    vp = canvas$graphPath("sample", 1),
                                                     name = "samplePlot.stat.2"))
+    y.mixed <- stackPoints(canvas$x, vp = canvas$graphPath("sample", 1),
+                           y.min = 0.8, y.max = 1)
+    y.mixed <- y.mixed[canvas$indexes[[i]]]
+    y.mixed.1 <- y.mixed[levels == ylevels[1]]
+    y.mixed.2 <- y.mixed[levels == ylevels[2]]
+    plotPoints(canvas, x[levels == ylevels[1]],
+               y.mixed.1, alpha = 0.5,
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "darkseagreen")
+    plotPoints(canvas, x[levels == ylevels[2]],
+               y.mixed.2, alpha = 0.5,
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
 }
 
 
@@ -77,7 +90,7 @@ dataDiffArrow <- function(canvas, e){
     n <- 1
     for (i in ylevels) {
         plotPoints(canvas, x[levels == i],
-                   y[levels == i],
+                   y[levels == i], col = c("darkseagreen", "tan4")[n],
                    vp = canvas$graphPath("data", as.character(n)),
                    name = "dataPlot")
         plotBoxplot(canvas, x[levels == i], stat = mean, stat.color = "purple",
@@ -98,23 +111,82 @@ dataDiffArrow <- function(canvas, e){
                                                     name = "zeroline.1"))
 }
 
-permTwoSample <- function(canvas, e, n.steps){
+permTwoSample <- function(canvas, e, n.steps, mix = TRUE){
+    e$clearPanel("sample")
     ## Drop samples down to middle plot.
     x <- canvas$x
     levels <- canvas$levels
-    y <- stackPoints(x, levels, vp = canvas$graphPath("data"))
-    y.start <- y + 2
-    y.end <- y + 1
+    ylevels <- unique(levels)
+    y <- stackPoints(canvas$x, canvas$levels, vp = canvas$graphPath("data"), y.min = 0.3, y.max = 1)
+    y.start <- y
+    y.end <- y - 2
     y.step <- (y.start - y.end)/n.steps
+    if (mix){
+    ## Dropping samples
     for (i in 1:n.steps){
-        for (j in unique(levels)) {
-        plotPoints(canvas, x[levels == j],
-                   y.start[levels == j] - i*y.step[levels == j],
-                   vp = vpPath("canvas.frame", "animation.field"),
-                   name = "temp")
-    }
+        plotPointGroups(canvas, x, y.start - i*y.step, levels, "data",
+                        cols = c("darkseagreen", "tan4"), "temp")
         canvas$drawImage()
     }
+    canvas$pauseImage(10)
+    canvas$image <- removeGrob(canvas$image, gPath("temp.points.1"))
+    canvas$image <- removeGrob(canvas$image, gPath("temp.points.2"))
+    ## Mixing samples
+    y.end <- stackPoints(x, vp = canvas$graphPath("sample"), y.min = 0, y.max = 0.2)
+    y.end.1 <- y.end[levels == ylevels[1]] + 0.8
+    y.end.2 <- y.end[levels == ylevels[2]] - 0.2
+    y.start.1 <- y.start[levels == ylevels[1]]
+    y.start.2 <- y.start[levels == ylevels[2]]
+    y.step.1 <- (y.start.1 - y.end.1)/n.steps
+    y.step.2 <- (y.start.2 - y.end.2)/n.steps
+    for (i in 1:n.steps){
+        plotPoints(canvas, x[levels == ylevels[1]],
+                   y.start.1 - i*y.step.1,
+                   vp = canvas$graphPath("sample", 1), name = "tempjoin", col = "darkseagreen")
+        plotPoints(canvas, x[levels == ylevels[2]],
+                   y.start.2 - i*y.step.2,
+                   vp = canvas$graphPath("sample", 2), name = "tempjoin", col = "tan4")
+        canvas$drawImage()
+    }
+    canvas$image <- removeGrob(canvas$image, gPath("tempjoin.points.1"))
+    canvas$image <- removeGrob(canvas$image, gPath("tempjoin.points.2"))
+    plotPoints(canvas, x, y.end + 0.8,
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin", col = "black")
+    canvas$pauseImage(10)
+    canvas$image <- removeGrob(canvas$image, gPath("samplePlotJoin.points.1"))
+}
+    ## Separating samples
+    x.sample <- canvas$samples[[canvas$which.sample]]
+    y.start <- stackPoints(x, vp = canvas$graphPath("sample", 1),
+                           y.min = 0.8, y.max = 1)
+    y.start <- y.start[canvas$indexes[[canvas$which.sample]]]
+    y.start.1 <- y.start[levels == ylevels[1]]
+    y.start.2 <- y.start[levels == ylevels[2]]
+    plotPoints(canvas, x.sample[levels == ylevels[1]],
+               y.start.1, alpha = 0.5,
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "darkseagreen")
+    plotPoints(canvas, x.sample[levels == ylevels[2]],
+               y.start.2, alpha = 0.5,
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
+    canvas$pauseImage(10)
+    y.sample <- stackPoints(x.sample, levels, vp = canvas$graphPath("sample"))
+    y.end.1 <- y.sample[levels == ylevels[1]]
+    y.end.2 <- y.sample[levels == ylevels[2]] + 1
+    y.step.1 <- (y.start.1 - y.end.1)/n.steps
+    y.step.2 <- (y.start.2 - y.end.2)/n.steps
+    for (i in 1:n.steps){
+        plotPoints(canvas, x.sample[levels == ylevels[1]],
+                   y.start.1 - i*y.step.1,
+                   vp = canvas$graphPath("sample", 1), name = "tempjoin1", col = "darkseagreen")
+        plotPoints(canvas, x.sample[levels == ylevels[2]],
+                   y.start.2 - i*y.step.2,
+                   vp = canvas$graphPath("sample", 1), name = "tempjoin2", col = "tan4")
+        canvas$drawImage()
+    }
+    canvas$image <- removeGrob(canvas$image, gPath("tempjoin1.points.1"))
+    canvas$image <- removeGrob(canvas$image, gPath("tempjoin2.points.1"))
+    canvas$image <- removeGrob(canvas$image, gPath("samplePlotJoin1.points.1"))
+    canvas$image <- removeGrob(canvas$image, gPath("samplePlotJoin2.points.1"))
 
 }
 

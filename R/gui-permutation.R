@@ -33,12 +33,19 @@ permGUIHandler <- function(e){
                               }
                               n <- svalue(e$redraw.radio)
                               for (i in 1:n){
-                                  #e$c1$animateSample(e, n.steps = 10)
+                                  if (n != 20){
+                                      if (n == 1){
+                                          e$c1$animateSample(e, n.steps = 10, mix = TRUE)
+                                      } else {
+                                          e$c1$animateSample(e, n.steps = 10, mix = FALSE)
+                                      }
+                                  }
                                   e$c1$plotSample(e)
-                                  e$c1$drawImage()
+                                  if (n != 5) e$c1$drawImage() else e$c1$pauseImage(10)
                                   e$c1$advanceWhichSample()
                               }
                           }
+
                           )
 
     addSpace(e$lower, 20, horizontal = FALSE)
@@ -62,6 +69,8 @@ permGUIHandler <- function(e){
                                 e$clear.stat <- TRUE
                             } else {
                                 for (i in 1:n){
+                                    if (n == 1)
+                                        e$c1$animateSample(e, n.steps = 10, mix = FALSE)
                                     e$c1$plotSample(e)
                                     if (n != 20) e$c1$animateStat(e, 10)
                                     e$c1$plotStatDist(e)
