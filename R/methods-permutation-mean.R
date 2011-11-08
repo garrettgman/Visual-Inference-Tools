@@ -30,12 +30,6 @@ plotSampleGroupPoints <- function(canvas, e, i){
                     name = "samplePlot")
         n <- n + 1
     }
-    canvas$image <- addGrob(canvas$image, linesGrob(x = unit(canvas$stat.dist[[i]], "native"),
-                                                    y = unit(0.8, "npc"),
-                                                    gp = gpar(lwd = 2, col = "red"),
-                                                    arrow = arrow(length = unit(0.1, "inches")),
-                                                    vp = canvas$graphPath("sample", 1),
-                                                    name = "samplePlot.stat.2"))
     y.mixed <- stackPoints(canvas$x, vp = canvas$graphPath("sample", 1),
                            y.min = 0.8, y.max = 1)
     y.mixed <- y.mixed[canvas$indexes[[i]]]
@@ -47,6 +41,12 @@ plotSampleGroupPoints <- function(canvas, e, i){
     plotPoints(canvas, x[levels == ylevels[2]],
                y.mixed.2, alpha = 0.5,
                vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
+        canvas$image <- addGrob(canvas$image, linesGrob(x = unit(canvas$stat.dist[[i]], "native"),
+                                                    y = unit(0.8, "npc"),
+                                                    gp = gpar(lwd = 2, col = "red"),
+                                                    arrow = arrow(length = unit(0.1, "inches")),
+                                                    vp = canvas$graphPath("sample", 1),
+                                                    name = "samplePlot.stat.2"))
 }
 
 
@@ -196,7 +196,7 @@ dropPermArrow <- function(canvas, e, n.steps){
     curr.arrow <- arrowbounds[[length(stats)]]
     curr.stat <- stats[length(stats)]
     y <- stackPoints(stats, vp = canvas$graphPath("stat"), y.min = 0)
-    y.start <- 1.5
+    y.start <- 1.4
     y.end <- y[length(stats)]
     y.step <- (y.start - y.end)/n.steps
     xs.start <- curr.arrow
