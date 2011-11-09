@@ -9,7 +9,7 @@ load_permutation_mean <- function(e){
     ANIMATE_SAMPLE <<- permTwoSample
     TRACK_SAMPLE <<- notYetImplemented
     ANIMATE_STAT <<- dropPermArrow
-    DISPLAY_RESULT <<- notYetImplemented
+    DISPLAY_RESULT <<- showTail
     HANDLE_1000 <<- perm1000
     FADE_PLOTS <<- notYetImplemented
 }
@@ -41,12 +41,16 @@ plotSampleGroupPoints <- function(canvas, e, i){
     plotPoints(canvas, x[levels == ylevels[2]],
                y.mixed.2, alpha = 0.5,
                vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
-        canvas$image <- addGrob(canvas$image, linesGrob(x = unit(canvas$stat.dist[[i]], "native"),
+    canvas$image <- addGrob(canvas$image, linesGrob(x = unit(canvas$stat.dist[[i]], "native"),
                                                     y = unit(0.8, "npc"),
                                                     gp = gpar(lwd = 2, col = "red"),
                                                     arrow = arrow(length = unit(0.1, "inches")),
                                                     vp = canvas$graphPath("sample", 1),
                                                     name = "samplePlot.stat.2"))
+    text <- as.character(levels[canvas$indexes[[i]]])
+    canvas$image <- addGrob(canvas$image, datatextGrob
+                            (data = text, title = "Permutation", x = 0.5, max = 50,
+                             name = "databox.text.2", vp = canvas$graphPath("databox", 2)))
 }
 
 
@@ -99,10 +103,10 @@ dataDiffArrow <- function(canvas, e){
         n <- n + 1
     }
     canvas$image <- addGrob(canvas$image, linesGrob(x = unit(c(mean2, mean1), "native"),
-                                                    y = unit(0, "npc"),
+                                                    y = unit(0.8, "npc"),
                                                     gp = gpar(lwd = 2, col = "red"),
                                                     arrow = arrow(length = unit(0.1, "inches")),
-                                                    vp = canvas$graphPath("data", 2),
+                                                    vp = canvas$graphPath("data", 1),
                                                     name = "dataPlot.stat.2"))
     canvas$image <- addGrob(canvas$image, linesGrob(x = unit(rep(0, 2), "native"),
                                                     y = unit(0:1, "npc"),
@@ -207,7 +211,7 @@ dropPermArrow <- function(canvas, e, n.steps){
                                           y = unit(rep(y.start - i*y.step, 2), "native"),
                                           gp = gpar(lwd = 2, col = "red"),
                                           arrow = arrow(length = unit(0.1, "inches")),
-                                          vp = vpPath("canvas.frame", "animation.field"),
+                                          vp = vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field"),
                                           name = "temp.arrow")
         canvas$image <- addGrob(canvas$image, temp.arrow)
         canvas$drawImage()
@@ -236,5 +240,66 @@ perm1000 <- function(canvas, e){
     }
     canvas$plotted.stats <- NULL
     e$clearPanel("sample")
+    canvas$image <- removeGrob(canvas$image, gPath("databox.text.2"))
     canvas$drawImage()
+}
+
+showTail <- function(canvas, e){
+    n.steps <- 10
+    x <- canvas$x
+    levels <- canvas$levels
+    ylevels <- unique(levels)
+    mean1 <- mean(x[levels == ylevels[1]])
+    mean2 <- mean(x[levels != ylevels[1]])
+    y.start <- 2.4
+    y.end <- 0
+    y.step <- (y.start - y.end)/n.steps
+    x.start <- mean2
+    x.end <- mean(range(x))
+    x.step <- (x.start - x.end)/n.steps
+    for (i in 0:10){
+        canvas$image <- addGrob(canvas$image, linesGrob(x = unit(c(mean2, mean1) - i*x.step, "native"),
+                                                        y = unit(y.start - i*y.step, "native"),
+                                                        gp = gpar(lwd = 2, col = "red"),
+                                                        arrow = arrow(length = unit(0.1, "inches")),
+                                                        vp = vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field"),
+                                                        name = "temp.arrow"))
+        canvas$drawImage()
+    }
+    stats <- sapply(canvas$stat.dist, diff)
+    diff <- diff(c(mean2, mean1))
+    tot <- sum(stats >= diff)
+    p <- mean(stats >= diff)
+    y.max <- unit(1, "npc") - unit(2, "lines")
+    y <- stackPoints(stats, vp = canvas$graphPath("stat"), y.min = 0,
+                     y.max = y.max)
+    x.in <- stats[stats < diff]
+    x.out <- stats[stats >= diff]
+    y.in <- y[stats < diff]
+    y.out <- y[stats >= diff]
+    if (length(x.in) > 0)
+        canvas$image <- addGrob(canvas$image, pointsGrob
+                                (x.in, y.in, gp = gpar(col = "lightgrey", lwd = 2, alpha = 0.7),
+                                 vp = canvas$graphPath("stat"), name = "lightpoints"))
+    if (length(x.out) > 0)
+        canvas$image <- addGrob(canvas$image, pointsGrob
+                                (x.out, y.out, gp = gpar(col = "grey60", lwd = 2, alpha = 0.7),
+                                         vp = canvas$graphPath("stat"), name = "darkpoints"))
+    canvas$image <- addGrob(canvas$image, textGrob
+                            (paste(tot, "/ 1000 =", p, sep = " "),
+                             x = unit(diff, "native"), y = unit(0.5, "npc"),
+                             just = c("centre", "bottom"), vp = canvas$graphPath("stat"),
+                             name = "proptext"))
+    canvas$image <- addGrob(canvas$image, linesGrob
+                            (x = unit(rep(diff, 2), "native"),
+                             y = unit(c(0, 0.5), "npc") - unit(1, "mm"),
+                             vp = canvas$graphPath("stat"), name = "propline"))
+    canvas$drawImage()
+    canvas$image <- removeGrob(canvas$image, gPath("temp.arrow"))
+    canvas$image <- removeGrob(canvas$image, gPath("proptext"))
+    canvas$image <- removeGrob(canvas$image, gPath("propline"))
+    if (length(x.in) > 0)
+        canvas$image <- removeGrob(canvas$image, gPath("lightpoints"))
+    if (length(x.out) > 0)
+        canvas$image <- removeGrob(canvas$image, gPath("darkpoints"))
 }

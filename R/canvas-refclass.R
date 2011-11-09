@@ -139,11 +139,24 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
                                       just = c("left", "bottom"),
                                       gp = gpar(col = "gray40", fill = "gray95", lwd = 2),
                                       vp = graphPath("databox", 2))
-            text.sample <- datatextGrob(data = x, title = "Sample", max = 50, name = "text.sample",
-                                     vp = graphPath("databox", 1))
             image <<- addGrob(image, databox1)
             image <<- addGrob(image, databox2)
-            image <<- addGrob(image, text.sample)
+            if (is.null(levels)){
+                text.sample <- datatextGrob(data = x, title = "Sample", max = 50,
+                                            name = "text.sample",
+                                            vp = graphPath("databox", 1))
+                image <<- addGrob(image, text.sample)
+            } else {
+                text.sample1 <- datatextGrob(data = x, title = "Sample", x = 0.25,
+                                             max = 50, name = "text.sample1",
+                                             vp = graphPath("databox", 1))
+                text.sample2 <- datatextGrob(data = as.character(levels), title = "Levels",
+                                             x = 0.75,
+                                             max = 50, name = "text.sample2",
+                                             vp = graphPath("databox", 1))
+                image <<- addGrob(image, text.sample1)
+                image <<- addGrob(image, text.sample2)
+            }
         },
         buildImage = function(data.boxes = FALSE) {
             'builds an initial image for a canvas object. The initial image is just the background, with nothing added.'

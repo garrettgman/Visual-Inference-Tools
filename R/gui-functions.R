@@ -136,6 +136,7 @@ dataGUI <- function(e){
         clear_actions(e)
         loadPlotDetails(e, e$c1)
         e$buildCanvas()
+        if (e$data.boxes) e$c1$buildBoxes()
         e$c1$drawImage()
         enabled(e$upper) <- TRUE
         enabled(e$lower) <- FALSE

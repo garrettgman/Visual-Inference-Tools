@@ -15,30 +15,34 @@ grid.datatext <- function(...)
 #' @param gp graphical parameters for the text, constructed with gpar().
 #' @param vp a default viewport to be used when drawing the grob.
 
-datatextGrob <- function(data, title = NULL, max = 30, name = NULL, gp = NULL, vp = NULL){
+datatextGrob <- function(data, title = NULL, x = 0.5, max = 30, name = NULL, gp = NULL, vp = NULL){
+    if (is.numeric(data)){
+        data <- format(round(data, 1), nsmall = 1)
+    }
     n <- length(data)
     if (n <= max){
         ntext <- n
-        datalabs <- c(title, format(round(data, 1), nsmall = 1))
+        datalabs <- c(title, data)
     } else {
         ntext <- max
-        datalabs <- c(title, format(round(data[1:(max - 1)], 1), nsmall = 1), "...")
+        datalabs <- c(title, data[1:(max - 1)], "...")
     }
     npcs <- (ntext:0)/ntext
     yunit <- unit(npcs, "npc") - unit(4*(npcs - 0.5), "mm") + unit(1 - npcs, "lines")
-    grob(data = data, datalabs = datalabs, yunit = yunit, max = max,
+    grob(data = data, datalabs = datalabs, x = x, yunit = yunit, max = max,
          name = name, gp = gp, vp = vp, cl = "datatext")
 }
 
 drawDetails.datatext <- function(x, recording){
     datalabs <- x$datalabs
     yunit <- x$yunit
-    grid.text(datalabs, y = yunit, just = "top")
+    x <- x$x
+    grid.text(datalabs, x = x, y = yunit, just = "top")
 }
 
 editDetails.datatext <- function(x, spec){
-    x <- datatextGrob(x$data, x$title, x$name, x$gp, x$vp)
-    x
+    g <- datatextGrob(x$data, x$title, x$x, x$name, x$gp, x$vp)
+    g
 }
 
 vaildDetails.datatext <- function(x){

@@ -41,7 +41,7 @@ makeVitGraphViewportsBoxes <- function(x.scale, nlevels.y, stat.scale){
                           name = "data.data")
     sample <- splitDataPane(x.scale = x.scale, n = nlevels.y,
                             layout.pos.row = 2, name = "sample.data")
-    stat <- dataViewport(xscale = x.scale, yscale = c(0, 1), layout.pos.row = 3,
+    stat <- dataViewport(xscale = stat.scale, yscale = c(0, 1), layout.pos.row = 3,
                          name = "stat.data.1")
     boxes <- vpTree(canvas.boxes, vpList(databox.1, databox.2))
     plots <- vpTree(canvas.plots, vpList(vpTree(canvas.frame, vpList(vpTree(animation.field,

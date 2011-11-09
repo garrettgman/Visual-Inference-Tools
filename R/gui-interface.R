@@ -45,7 +45,7 @@ vit <- function(cb = FALSE) {
                               function(h, ...){
                                   dispose(home)
                                   graphics.off()
-                                  dev.new(height = 50, width = 50)
+                                  dev.new(height = 50, width = 75)
                                   plot.new()
                                   e <- new.vit.env()
                                   #initialize_actions(e)
