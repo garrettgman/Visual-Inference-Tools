@@ -17,12 +17,12 @@ load_permutation_median <- function(e){
 plotSampleGroupPointsMedian <- function(canvas, e, i){
     x <- canvas$samples[[i]]
     levels <- canvas$levels
-    ylevels <- unique(levels)
+    ylevels <- sort(unique(levels))
     y <- stackPoints(x, levels, vp = canvas$graphPath("sample"))
     n <- 1
     for (j in ylevels) {
         plotPoints(canvas, x[levels == j],
-                   y[levels == j], col = c("darkseagreen", "tan4")[n],
+                   y[levels == j], col = c("tan4", "darkseagreen")[n],
                    vp = canvas$graphPath("sample", as.character(n)),
                    name = "samplePlot")
         plotBoxplot(canvas, x[levels == j],
@@ -37,10 +37,10 @@ plotSampleGroupPointsMedian <- function(canvas, e, i){
     y.mixed.2 <- y.mixed[levels == ylevels[2]]
     plotPoints(canvas, x[levels == ylevels[1]],
                y.mixed.1, alpha = 0.25,
-               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "darkseagreen")
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "tan4")
     plotPoints(canvas, x[levels == ylevels[2]],
                y.mixed.2, alpha = 0.25,
-               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "darkseagreen")
     canvas$image <- addGrob(canvas$image, linesGrob(x = unit(canvas$stat.dist[[i]], "native"),
                                                     y = unit(0.8, "npc"),
                                                     gp = gpar(lwd = 2, col = "red"),
@@ -55,7 +55,7 @@ plotSampleGroupPointsMedian <- function(canvas, e, i){
 }
 
 calcMedianDiff <- function(x, y){
-    ylevels <- unique(y)
+    ylevels <- sort(unique(y))
     median1 <- median(x[y == ylevels[1]])
     median2 <- median(x[y != ylevels[1]])
     c(median2, median1)
@@ -64,14 +64,14 @@ calcMedianDiff <- function(x, y){
 dataDiffArrowMedian <- function(canvas, e){
     x <- canvas$x
     levels <- canvas$levels
-    ylevels <- unique(levels)
+    ylevels <- sort(unique(levels))
     median1 <- median(x[levels == ylevels[1]])
     median2 <- median(x[levels != ylevels[1]])
     y <- stackPoints(x, levels, vp = canvas$graphPath("data"))
     n <- 1
     for (i in ylevels) {
         plotPoints(canvas, x[levels == i],
-                   y[levels == i], col = c("darkseagreen", "tan4")[n],
+                   y[levels == i], col = c("tan4", "darkseagreen")[n],
                    vp = canvas$graphPath("data", as.character(n)),
                    name = "dataPlot")
         plotBoxplot(canvas, x[levels == i], stat = median, stat.color = "purple",
@@ -96,7 +96,7 @@ showTailMedian <- function(canvas, e){
     n.steps <- 10
     x <- canvas$x
     levels <- canvas$levels
-    ylevels <- unique(levels)
+    ylevels <- sort(unique(levels))
     median1 <- median(x[levels == ylevels[1]])
     median2 <- median(x[levels != ylevels[1]])
     y.start <- 2.4
@@ -117,15 +117,24 @@ showTailMedian <- function(canvas, e){
     canvas$image <- removeGrob(canvas$image, gPath("temp.arrow"))
     stats <- sapply(canvas$stat.dist, diff)
     diff <- diff(c(median2, median1))
-    tot <- sum(stats >= diff)
-    p <- mean(stats >= diff)
     y.max <- unit(1, "npc") - unit(2, "lines")
     y <- stackPoints(stats, vp = canvas$graphPath("stat"), y.min = 0,
                      y.max = y.max)
-    x.in <- stats[stats < diff]
-    x.out <- stats[stats >= diff]
-    y.in <- y[stats < diff]
-    y.out <- y[stats >= diff]
+    if (diff > 0){
+        x.in <- stats[stats < diff]
+        x.out <- stats[stats >= diff]
+        y.in <- y[stats < diff]
+        y.out <- y[stats >= diff]
+        tot <- sum(stats >= diff)
+        p <- mean(stats >= diff)
+    } else {
+        x.in <- stats[stats > diff]
+        x.out <- stats[stats <= diff]
+        y.in <- y[stats > diff]
+        y.out <- y[stats <= diff]
+        tot <- sum(stats <= diff)
+        p <- mean(stats <= diff)
+    }
     if (length(x.in) > 0)
         canvas$image <- addGrob(canvas$image, pointsGrob
                                 (x.in, y.in, gp = gpar(col = "lightgrey", lwd = 2, alpha = 0.7),

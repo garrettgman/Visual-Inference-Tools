@@ -17,13 +17,13 @@ load_permutation_mean <- function(e){
 plotSampleGroupPointsMean <- function(canvas, e, i){
     x <- canvas$samples[[i]]
     levels <- canvas$levels
-    ylevels <- unique(levels)
+    ylevels <- sort(unique(levels))
     y <- stackPoints(x, levels, vp = canvas$graphPath("sample"))
     n <- 1
     ## Plotting samples
     for (j in ylevels) {
         plotPoints(canvas, x[levels == j],
-                   y[levels == j], col = c("darkseagreen", "tan4")[n],
+                   y[levels == j], col = c("tan4", "darkseagreen")[n],
                    vp = canvas$graphPath("sample", as.character(n)),
                    name = "samplePlot")
         plotBoxplot(canvas, x[levels == j],
@@ -39,10 +39,10 @@ plotSampleGroupPointsMean <- function(canvas, e, i){
     ## Plotting faded mixed sample
     plotPoints(canvas, x[levels == ylevels[1]],
                y.mixed.1, alpha = 0.25,
-               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "darkseagreen")
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "tan4")
     plotPoints(canvas, x[levels == ylevels[2]],
                y.mixed.2, alpha = 0.25,
-               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "darkseagreen")
     canvas$image <- addGrob(canvas$image, linesGrob(x = unit(canvas$stat.dist[[i]], "native"),
                                                     y = unit(0.8, "npc"),
                                                     gp = gpar(lwd = 2, col = "red"),
@@ -81,7 +81,7 @@ permLabels <- function(canvas){
 }
 
 calcMeanDiff <- function(x, y){
-    ylevels <- unique(y)
+    ylevels <- sort(unique(y))
     mean1 <- mean(x[y == ylevels[1]])
     mean2 <- mean(x[y != ylevels[1]])
     c(mean2, mean1)
@@ -90,7 +90,7 @@ calcMeanDiff <- function(x, y){
 dataDiffArrowMean <- function(canvas, e){
     x <- canvas$x
     levels <- canvas$levels
-    ylevels <- unique(levels)
+    ylevels <- sort(unique(levels))
     mean1 <- mean(x[levels == ylevels[1]])
     mean2 <- mean(x[levels != ylevels[1]])
     y <- stackPoints(x, levels, vp = canvas$graphPath("data"))
@@ -98,7 +98,7 @@ dataDiffArrowMean <- function(canvas, e){
     ## Plotting coloured data.
     for (i in ylevels) {
         plotPoints(canvas, x[levels == i],
-                   y[levels == i], col = c("darkseagreen", "tan4")[n],
+                   y[levels == i], col = c("tan4", "darkseagreen")[n],
                    vp = canvas$graphPath("data", as.character(n)),
                    name = "dataPlot")
         plotBoxplot(canvas, x[levels == i], stat = mean, stat.color = "purple",
@@ -125,7 +125,7 @@ permTwoSample <- function(canvas, e, n.steps, mix = TRUE){
     ## Drop samples down to middle plot.
     x <- canvas$x
     levels <- canvas$levels
-    ylevels <- unique(levels)
+    ylevels <- sort(unique(levels))
     y <- stackPoints(canvas$x, canvas$levels, vp = canvas$graphPath("data"), y.min = 0.3, y.max = 1)
     y.start <- y
     y.end <- y - 2
@@ -134,7 +134,7 @@ permTwoSample <- function(canvas, e, n.steps, mix = TRUE){
     ## Dropping samples
     for (i in 1:n.steps){
         plotPointGroups(canvas, x, y.start - i*y.step, levels, "data",
-                        cols = c("darkseagreen", "tan4"), "temp")
+                        cols = c("tan4", "darkseagreen"), "temp")
         canvas$drawImage()
     }
     canvas$pauseImage(10)
@@ -151,10 +151,10 @@ permTwoSample <- function(canvas, e, n.steps, mix = TRUE){
     for (i in 1:n.steps){
         plotPoints(canvas, x[levels == ylevels[1]],
                    y.start.1 - i*y.step.1,
-                   vp = canvas$graphPath("sample", 1), name = "tempjoin", col = "darkseagreen")
+                   vp = canvas$graphPath("sample", 1), name = "tempjoin", col = "tan4")
         plotPoints(canvas, x[levels == ylevels[2]],
                    y.start.2 - i*y.step.2,
-                   vp = canvas$graphPath("sample", 2), name = "tempjoin", col = "tan4")
+                   vp = canvas$graphPath("sample", 2), name = "tempjoin", col = "darkseagreen")
         canvas$drawImage()
     }
     canvas$image <- removeGrob(canvas$image, gPath("tempjoin.points.1"))
@@ -173,10 +173,10 @@ permTwoSample <- function(canvas, e, n.steps, mix = TRUE){
     y.start.2 <- y.start[levels == ylevels[2]]
     plotPoints(canvas, x.sample[levels == ylevels[1]],
                y.start.1, alpha = 0.25,
-               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "darkseagreen")
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "tan4")
     plotPoints(canvas, x.sample[levels == ylevels[2]],
                y.start.2, alpha = 0.25,
-               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
+               vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "darkseagreen")
     canvas$pauseImage(10)
     y.sample <- stackPoints(x.sample, levels, vp = canvas$graphPath("sample"))
     y.end.1 <- y.sample[levels == ylevels[1]]
@@ -186,10 +186,10 @@ permTwoSample <- function(canvas, e, n.steps, mix = TRUE){
     for (i in 1:n.steps){
         plotPoints(canvas, x.sample[levels == ylevels[1]],
                    y.start.1 - i*y.step.1,
-                   vp = canvas$graphPath("sample", 1), name = "tempjoin1", col = "darkseagreen")
+                   vp = canvas$graphPath("sample", 1), name = "tempjoin1", col = "tan4")
         plotPoints(canvas, x.sample[levels == ylevels[2]],
                    y.start.2 - i*y.step.2,
-                   vp = canvas$graphPath("sample", 1), name = "tempjoin2", col = "tan4")
+                   vp = canvas$graphPath("sample", 1), name = "tempjoin2", col = "darkseagreen")
         canvas$drawImage()
     }
     canvas$image <- removeGrob(canvas$image, gPath("tempjoin1.points.1"))
@@ -253,7 +253,7 @@ showTailMean <- function(canvas, e){
     n.steps <- 10
     x <- canvas$x
     levels <- canvas$levels
-    ylevels <- unique(levels)
+    ylevels <- sort(unique(levels))
     mean1 <- mean(x[levels == ylevels[1]])
     mean2 <- mean(x[levels != ylevels[1]])
     y.start <- 2.4
@@ -274,15 +274,24 @@ showTailMean <- function(canvas, e){
     canvas$image <- removeGrob(canvas$image, gPath("temp.arrow"))
     stats <- sapply(canvas$stat.dist, diff)
     diff <- diff(c(mean2, mean1))
-    tot <- sum(stats >= diff)
-    p <- mean(stats >= diff)
     y.max <- unit(1, "npc") - unit(2, "lines")
     y <- stackPoints(stats, vp = canvas$graphPath("stat"), y.min = 0,
                      y.max = y.max)
-    x.in <- stats[stats < diff]
-    x.out <- stats[stats >= diff]
-    y.in <- y[stats < diff]
-    y.out <- y[stats >= diff]
+    if (diff > 0){
+        x.in <- stats[stats < diff]
+        x.out <- stats[stats >= diff]
+        y.in <- y[stats < diff]
+        y.out <- y[stats >= diff]
+        tot <- sum(stats >= diff)
+        p <- mean(stats >= diff)
+    } else {
+        x.in <- stats[stats > diff]
+        x.out <- stats[stats <= diff]
+        y.in <- y[stats > diff]
+        y.out <- y[stats <= diff]
+        tot <- sum(stats <= diff)
+        p <- mean(stats <= diff)
+    }
     if (length(x.in) > 0)
         canvas$image <- addGrob(canvas$image, pointsGrob
                                 (x.in, y.in, gp = gpar(col = "lightgrey", lwd = 2, alpha = 0.7),

@@ -86,7 +86,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Plots a vector or dataframe of data points.'
 		PLOT_DATA(.self)
 	},
-	plotDataStat = function(env) {
+	plotDataStat = function(env, ...) {
 		'Plots the sample statistic with the sample.'
 		PLOT_DATA_STAT(.self, env)
             },
@@ -98,7 +98,7 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
 		'Plots the sample statistic with the sample.'
 		PLOT_SAMPLE_STAT(.self, env, i, ...)
 	},
-	plotStatDist = function(env) {
+	plotStatDist = function(env, ...) {
 		'Plots the distribution of the sample statistic.'
 		PLOT_STAT_DIST(.self, env)
 	},
