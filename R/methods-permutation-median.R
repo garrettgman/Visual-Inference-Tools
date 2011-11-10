@@ -36,10 +36,10 @@ plotSampleGroupPointsMedian <- function(canvas, e, i){
     y.mixed.1 <- y.mixed[levels == ylevels[1]]
     y.mixed.2 <- y.mixed[levels == ylevels[2]]
     plotPoints(canvas, x[levels == ylevels[1]],
-               y.mixed.1, alpha = 0.5,
+               y.mixed.1, alpha = 0.25,
                vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "darkseagreen")
     plotPoints(canvas, x[levels == ylevels[2]],
-               y.mixed.2, alpha = 0.5,
+               y.mixed.2, alpha = 0.25,
                vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
     canvas$image <- addGrob(canvas$image, linesGrob(x = unit(canvas$stat.dist[[i]], "native"),
                                                     y = unit(0.8, "npc"),
@@ -48,8 +48,9 @@ plotSampleGroupPointsMedian <- function(canvas, e, i){
                                                     vp = canvas$graphPath("sample", 1),
                                                     name = "samplePlot.stat.2"))
     text <- as.character(levels[canvas$indexes[[i]]])
-    canvas$image <- addGrob(canvas$image, datatextGrob
-                            (data = text, title = "Permutation", x = 0.5, max = 50,
+    canvas$image <- addGrob(canvas$image, coldatatextGrob
+                            (data = text, title = "Re-randomised", cols = c("tan4", "darkseagreen"),
+                             x = 0.5, max = 50,
                              name = "databox.text.2", vp = canvas$graphPath("databox", 2)))
 }
 

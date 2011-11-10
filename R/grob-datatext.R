@@ -29,7 +29,7 @@ datatextGrob <- function(data, title = NULL, x = 0.5, max = 30, name = NULL, gp 
     }
     npcs <- (ntext:0)/ntext
     yunit <- unit(npcs, "npc") - unit(4*(npcs - 0.5), "mm") + unit(1 - npcs, "lines")
-    grob(data = data, datalabs = datalabs, x = x, yunit = yunit, max = max,
+    grob(data = data, title = title, datalabs = datalabs, x = x, yunit = yunit, max = max,
          name = name, gp = gp, vp = vp, cl = "datatext")
 }
 
@@ -45,13 +45,14 @@ editDetails.datatext <- function(x, spec){
     g
 }
 
-vaildDetails.datatext <- function(x){
+validDetails.datatext <- function(x){
     if (!is.vector(x$data))
         stop("data must be provided as a vector")
     if (length(x$title) != 1)
-        stop("title should be a vector of length 1")
+        stop("title must be a vector of length 1")
     if (!is.numeric(x$max) | length(x$max) != 1 | x$max < 1)
         stop("max should be a numeric vector of length 1")
+    x
 }
 
 grid.datatext.example <- function(data = rnorm(100), title = "X", name = "datatext.example")

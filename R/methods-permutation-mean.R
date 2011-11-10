@@ -20,6 +20,7 @@ plotSampleGroupPointsMean <- function(canvas, e, i){
     ylevels <- unique(levels)
     y <- stackPoints(x, levels, vp = canvas$graphPath("sample"))
     n <- 1
+    ## Plotting samples
     for (j in ylevels) {
         plotPoints(canvas, x[levels == j],
                    y[levels == j], col = c("darkseagreen", "tan4")[n],
@@ -35,11 +36,12 @@ plotSampleGroupPointsMean <- function(canvas, e, i){
     y.mixed <- y.mixed[canvas$indexes[[i]]]
     y.mixed.1 <- y.mixed[levels == ylevels[1]]
     y.mixed.2 <- y.mixed[levels == ylevels[2]]
+    ## Plotting faded mixed sample
     plotPoints(canvas, x[levels == ylevels[1]],
-               y.mixed.1, alpha = 0.5,
+               y.mixed.1, alpha = 0.25,
                vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "darkseagreen")
     plotPoints(canvas, x[levels == ylevels[2]],
-               y.mixed.2, alpha = 0.5,
+               y.mixed.2, alpha = 0.25,
                vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
     canvas$image <- addGrob(canvas$image, linesGrob(x = unit(canvas$stat.dist[[i]], "native"),
                                                     y = unit(0.8, "npc"),
@@ -48,26 +50,27 @@ plotSampleGroupPointsMean <- function(canvas, e, i){
                                                     vp = canvas$graphPath("sample", 1),
                                                     name = "samplePlot.stat.2"))
     text <- as.character(levels[canvas$indexes[[i]]])
-    canvas$image <- addGrob(canvas$image, datatextGrob
-                            (data = text, title = "Permutation", x = 0.5, max = 50,
+    canvas$image <- addGrob(canvas$image, coldatatextGrob
+                            (data = text, title = "Re-randomised", cols = c("tan4", "darkseagreen"),
+                             xpos = 0.5, max = 50,
                              name = "databox.text.2", vp = canvas$graphPath("databox", 2)))
 }
 
 
 permLabels <- function(canvas){
-    samplabel <- textGrob("Samples",
+    samplabel <- textGrob("Data",
                          x = unit(0, "npc") + unit(1, "mm"),
                          y = unit(0.8, "npc"),
                          just = c("left", "top"),
                          vp = canvas$graphPath("data", 2),
                          gp = gpar(fontface = 2))
-    resamplabel <- textGrob("Permuted samples",
+    resamplabel <- textGrob("Re-randomised samples",
                           x = unit(0, "npc") + unit(1, "mm"),
                           y = unit(0.6, "npc"),
                           just = c("left", "top"),
                           vp = canvas$graphPath("sample", 2),
                           gp = gpar(fontface = 2))
-    statlabel <- textGrob("Permutation distribution",
+    statlabel <- textGrob("Re-randomised distribution",
                           x = unit(0, "npc") + unit(1, "mm"),
                           y = unit(0.8, "npc"),
                           just = c("left", "top"),
@@ -92,6 +95,7 @@ dataDiffArrowMean <- function(canvas, e){
     mean2 <- mean(x[levels != ylevels[1]])
     y <- stackPoints(x, levels, vp = canvas$graphPath("data"))
     n <- 1
+    ## Plotting coloured data.
     for (i in ylevels) {
         plotPoints(canvas, x[levels == i],
                    y[levels == i], col = c("darkseagreen", "tan4")[n],
@@ -102,6 +106,7 @@ dataDiffArrowMean <- function(canvas, e){
                     name = "dataPlot")
         n <- n + 1
     }
+    ## Plotting arrow on data plot.
     canvas$image <- addGrob(canvas$image, linesGrob(x = unit(c(mean2, mean1), "native"),
                                                     y = unit(0.8, "npc"),
                                                     gp = gpar(lwd = 2, col = "red"),
@@ -167,10 +172,10 @@ permTwoSample <- function(canvas, e, n.steps, mix = TRUE){
     y.start.1 <- y.start[levels == ylevels[1]]
     y.start.2 <- y.start[levels == ylevels[2]]
     plotPoints(canvas, x.sample[levels == ylevels[1]],
-               y.start.1, alpha = 0.5,
+               y.start.1, alpha = 0.25,
                vp = canvas$graphPath("sample", 1), name = "samplePlotJoin1", col = "darkseagreen")
     plotPoints(canvas, x.sample[levels == ylevels[2]],
-               y.start.2, alpha = 0.5,
+               y.start.2, alpha = 0.25,
                vp = canvas$graphPath("sample", 1), name = "samplePlotJoin2", col = "tan4")
     canvas$pauseImage(10)
     y.sample <- stackPoints(x.sample, levels, vp = canvas$graphPath("sample"))
