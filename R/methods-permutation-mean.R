@@ -1,20 +1,20 @@
 #' methods for permutation tests.
 load_permutation_mean <- function(e){
     PLOT_DATA <<- PLOT_DATA
-    PLOT_SAMPLE <<- plotSampleGroupPoints
+    PLOT_SAMPLE <<- plotSampleGroupPointsMean
     SHOW_LABELS <<- permLabels
     CALC_STAT <<- calcMeanDiff
-    PLOT_DATA_STAT <<- dataDiffArrow
+    PLOT_DATA_STAT <<- dataDiffArrowMean
     PLOT_STAT_DIST <<- plotDiffDist
     ANIMATE_SAMPLE <<- permTwoSample
     TRACK_SAMPLE <<- notYetImplemented
     ANIMATE_STAT <<- dropPermArrow
-    DISPLAY_RESULT <<- showTail
+    DISPLAY_RESULT <<- showTailMean
     HANDLE_1000 <<- perm1000
     FADE_PLOTS <<- notYetImplemented
 }
 
-plotSampleGroupPoints <- function(canvas, e, i){
+plotSampleGroupPointsMean <- function(canvas, e, i){
     x <- canvas$samples[[i]]
     levels <- canvas$levels
     ylevels <- unique(levels)
@@ -84,7 +84,7 @@ calcMeanDiff <- function(x, y){
     c(mean2, mean1)
 }
 
-dataDiffArrow <- function(canvas, e){
+dataDiffArrowMean <- function(canvas, e){
     x <- canvas$x
     levels <- canvas$levels
     ylevels <- unique(levels)
@@ -244,7 +244,7 @@ perm1000 <- function(canvas, e){
     canvas$drawImage()
 }
 
-showTail <- function(canvas, e){
+showTailMean <- function(canvas, e){
     n.steps <- 10
     x <- canvas$x
     levels <- canvas$levels
@@ -266,6 +266,7 @@ showTail <- function(canvas, e){
                                                         name = "temp.arrow"))
         canvas$drawImage()
     }
+    canvas$image <- removeGrob(canvas$image, gPath("temp.arrow"))
     stats <- sapply(canvas$stat.dist, diff)
     diff <- diff(c(mean2, mean1))
     tot <- sum(stats >= diff)
@@ -294,10 +295,18 @@ showTail <- function(canvas, e){
                             (x = unit(rep(diff, 2), "native"),
                              y = unit(c(0, 0.5), "npc") - unit(1, "mm"),
                              vp = canvas$graphPath("stat"), name = "propline"))
+    canvas$image <- addGrob(canvas$image, linesGrob
+                            (x = unit(c(mean2, mean1) - x.start + x.end, "native"),
+                             y = unit(y.end, "native"),
+                             gp = gpar(lwd = 2, col = "red"),
+                             arrow = arrow(length = unit(0.1, "inches")),
+                             vp = vpPath("canvas.all", "canvas.plots",
+                             "canvas.frame", "animation.field"),
+                             name = "statPlot.arrow.1"))
     canvas$drawImage()
-    canvas$image <- removeGrob(canvas$image, gPath("temp.arrow"))
     canvas$image <- removeGrob(canvas$image, gPath("proptext"))
     canvas$image <- removeGrob(canvas$image, gPath("propline"))
+    canvas$image <- removeGrob(canvas$image, gPath("statPlot.arrow.1"))
     if (length(x.in) > 0)
         canvas$image <- removeGrob(canvas$image, gPath("lightpoints"))
     if (length(x.out) > 0)
