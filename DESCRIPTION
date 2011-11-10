@@ -29,6 +29,7 @@ Collate:
 	'error-checks.R'
 	'grob-boxplot.R'
 	'grob-ci.R'
+	'grob-coloureddatatext.R'
 	'grob-datatext.R'
 	'grob-ghosts.R'
 	'grob-hist.R'
