@@ -196,7 +196,6 @@ permTwoSample <- function(canvas, e, n.steps, mix = TRUE){
     canvas$image <- removeGrob(canvas$image, gPath("tempjoin2.points.1"))
     canvas$image <- removeGrob(canvas$image, gPath("samplePlotJoin1.points.1"))
     canvas$image <- removeGrob(canvas$image, gPath("samplePlotJoin2.points.1"))
-
 }
 
 dropPermArrow <- function(canvas, e, n.steps){

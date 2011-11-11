@@ -20,6 +20,7 @@ plotSampleGroupPointsMedian <- function(canvas, e, i){
     ylevels <- sort(unique(levels))
     y <- stackPoints(x, levels, vp = canvas$graphPath("sample"))
     n <- 1
+    ## Plotting points and boxplots
     for (j in ylevels) {
         plotPoints(canvas, x[levels == j],
                    y[levels == j], col = c("tan4", "darkseagreen")[n],
@@ -106,12 +107,13 @@ showTailMedian <- function(canvas, e){
     x.end <- mean(range(x))
     x.step <- (x.start - x.end)/n.steps
     for (i in 0:10){
-        canvas$image <- addGrob(canvas$image, linesGrob(x = unit(c(median2, median1) - i*x.step, "native"),
-                                                        y = unit(y.start - i*y.step, "native"),
-                                                        gp = gpar(lwd = 2, col = "red"),
-                                                        arrow = arrow(length = unit(0.1, "inches")),
-                                                        vp = canvas$graphPath("animation.field"),
-                                                        name = "temp.arrow"))
+        canvas$image <- addGrob(canvas$image, linesGrob
+                                (x = unit(c(median2, median1) - i*x.step, "native"),
+                                 y = unit(y.start - i*y.step, "native"),
+                                 gp = gpar(lwd = 2, col = "red"),
+                                 arrow = arrow(length = unit(0.1, "inches")),
+                                 vp = canvas$graphPath("animation.field"),
+                                 name = "temp.arrow"))
         canvas$drawImage()
     }
     canvas$image <- removeGrob(canvas$image, gPath("temp.arrow"))
@@ -120,6 +122,9 @@ showTailMedian <- function(canvas, e){
     y.max <- unit(1, "npc") - unit(2, "lines")
     y <- stackPoints(stats, vp = canvas$graphPath("stat"), y.min = 0,
                      y.max = y.max)
+    ## We only consider one-tailed p-values - the statistics
+    ## considered "more extreme" that what is observed therefore
+    ## depends on the original direction of the observed effect.
     if (diff > 0){
         x.in <- stats[stats < diff]
         x.out <- stats[stats >= diff]
@@ -135,14 +140,16 @@ showTailMedian <- function(canvas, e){
         tot <- sum(stats <= diff)
         p <- mean(stats <= diff)
     }
-    if (length(x.in) > 0)
+    if (length(x.in) > 0){
         canvas$image <- addGrob(canvas$image, pointsGrob
                                 (x.in, y.in, gp = gpar(col = "lightgrey", lwd = 2, alpha = 0.7),
                                  vp = canvas$graphPath("stat"), name = "lightpoints"))
-    if (length(x.out) > 0)
+    }
+    if (length(x.out) > 0){
         canvas$image <- addGrob(canvas$image, pointsGrob
                                 (x.out, y.out, gp = gpar(col = "grey60", lwd = 2, alpha = 0.7),
-                                         vp = canvas$graphPath("stat"), name = "darkpoints"))
+                                 vp = canvas$graphPath("stat"), name = "darkpoints"))
+    }
     canvas$image <- addGrob(canvas$image, textGrob
                             (paste(tot, "/ 1000 =", p, sep = " "),
                              x = unit(diff, "native"), y = unit(0.5, "npc"),
