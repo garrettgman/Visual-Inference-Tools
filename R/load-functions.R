@@ -20,7 +20,11 @@ loadPlotDetails <- function(e, canvas) {
     } else {
         load_numeric_2d()
     }
-    if (e$data.boxes) GRAPHPATH <<- graphPathBoxes else GRAPHPATH <<- graphPathNoBoxes
+    if (e$data.boxes){
+        GRAPHPATH <<- graphPathBoxes
+    } else {
+        GRAPHPATH <<- graphPathNoBoxes
+    }
 }
 
 # calls the load function for the selected statistic method. The load

@@ -114,10 +114,9 @@ canvas <- setRefClass("canvasClass", fields = c("x", "y", "levels", "n",
         },
 
         graphPath = function(plot.name = "sample", number = "1") {
-            'Different graphpath methods required depending on whether or not data boxes are plotted'
+            'Different graphpath methods required depending on whether or not databoxes are plotted'
             GRAPHPATH(plot.name, number)
         },
-
 	# Helpers
 	advanceWhichSample = function() {
 		'Advances which.sample.'

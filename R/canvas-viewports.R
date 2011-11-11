@@ -68,39 +68,46 @@ splitDataPane <- function(x.scale, n, layout.pos.row, name) {
 ## returns the vpPath to the graph viewport for the specified field.
 
 graphPathNoBoxes <- function(plot.name = "sample", number = "1") {
-    if(!(plot.name %in% c("data", "sample", "stat")))
+    if(!(plot.name %in% c("data", "sample", "stat", "animation.field")))
         stop("plot.name must be \'data', \'sample', or \'stat'.")
     if (is.numeric(number)) number <- as.character(number)
     if ( !(number %in% c("1", "2", "3", "4", "5")))
         stop("number must be \'1', \'2', \'3', \'4', or \'5'.")
-
-    if (plot.name == "stat") {
-        vpPath("canvas.frame", "animation.field",
-               paste(plot.name, "data", number, sep = "."))
+    if (plot.name == "animation.field"){
+        vpPath("canvas.frame", "animation.field")
     } else {
-        vpPath("canvas.frame", "animation.field",
-               paste(plot.name, "data.placer", sep = "."),
-               paste(plot.name, "data", number, sep = "."))
+        if (plot.name == "stat") {
+            vpPath("canvas.frame", "animation.field",
+                   paste(plot.name, "data", number, sep = "."))
+        } else {
+            vpPath("canvas.frame", "animation.field",
+                   paste(plot.name, "data.placer", sep = "."),
+                   paste(plot.name, "data", number, sep = "."))
+        }
     }
 }
 
 graphPathBoxes <- function(plot.name = "sample", number = "1") {
-    if(!(plot.name %in% c("data", "sample", "stat", "databox")))
+    if(!(plot.name %in% c("data", "sample", "stat", "databox", "animation.field")))
         stop("plot.name must be \'data', \'sample', or \'stat'.")
     if (is.numeric(number)) number <- as.character(number)
     if ( !(number %in% c("1", "2", "3", "4", "5")))
     stop("number must be \'1', \'2', \'3', \'4', or \'5'.")
-    if (plot.name == "databox")
-        vpPath("canvas.all", "canvas.boxes", paste(plot.name, number, sep = ".")) else{
-            if (plot.name == "stat") {
-                vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field",
-                       paste(plot.name, "data", number, sep = "."))
-            } else {
-                vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field",
-                       paste(plot.name, "data.placer", sep = "."),
-                       paste(plot.name, "data", number, sep = "."))
+    if (plot.name == "animation.field"){
+        vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field")
+    } else {
+        if (plot.name == "databox")
+            vpPath("canvas.all", "canvas.boxes", paste(plot.name, number, sep = ".")) else{
+                if (plot.name == "stat") {
+                    vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field",
+                           paste(plot.name, "data", number, sep = "."))
+                } else {
+                    vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field",
+                           paste(plot.name, "data.placer", sep = "."),
+                           paste(plot.name, "data", number, sep = "."))
+                }
             }
-        }
+    }
 }
 
 ## If same.stat.scale is TRUE, then stat plot will have same x-axis

@@ -110,7 +110,7 @@ showTailMedian <- function(canvas, e){
                                                         y = unit(y.start - i*y.step, "native"),
                                                         gp = gpar(lwd = 2, col = "red"),
                                                         arrow = arrow(length = unit(0.1, "inches")),
-                                                        vp = vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field"),
+                                                        vp = canvas$graphPath("animation.field"),
                                                         name = "temp.arrow"))
         canvas$drawImage()
     }
@@ -157,8 +157,7 @@ showTailMedian <- function(canvas, e){
                              y = unit(y.end, "native"),
                              gp = gpar(lwd = 2, col = "red"),
                              arrow = arrow(length = unit(0.1, "inches")),
-                             vp = vpPath("canvas.all", "canvas.plots",
-                             "canvas.frame", "animation.field"),
+                             vp = canvas$graphPath("animation.field"),
                              name = "statPlot.arrow.1"))
     canvas$drawImage()
     canvas$image <- removeGrob(canvas$image, gPath("proptext"))
