@@ -27,7 +27,8 @@ plotSampleGroupPointsMean <- function(canvas, e, i){
                    vp = canvas$graphPath("sample", as.character(n)),
                    name = "samplePlot")
         plotBoxplot(canvas, x[levels == j],
-                    stat = mean, stat.color = "blue", vp = canvas$graphPath("sample", as.character(n)),
+                    stat = mean, stat.color = "blue",
+                    vp = canvas$graphPath("sample", as.character(n)),
                     name = "samplePlot")
         n <- n + 1
     }

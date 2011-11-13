@@ -287,10 +287,6 @@ dropCI <- function(canvas, e, n.steps) {
     canvas$image <- removeGrob(canvas$image, gPath(c("moving.stat")))
 }
 
-
-
-
-
 ##' confidence coverage method for DISPLAY_RESULT
 CIcounter <- function(canvas, env) {
     if (is.null(env$results)) {
