@@ -123,7 +123,7 @@ addMeanLine <- function(canvas, e) {
                             segmentsGrob(x0 = x, x1 = x, y0 = 0,
                                          y1 = 3, default.units = "native",
                                          gp = gpar(col = "grey60", lty = "dashed"),
-                                         vp = vpPath("canvas.frame", "animation.field"),
+                                         vp = canvas$graphPath("animation.field"),
                                          name = "hline"))
     canvas$y <- stackPoints(canvas$x, vp = canvas$graphPath("data"))
     if (length(canvas$x) >= 1000)
@@ -247,9 +247,8 @@ dropPoints1d <- function(canvas, n.steps, n.slow, keep.plot, move = TRUE) {
         for (i in 1:n.steps){
             y.pos <- y.pos - y.step
             canvas$image <- addGrob(canvas$image,
-                                    pointsGrob(x, y.pos, vp = vpPath("canvas.frame",
-                                                         "animation.field"), pch = 19,
-                                               name = "temp"))
+                                    pointsGrob(x, y.pos, vp = canvas$graphPath("animation.field"),
+                                               pch = 19, name = "temp"))
             canvas$drawImage()
         }
         canvas$image <- removeGrob(canvas$image, gPath(c("temp")))
@@ -279,7 +278,7 @@ dropCI <- function(canvas, e, n.steps) {
                                          height = unit(0.015, "native"),
                                          gp = gpar(col = orangecol,
                                          fill = orangecol),
-                                         vp = vpPath("canvas.frame", "animation.field"),
+                                         vp = canvas$graphPath("animation.field"),
                                          name = "moving.stat"))
 
         canvas$drawImage()

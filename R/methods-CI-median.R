@@ -73,7 +73,7 @@ addMedianLine <- function(canvas, e) {
                             segmentsGrob(x0 = x, x1 = x, y0 = 0,
                                          y1 = 3, default.units = "native",
                                          gp = gpar(col = "grey60", lty = "dashed"),
-                                         vp = vpPath("canvas.frame", "animation.field"),
+                                         vp = canvas$graphPath("animation.field"),
                                          name = "hline"))
         canvas$y <- stackPoints(canvas$x, vp = canvas$graphPath("data"))
     if (length(canvas$x) >= 1000)

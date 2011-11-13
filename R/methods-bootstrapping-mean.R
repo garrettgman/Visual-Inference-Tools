@@ -153,8 +153,7 @@ moveDataTextAndDropPoints <- function(canvas, drop.points = FALSE, n.steps = 10,
             if (drop.points){
                 canvas$image <- addGrob(canvas$image, pointsGrob
                                         (x = x[i], y = y.start[i] + j*y.step[i], pch = 19,
-                                         vp = vpPath("canvas.all", "canvas.plots",
-                                         "canvas.frame", "animation.field"), name = "temp"))
+                                         vp = canvas$graphPath("animation.field"), name = "temp"))
             }
             canvas$drawImage()
             if (j == n.steps & drop.points)
@@ -325,7 +324,7 @@ dropStat <- function(canvas, e, n.steps){
                                  y = unit(c(y.start - i*y.step, y.start - i*y.step + linelength),
                                  "native"),
                                  gp = gpar(lwd = 4, col = "red"),
-                                 vp = vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field"),
+                                 vp = canvas$graphPath("animation.field"),
                                  name = "temp"))
         canvas$drawImage()
         linelength <- linelength - 0.15/n.steps
@@ -401,7 +400,7 @@ showCIandStats <- function(canvas, e, ci = TRUE, points = TRUE){
                                                            height = unit(0.01, "native"),
                                                            width = unit(diff(ci), "native"),
                                                            just = c("left", "centre"), vp =
-                                                           vpPath("canvas.all", "canvas.plots", "canvas.frame", "animation.field"),
+                                                           canvas$graphPath("animation.field"),
                                                            gp = gpar(col = "red", fill = "red"),
                                                            name = "temp"))
             canvas$drawImage()
