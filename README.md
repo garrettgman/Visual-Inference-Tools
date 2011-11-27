@@ -28,3 +28,7 @@ The vit code is structured into different parts:
 * Method details to be assigned to the action functions. These are organized by the type of data or statistical method they work with. A new method can be enabled by writing method details for it and then altering the load-functions to load those details when appropriate
 * Load functions that oversee the assignment of details to actions
 * grid grob code and methods that create the type of visualizations required by the method details
+
+## Acknowledgements
+
+We would like to thank the National Science Foundation and the Royal Society of New Zealand. This work was supported by the NSF EAPSI grant.
